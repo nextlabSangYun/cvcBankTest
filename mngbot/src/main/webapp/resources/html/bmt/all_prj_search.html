@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>Management Bot</title>
+	<link rel="stylesheet" href="../css/common.css">
+	<link rel="stylesheet" href="../css/bmt.css">
+	<script src="../js/jquery-3.2.1.min.js"></script>
+	<script src="../js/jquery-ui.min.js"></script>
+	<script src="../js/jquery.form.min.js"></script>
+	<script src="../js/vue.min.js"></script>
+	<script src="../js/lodash.min.js"></script>
+	<script src="../js/calendar.js"></script>
+	<script src="../js/common.js"></script>
+</head>
+<body>
+<div class="wrap">
+	<header>
+		<div class="inner">
+			<a href="index.html" class="syt_name">Management Bot</a>
+			<button class="btn_nav"><span class="icon"></span></button>
+			<div class="btn_right">
+				<button class="btn_notice"><span class="ir">알림</span><span class="new">2</span></button>
+				<button class="btn_setting"><span class="photo" style="background-image:url('../images/common/btn_my.png')"></span>김성민</button>
+			</div>
+		</div>
+	</header>
+	<nav class="nav">
+		<div class="app_list">
+			<p class="cate_tit">Favorites</p>
+			<ul>
+				<li class="fav">
+					<a href="#">
+						<div class="app_icon"><img src="../images/common/app_bmt.png" alt="BMT 프로젝트"></div>
+						<span class="app_name">BMT 프로젝트</span>
+					</a>
+					<button class="btn_fav"></button>
+				</li>
+				<li class="fav">
+					<a href="#">
+						<div class="app_icon"><img src="../images/common/app_live.png" alt="실시간 방송 측정"></div>
+						<span class="app_name">실시간 방송 측정</span>
+					</a>
+					<button class="btn_fav"></button>
+				</li>
+			</ul>
+		</div>
+		<div class="app_list">
+			<p class="cate_tit">All</p>
+			<ul>
+				<li class="fav">
+					<a href="#">
+						<div class="app_icon"><img src="../images/common/app_bmt.png" alt="BMT 프로젝트"></div>
+						<span class="app_name">BMT 프로젝트</span>
+					</a>
+					<button class="btn_fav"></button>
+				</li>
+				<li class="fav">
+					<a href="#">
+						<div class="app_icon"><img src="../images/common/app_live.png" alt="실시간 방송 측정"></div>
+						<span class="app_name">실시간 방송 측정</span>
+					</a>
+					<button class="btn_fav"></button>
+				</li>
+				<li>
+					<a href="#">
+						<div class="app_icon"><img src="../images/common/app_err.png" alt="장애이력관리"></div>
+						<span class="app_name">장애이력관리</span>
+					</a>
+					<button class="btn_fav"></button>
+				</li>
+				<li>
+					<a href="#">
+						<div class="app_icon"><img src="../images/common/app_stat.png" alt="통계분석"></div>
+						<span class="app_name">통계분석</span>
+					</a>
+					<button class="btn_fav"></button>
+				</li>
+				<li>
+					<a href="system_setting_main.html">
+						<div class="app_icon"><img src="../images/common/app_setting.png" alt="시스템설정"></div>
+						<span class="app_name">시스템설정</span>
+					</a>
+					<button class="btn_fav"></button>
+				</li>
+			</ul>
+		</div>
+	</nav>
+	<div class="ly_notice">
+		<div class="notice_list">
+			<p class="cate_tit">Notice</p>
+			<ul>
+				<li>
+					<p class="tit"><a href="#">시스템 정기점검 공지</a></p>
+					<div class="info">
+						<p class="date">2017년 10월 30일</p>
+						<p class="writer">By 관리자</p>
+					</div>
+				</li>
+				<li>
+					<p class="tit"><a href="#">시스템 정기점검 공지</a></p>
+					<div class="info">
+						<p class="date">2017년 10월 30일</p>
+						<p class="writer">By 관리자</p>
+					</div>
+				</li>
+				<li>
+					<p class="tit"><a href="#">시스템 정기점검 공지</a></p>
+					<div class="info">
+						<p class="date">2017년 10월 30일</p>
+						<p class="writer">By 관리자</p>
+					</div>
+				</li>
+				<li>
+					<p class="tit"><a href="#">시스템 정기점검 공지</a></p>
+					<div class="info">
+						<p class="date">2017년 10월 30일</p>
+						<p class="writer">By 관리자</p>
+					</div>
+				</li>
+				<li>
+					<p class="tit"><a href="#">시스템 정기점검 공지</a></p>
+					<div class="info">
+						<p class="date">2017년 10월 30일</p>
+						<p class="writer">By 관리자</p>
+					</div>
+				</li>
+			</ul>
+		</div>
+		<div class="notice_list">
+			<p class="cate_tit">Received Messages</p>
+			<ul>
+				<li>
+					<p class="tit"><a href="#">이슈Update–채널전환 시간 이슈Update–채널전환 시간</a></p>
+					<div class="info">
+						<p class="date">2017년 10월 30일</p>
+						<p class="writer">By 관리자</p>
+					</div>
+				</li>
+				<li>
+					<p class="tit"><a href="#">이슈Update–채널전환 시간 이슈Update–채널전환 시간</a></p>
+					<div class="info">
+						<p class="date">2017년 10월 30일</p>
+						<p class="writer">By 관리자</p>
+					</div>
+				</li>
+				<li>
+					<p class="tit"><a href="#">이슈Update–채널전환 시간 이슈Update–채널전환 시간</a></p>
+					<div class="info">
+						<p class="date">2017년 10월 30일</p>
+						<p class="writer">By 관리자</p>
+					</div>
+				</li>
+				<li>
+					<p class="tit"><a href="#">이슈Update–채널전환 시간 이슈Update–채널전환 시간</a></p>
+					<div class="info">
+						<p class="date">2017년 10월 30일</p>
+						<p class="writer">By 관리자</p>
+					</div>
+				</li>
+				<li>
+					<p class="tit"><a href="#">이슈Update–채널전환 시간 이슈Update–채널전환 시간</a></p>
+					<div class="info">
+						<p class="date">2017년 10월 30일</p>
+						<p class="writer">By 관리자</p>
+					</div>
+				</li>
+			</ul>
+		</div>
+	</div>
+	<div class="ly_my_setting">
+		<ul>
+			<li><a href="#">개인정보 수정</a></li>
+			<li class="bg"><a href="#">배경화면 설정</a></li>
+			<li class="logout"><a href="#">로그아웃</a></li>
+		</ul>
+	</div>
+	<div class="location">
+		<ol>
+			<!-- 17.12.18 수정 -->
+			<li><a href="#"><span class="app_ico"><img src="../images/common/app_bmt.png" alt=""></span>품질측정 프로젝트 Main</a></li>
+			<li>전체 프로젝트 검색</li>
+		</ol>
+	</div>
+	<div class="content">
+		<div class="sub_layout">
+			<!-- 18.01.17 수정  -->
+			<div class="sort_area">
+				<div class="sel_item full">
+					<span class="sort_tit">대상기간</span>
+					<div class="con_col2">
+						<div class="period">
+							<input type="text" class="input_date"><span class="bar">~</span><input type="text" class="input_date">
+						</div>
+						<div class="chk_area">
+							<input type="checkbox" id="chk"><label for="chk">진행중인 프로젝트만 조회</label>
+						</div>
+					</div>
+				</div>
+				<div class="sel_item full">
+					<span class="sort_tit">측정모델</span>
+					<div class="con_col2">
+						<div class="sch_area">
+							<select name="" id="">
+								<option value="">모델선택</option>
+							</select>
+						</div>
+						<div class="reg_list">
+							<ul>
+								<li><span>bhx-yh400(10.3.5)</span><button class="del"></button></li>
+								<li><span>bhx-yh400(10.3.5)</span><button class="del"></button></li>
+								<li><span>bhx-yh400(10.3.5)</span><button class="del"></button></li>
+								<li><span>bhx-yh400(10.3.5)</span><button class="del"></button></li>
+								<li><span>bhx-yh400(10.3.5)</span><button class="del"></button></li>
+								<li><span>bhx-yh400(10.3.5)</span><button class="del"></button></li>
+							</ul>
+						</div>
+					</div>
+				</div>
+				
+				<button class="g_btn01">조회</button>
+			</div>
+			<div class="tb_desc">
+				<p>조회결과 : 24건</p>
+			</div>
+			<div class="g_table">
+				<table>
+					<caption>프로젝트 이름, 기간, 진행상태, 바로가기로 구성된 표 입니다.</caption>
+					<colgroup>
+						<col style="width:25%;">
+						<col style="width:25%;">
+						<col style="width:15%;">
+						<col>
+					</colgroup>
+					<thead>
+						<tr>
+							<th>이름</th>
+							<th>기간</th>
+							<th>진행상태</th>
+							<th>바로가기</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<!-- 18.01.15 수정 -->
+							<td><p class="ellips"><a href="#" class="link">Smart STB 4Q BMT Smart STB 4Q BMT Smart STB 4Q BMTSmart STB 4Q bmt Smart STB 4Q BMT</a></p></td>
+							<td>2017/10/02~2017/10/13</td>
+							<td class="l_align">1차</td>
+							<td><a href="#" class="g_btn01">테스트관리</a><a href="#" class="g_btn01">이슈관리</a></td>
+						</tr>
+						<tr>
+							<td><p class="ellips"><a href="#" class="link">Smart STB 4Q BMT</a></p></td>
+							<td>2017/10/02~2017/10/13</td>
+							<td class="l_align">1차</td>
+							<td><a href="#" class="g_btn01">테스트관리</a><a href="#" class="g_btn01">이슈관리</a></td>
+						</tr>
+						<tr>
+							<td><p class="ellips"><a href="#" class="link">Smart STB 4Q BMT</a></p></td>
+							<td>2017/10/02~2017/10/13</td>
+							<td class="l_align">1차</td>
+							<td><a href="#" class="g_btn01">테스트관리</a><a href="#" class="g_btn01">이슈관리</a></td>
+						</tr>
+						<tr>
+							<td><p class="ellips"><a href="#" class="link">Smart STB 4Q BMT</a></p></td>
+							<td>2017/10/02~2017/10/13</td>
+							<td class="l_align">1차</td>
+							<td><a href="#" class="g_btn01">테스트관리</a><a href="#" class="g_btn01">이슈관리</a></td>
+						</tr>
+						<tr>
+							<td><p class="ellips"><a href="#" class="link">Smart STB 4Q BMT</a></p></td>
+							<td>2017/10/02~2017/10/13</td>
+							<td class="l_align">1차</td>
+							<td><a href="#" class="g_btn01">테스트관리</a><a href="#" class="g_btn01">이슈관리</a></td>
+						</tr>
+						<tr>
+							<td><p class="ellips"><a href="#" class="link">Smart STB 4Q BMT</a></p></td>
+							<td>2017/10/02~2017/10/13</td>
+							<td class="l_align">1차</td>
+							<td><a href="#" class="g_btn01">테스트관리</a><a href="#" class="g_btn01">이슈관리</a></td>
+						</tr>
+						<tr>
+							<td><p class="ellips"><a href="#" class="link">Smart STB 4Q BMT</a></p></td>
+							<td>2017/10/02~2017/10/13</td>
+							<td class="l_align">1차</td>
+							<td><a href="#" class="g_btn01">테스트관리</a><a href="#" class="g_btn01">이슈관리</a></td>
+						</tr>
+						<tr>
+							<td><p class="ellips"><a href="#" class="link">Smart STB 4Q BMT</a></p></td>
+							<td>2017/10/02~2017/10/13</td>
+							<td class="l_align">1차</td>
+							<td><a href="#" class="g_btn01">테스트관리</a><a href="#" class="g_btn01">이슈관리</a></td>
+						</tr>
+						<tr>
+							<td><p class="ellips"><a href="#" class="link">Smart STB 4Q BMT</a></p></td>
+							<td>2017/10/02~2017/10/13</td>
+							<td class="l_align">1차</td>
+							<td><a href="#" class="g_btn01">테스트관리</a><a href="#" class="g_btn01">이슈관리</a></td>
+						</tr>
+						<tr>
+							<td><p class="ellips"><a href="#" class="link">Smart STB 4Q BMT</a></p></td>
+							<td>2017/10/02~2017/10/13</td>
+							<td class="l_align">1차</td>
+							<td><a href="#" class="g_btn01">테스트관리</a><a href="#" class="g_btn01">이슈관리</a></td>
+						</tr>
+					</tbody>
+				</table>
+				<div class="pagination">
+					<ol>
+						<li class="btn_first"><button>처음</button></li>
+						<li class="btn_prev"><button>이전</button></li>
+						<li class="num on"><button>1</button></li>
+						<li class="num"><button>2</button></li>
+						<li class="num"><button>3</button></li>
+						<li class="num"><button>4</button></li>
+						<li class="num"><button>5</button></li>
+						<li class="btn_next"><button>다음</button></li>
+						<li class="btn_last"><button>마지막</button></li>
+					</ol>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+</html>

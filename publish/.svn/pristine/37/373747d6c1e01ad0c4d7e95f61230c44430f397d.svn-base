@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>CVCBank</title>
+	<link rel="shortcut icon" href="../../images/favicon.ico" type="image/x-icon">
+	<link rel="stylesheet" href="../../css/common.css">
+	<link rel="stylesheet" href="../../css/hded.css">
+	<script src="../../js/jquery-3.2.1.min.js"></script>
+	<script src="../../js/jquery-ui.min.js"></script>
+	<script src="../../js/jquery.form.min.js"></script>
+	<script src="../../js/vue.min.js"></script>
+	<script src="../../js/lodash.min.js"></script>
+	<script src="../../js/calendar.js"></script>
+	<script src="../../js/common.js"></script>
+</head>
+<body>
+	<div class="pop_wrap" style="width:900px;">
+		<div class="pop_tit">
+			<p>변경이력 상세</p>
+		</div>
+		<div class="pop_cont">
+			<div class="g_table">
+				<table>
+					<colgroup>
+						<col style="width:16%">
+						<col style="width:42%">
+						<col style="width:42%">
+					</colgroup>
+					<thead>
+						<tr>
+							<th></th>
+							<th>선택 데이터</th>
+							<th>현재 데이터</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<th>Input (테스트 입력 값)</th>
+							<td class="l_align">
+								?ver=9.0&contentId=12312212212121213112222224444441212&userId={EAA83A42-094A-11E3-93C5-43A06BC0E55B}&locationCode=25&cdnCode=12&scsInfo={"id":"1","stb_if":"2","stb_type":"2"}&type=streaming&contents={"video":[{"quality":"UHD","codec":"H.264","path":"/movie/file_1.ts","bitrate":2500000,"filesize":123456,"resolution":"1080p"},{"quality":"HD","codec":"H.264","path":"/movie/file_2.ts","bitrate":2500000,"filesize":123456,"resolution":"1080p"}],"audio":[{"language":"KOR","path":"/movie/file_1.ts.mp4"}],"subtitle":[{"language":"KOR","path":"/movie/file_1.ts.smi"}]}&startTime=0&endTime=0&drm=skdrm&deviceType=stb&userAgent=UH-200&swVersion=4.0.0.12&userIp=123.123.123.123&bearer=wifi&carrier=sk&protocol=rtsp&ssl=false&transactionId=transactionid&if=IF-BTV-HE-EAG-0011
+							</td>
+							<td class="l_align">
+								?ver=9.0&format=json&contentId=12312212212121213112222224444441212&userId={EAA83A42-094A-11E3-93C5-43A06BC0E55B}&locationCode=25&cdnCode=12&scsInfo={"id":"1","stb_if":"2","stb_type":"2"}&type=streaming&contents={"video":[{"quality":"UHD","codec":"H.264","path":"/movie/file_1.ts","bitrate":2500000,"filesize":123456,"resolution":"1080p"},{"quality":"HD","codec":"H.264","path":"/movie/file_2.ts","bitrate":2500000,"filesize":123456,"resolution":"1080p"}],"audio":[{"language":"KOR","path":"/movie/file_1.ts.mp4"}],"subtitle":[{"language":"KOR","path":"/movie/file_1.ts.smi"}]}&startTime=0&endTime=0&drm=skdrm&deviceType=stb&userAgent=UH-200&swVersion=4.0.0.12&userIp=123.123.123.123&bearer=wifi&carrier=sk&protocol=rtsp&ssl=false&transactionId=transactionid
+							</td>
+						</tr>
+						<tr>
+							<th>Output (예상 결과 값)</th>
+							<td class="l_align">#status# HTTP/1.1 400 Bad Request</td>
+							<td class="l_align">#status# HTTP/1.1 400 Bad Request</td>
+						</tr>
+						<tr>
+							<th>정상판단기준</th>
+							<td class="l_align">응답 코드 400일 경우 정상</td>
+							<td class="l_align">응답 코드 400일 경우 정상</td>
+						</tr>
+						<tr>
+							<th>사전 테스트 결과</th>
+							<td class="l_align">PASS</td>
+							<td class="l_align">PASS</td>
+						</tr>
+						<tr>
+							<th>변경일시</th>
+							<td class="l_align">2018-04-06 12:33:56</td>
+							<td class="l_align">2018-04-06 12:33:56</td>
+						</tr>
+						<tr>
+							<th>수정내역/사유</th>
+							<td class="l_align">OOO 테스트를 위해 OOO parameter OOO로 변경</td>
+							<td class="l_align">OOO 테스트를 위해 OOO parameter OOO로 변경</td>
+						</tr>
+						<tr>
+							<th>작업자</th>
+							<td class="l_align">홍길동</td>
+							<td class="l_align">임꺽정</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<div class="btn_wrap">
+			<button class="btn_cancel" onclick="hidePopupLayer(); return false">닫기</button>
+		</div>
+	</div>
+</body>
+</html>

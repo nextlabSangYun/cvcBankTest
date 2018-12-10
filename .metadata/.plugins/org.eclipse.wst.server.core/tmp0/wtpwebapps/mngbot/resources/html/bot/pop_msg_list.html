@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>Management Bot</title>
+	<link rel="stylesheet" href="../css/common.css">
+	<link rel="stylesheet" href="../css/bot.css">
+	<script src="../js/jquery-3.2.1.min.js"></script>
+	<script src="../js/jquery-ui.min.js"></script>
+	<script src="../js/jquery.form.min.js"></script>
+	<script src="../js/vue.min.js"></script>
+	<script src="../js/lodash.min.js"></script>
+	<script src="../js/calendar.js"></script>
+	<script src="../js/common.js"></script>
+</head>
+<body>
+	<div class="pop_wrap" style="width:680px;">
+		<div class="pop_tit">
+			<p>받은 메세지</p>
+		</div>
+		<div class="pop_cont">
+			<div class="tb_btn_area">
+				<button>전체 삭제</button>
+			</div>
+			<div class="g_table">
+				<table>
+					<caption>메시지 제목, 발신자 , 발신 시간 나타내는 표 입니다.</caption>
+					<colgroup>
+						<col style="width:8%">
+						<col>
+						<col style="width:20%">
+						<col style="width:30%">
+					</colgroup>
+					<thead>
+						<tr>
+							<th>No</th>
+							<th>제목</th>
+							<th>보낸사람</th>
+							<th>받은시간</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>1</td>
+							<td><p class="ellips"><a href="#" class="link" onclick="showPopupLayer('pop_notice.html', 1); return false;">정기유지보수 안내 정기유지보수 안내 정기유지보수 안내 정기유지보수 안내</a></p></td>
+							<td>박재현</td>
+							<td>2017.10.14 17:32:11</td>
+						</tr>
+						<tr>
+							<td>2</td>
+							<td><p class="ellips"><a href="#" class="link">정기유지보수 안내</a></p></td>
+							<td>박재현</td>
+							<td>2017.10.14 17:32:11</td>
+						</tr>
+						<tr>
+							<td>3</td>
+							<td><p class="ellips"><a href="#" class="link">정기유지보수 안내</a></p></td>
+							<td>박재현</td>
+							<td>2017.10.14 17:32:11</td>
+						</tr>
+						<tr>
+							<td>4</td>
+							<td><p class="ellips"><a href="#" class="link">정기유지보수 안내</a></p></td>
+							<td>박재현</td>
+							<td>2017.10.14 17:32:11</td>
+						</tr>
+						<tr>
+							<td>5</td>
+							<td><p class="ellips"><a href="#" class="link">정기유지보수 안내</a></p></td>
+							<td>박재현</td>
+							<td>2017.10.14 17:32:11</td>
+						</tr>
+					</tbody>
+				</table>
+				<div class="pagination">
+					<ol>
+						<li class="btn_first"><button>처음</button></li>
+						<li class="btn_prev"><button>이전</button></li>
+						<li class="num on"><button>1</button></li>
+						<li class="num"><button>2</button></li>
+						<li class="num"><button>3</button></li>
+						<li class="num"><button>4</button></li>
+						<li class="num"><button>5</button></li>
+						<li class="btn_next"><button>다음</button></li>
+						<li class="btn_last"><button>마지막</button></li>
+					</ol>
+				</div>
+			</div>
+		</div>
+		<!-- 17.12.13 닫기 스크립트 추가 -->
+		<div class="btn_wrap">
+			<button class="g_btn02" onclick="hidePopupLayer();">닫기</button>
+		</div>
+	</div>
+	<script>
+		setPopup(2);
+	</script>
+</body>
+</html>

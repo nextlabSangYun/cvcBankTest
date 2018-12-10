@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>Management Bot</title>
+	<link rel="stylesheet" href="../css/common.css">
+	<link rel="stylesheet" href="../css/bot.css">
+	<script src="../js/jquery-3.2.1.min.js"></script>
+	<script src="../js/jquery-ui.min.js"></script>
+	<script src="../js/jquery.form.min.js"></script>
+	<script src="../js/vue.min.js"></script>
+	<script src="../js/lodash.min.js"></script>
+	<script src="../js/calendar.js"></script>
+	<script src="../js/common.js"></script>
+</head>
+<body>
+	<div class="pop_wrap" style="width:480px;">
+		<div class="pop_tit">
+			<p>앱 위젯 추가하기</p>
+		</div>
+		<div class="pop_cont">
+			<ul class="widget_list">
+				<li class="widget">
+					<i class="icon"><img src="../images/bot/ico_widget01.png" alt=""></i>
+					<div class="chk"><input type="checkbox" id="chk01"><label for="chk01">BMT 프로젝트  >  일정관리</label></div>
+				</li>
+				<li class="widget">
+					<i class="icon"><img src="../images/bot/ico_widget02.png" alt=""></i>
+					<div class="chk"><input type="checkbox" id="chk02"><label for="chk02">BMT 프로젝트  >  일정관리 > 내용이 두줄이 되는 경우</label></div>
+				</li>
+				<li class="widget">
+					<i class="icon"><img src="../images/bot/ico_widget03.png" alt=""></i>
+					<div class="chk"><input type="checkbox" id="chk03"><label for="chk03">BMT 프로젝트  >  일정관리</label></div>
+				</li>
+				<li class="widget">
+					<i class="icon"><img src="../images/bot/ico_widget01.png" alt=""></i>
+					<div class="chk"><input type="checkbox" id="chk01"><label for="chk01">BMT 프로젝트  >  일정관리</label></div>
+				</li>
+				<li class="widget">
+					<i class="icon"><img src="../images/bot/ico_widget02.png" alt=""></i>
+					<div class="chk"><input type="checkbox" id="chk02"><label for="chk02">BMT 프로젝트  >  일정관리 > 내용이 두줄이 되는 경우</label></div>
+				</li>
+				<li class="widget">
+					<i class="icon"><img src="../images/bot/ico_widget03.png" alt=""></i>
+					<div class="chk"><input type="checkbox" id="chk03"><label for="chk03">BMT 프로젝트  >  일정관리</label></div>
+				</li>
+			</ul>
+		</div>
+		<div class="btn_wrap">
+			<button class="g_btn01">적용</button>
+			<button class="g_btn02" onclick="hidePopupLayer(); return false">닫기</button>
+		</div>
+	</div>
+	<script>
+		setPopup(2);
+	</script>
+</body>
+</html>

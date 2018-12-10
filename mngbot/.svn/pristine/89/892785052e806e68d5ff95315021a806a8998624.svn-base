@@ -1,0 +1,232 @@
+/**
+ * @title	: 테스트 케이스 컨트롤러 
+ * @package	: kr.co.nextlab.hded.controller
+ * @file	: HdedTcController.java
+ * @author	: winolonam
+ * @date	: 2018. 4. 25.
+ * @desc	: 
+ */
+package kr.co.nextlab.hded.controller;
+
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.View;
+import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
+
+import kr.co.nextlab.annotation.security.Auth;
+import kr.co.nextlab.comm.controller.BaseController;
+import kr.co.nextlab.comm.model.FileVo;
+import kr.co.nextlab.hded.model.HeTcTmplCriteria;
+import kr.co.nextlab.hded.model.HeTcTmplVo;
+import kr.co.nextlab.hded.service.HdedTcService;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Controller
+public class HdedTcController extends BaseController {
+	
+	@Autowired
+	private HdedTcService hdedTcService;
+	
+	/**
+	 * 테스트 케이스 변경 이력 최근 30건
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping("/hded/tc/getTcChangeHistList")
+	public View getTcChangeHistList(Model model) {
+		model.addAttribute("tcChangeHistList", hdedTcService.selectTcChangeHistList());
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 해당 그룹 아이디에 속하는 이력 리스트 페이지
+	 * @param model
+	 * @param groupId
+	 */
+	@Auth(url={"/hded/main"})
+	@RequestMapping("/hded/tc/tcChangeHistByGroupId")
+	public void tcChangeHistByGroupId(Model model, String groupId) {
+		model.addAttribute("groupId", groupId);
+	}
+	
+	/**
+	 * 해당 그룹 아이디에 속하는 이력 리스트 조회
+	 * @param model
+	 * @param groupId
+	 * @return
+	 */
+	@RequestMapping("/hded/tc/getTcChangeHistByGroupIdList")
+	public View getTcChangeHistByGroupIdList(Model model, String groupId) {
+		model.addAttribute("tcChangeHistByGroupIdList", hdedTcService.selectTcChangeHistByGroupIdList(groupId));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 선택데이터 와 현재데이터 비교 페이지
+	 * @param model
+	 * @param tcId
+	 */
+	@Auth(url={"/hded/main"})
+	@RequestMapping("/hded/tc/tcChangeHistDetail")
+	public void tcChangeHistDetail(Model model, String tcId) {
+		model.addAttribute("tcId", tcId);
+	}
+	
+	/**
+	 * 선택데이터 와 현재데이터 비교 리스트
+	 * @param model
+	 * @param tcId
+	 * @return
+	 */
+	@RequestMapping("/hded/tc/getTcChangeHistDetail")
+	public View getTcChangeHistDetail(Model model, String tcId) {
+		model.addAttribute("tcChangeHistDetailList", hdedTcService.selectTcChangeHistDetail(tcId));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 테스트 케이스 변경 이력 페이지
+	 * @param model
+	 */
+	@RequestMapping("/hded/tc/tcChangeHist")
+	public void tcChangeHist(Model model) {
+	}
+	
+	/**
+	 * 테스트 케이스 변경 이력 전체 리스트 조회
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping("/hded/tc/getTcChangeHistAllList")
+	public View getTcChangeHistAllList(Model model, HeTcTmplCriteria heTcTmplCriteria) {
+		model.addAttribute("tcChangeHistList", hdedTcService.selectTcChangeHistAllList(heTcTmplCriteria));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 테스트 케이스 버킷 관리 페이지 
+	 * @param model
+	 */
+	@RequestMapping("/hded/tc/tcBucketList")
+	public void tcBucketList(Model model) {
+	}
+
+	/**
+	 * 테스트 케이스 리스트 페이지 
+	 * @param model
+	 */
+	@RequestMapping("/hded/tc/tcList")
+	public void tcList(Model model) {
+	}
+	
+	/**
+	 * 버킷리스트 리스트 화면
+	 * @param model
+	 */
+	@RequestMapping("/hded/tc/getBucketList")
+	public View issueList(Model model, @RequestBody HeTcTmplCriteria criteria) {
+		List<HeTcTmplVo> bucketList = hdedTcService.selectBucketList(criteria);
+		model.addAttribute("bucketList", bucketList);
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 버킷 TC 등록  페이지
+	 * @param model
+	 */
+	@Auth(url={"/hded/tc/tcBucketList"})
+	@RequestMapping("/hded/tc/tcBucketAddForm")
+	public void tcBucketAddForm(Model model) {
+	}
+	
+	/**
+	 * 버킷 TC 등록
+	 * @param model
+	 * @param heTcTmplVo
+	 * @return
+	 */
+	@RequestMapping(value="/hded/tc/regBucketTcPrc")
+	public View regBucketTctPrc(Model model, @RequestBody HeTcTmplVo heTcTmplVo)
+	{
+		boolean save = true;
+		heTcTmplVo.setRegId(super.getUser().getUserId());
+		heTcTmplVo.setModId(super.getUser().getUserId());
+		save = hdedTcService.insertBucketTsetCase(heTcTmplVo);
+		model.addAttribute("save", save);
+		return new MappingJackson2JsonView();
+	}
+	/**
+	 * 버킷 Tc 상세조회
+	 * @param model
+	 * @param tcId
+	 * @return
+	 */
+	@RequestMapping(value="/hded/tc/getTcView")
+	public View getTcView(Model model, String tcId) {
+		//tc 상세 조회
+		HeTcTmplVo heTcTmplVo = hdedTcService.selectTcView(tcId);
+		model.addAttribute("tcView", heTcTmplVo);
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 버킷 TC 수정
+	 * @param model
+	 * @param heTcTmplVo
+	 * @return
+	 */
+	@RequestMapping(value="/hded/tc/modBucketTcPrc")
+	public View modBucketTctPrc(Model model, @RequestBody HeTcTmplVo heTcTmplVo)
+	{
+		boolean save = true;
+		heTcTmplVo.setModId(super.getUser().getUserId());
+		save = hdedTcService.updateBucketTestCase(heTcTmplVo);
+		model.addAttribute("save", save);
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 테스트 케이스 대량 업로드 페이지
+	 * @param model
+	 */
+	@Auth(url={"/hded/tc/tcList"})
+	@RequestMapping("/hded/tc/tcLargeAddForm")
+	public void tcLargeAddForm(Model model) {
+	}
+	
+	/**
+	 * 테스트 케이스 대량 업르도
+	 * @param model
+	 */
+	@Auth(url={"/hded/tc/tcList"})
+	@RequestMapping("/hded/tc/regLargeAddFile")
+	public View regLargeAddFile(Model model, FileVo fileVo) {
+		boolean save = false;
+		
+		try {
+			fileVo = hdedTcService.insertLargeTcList(fileVo);
+			if (StringUtils.isNotEmpty(fileVo.getMessage())) {
+				model.addAttribute("message", fileVo.getMessage());
+			} else {
+				save = true;
+			}
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			if (e.getCause() != null) {
+				model.addAttribute("message", "저장 실패");
+			} else {
+				model.addAttribute("message", e.getMessage());
+			}
+		}
+		
+		model.addAttribute("save", save);
+		return new MappingJackson2JsonView();
+	}
+}

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.nextlab.test.mapper.TestMapper">
+	<select id="selectTestTran" resultType="testVo">
+		SELECT	seq, str 
+		FROM	test_tran
+		WHERE	seq = 1
+	</select>
+	
+	<insert id="intertTestTran" parameterType="testVo">
+		INSERT INTO test_tran (seq, str)
+		VALUES (#{seq}, #{str})
+	</insert>
+	
+	<update id="updateTestTran" parameterType="testVo">
+		UPDATE	test_tran SET
+				str = #{str}
+		WHERE	seq = #{seq}
+	</update>
+	
+	<select id="selectList" resultType="testVo" parameterType="testCriteria">
+		SELECT TOP (#{top}) COUNT(code_id) OVER () AS tot_rows
+			 , code_id
+			 , code_nm
+			 , 'Y' AS str
+		FROM tb_code
+		WHERE 1=1
+		<if test="codeType != null and codeType != ''">
+			AND code_type = #{codeType} 
+		</if>
+		ORDER BY code_type, code_id
+	</select>
+</mapper>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>CVCBank</title>
+	<link rel="shortcut icon" href="../../images/favicon.ico" type="image/x-icon">
+	<link rel="stylesheet" href="../../css/common.css">
+	<link rel="stylesheet" href="../../css/qa.css">
+	<script src="../../js/jquery-3.2.1.min.js"></script>
+	<script src="../../js/jquery-ui.min.js"></script>
+	<script src="../../js/jquery.form.min.js"></script>
+	<script src="../../js/vue.min.js"></script>
+	<script src="../../js/lodash.min.js"></script>
+	<script src="../../js/calendar.js"></script>
+	<script src="../../js/common.js"></script>
+</head>
+<body>
+	<div class="pop_wrap">
+		<div class="pop_tit">
+			<p>측정결과 수정 (TestCase)</p>
+		</div>
+		<div class="pop_cont">
+			<p class="info_tit">테스트 정보</p>
+			<div class="g_table column2">
+				<table>
+					<caption></caption>
+					<colgroup>
+						<col style="width:120px;">
+						<col>
+						<col style="width:120px;">
+						<col>
+					</colgroup>
+					<tbody>
+						<tr>
+							<th>Test Case 이름</th>
+							<td>new Task new Task new Task new Tasknew Tasknew Tasknew Tasknew Tasknew Tasknew Task</td>
+							<th>측정모델</th>
+							<td>BKO-AI700</td>
+						</tr>
+						<tr>
+							<th>중요도</th>
+							<td>Major</td>
+							<th>대분류</th>
+							<td>new Suite</td>
+						</tr>
+						<tr>
+							<th>차수</th>
+							<td>3차</td>
+							<th>리모컨</th>
+							<td>BRM-BT07</td>
+						</tr>
+						<tr>
+							<th>담당자</th>
+							<td>홍길동</td>
+							<th>측정일시</th>
+							<td>2018-06-25 11:52</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<p class="info_tit">결과값 수정</p>
+			<div class="g_table column2">
+				<table>
+					<caption></caption>
+					<colgroup>
+						<col style="width:120px;">
+						<col>
+						<col style="width:120px;">
+						<col>
+					</colgroup>
+					<tbody>
+						<tr>
+							<th>결과<strong>*</strong></th>
+							<td colspan="3">
+								<select>
+									<option>PASS</option>
+									<option>FAIL</option>
+									<option>N/A</option>
+									<option>N/T</option>
+								</select>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<div class="btn_wrap">
+			<button v-else class="btn_proc">저장</button>
+			<button class="btn_cancel">닫기</button>
+		</div>
+	</div>
+</body>
+</html>

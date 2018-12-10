@@ -1,0 +1,251 @@
+<%@ page contentType="text/html" pageEncoding="UTF-8" %>
+<%@ taglib uri="http://www.nextlab.co.kr/tags/nextlab" prefix="nl"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<div class="pop_wrap" style="width:610px;"id="vueApp">
+	<div class="pop_tit">
+		<p>측정 결과 등록</p>
+	</div>
+	<div class="pop_cont">
+	<p class="info_tit">기본정보</p>
+		<div class="g_table02">
+			<table>
+				<caption>분류, 중요도 차수 등의 정보를 입력하는 표 입니다.</caption>
+				<colgroup>
+					<col style="width:120px;">
+					<col>
+				</colgroup>
+				<tbody>
+					<tr>
+						<th>구분</th>
+						<td>{{tc.tcDiviCd | code(tcDivisionCodeNm)}}</td>
+					</tr>
+					<tr>
+						<th>분류</th>
+						<td>{{tc.lcateNm}} > {{tc.mcateNm}} > {{tc.scateNm}}</td>
+					</tr>
+					<tr>
+						<th>중요도</th>
+						<td>{{tc.tcImpoCd| code(importanceCodeNm)}}</td>
+					</tr>
+					<tr>
+						<th>Test Case 이름</th>
+						<td>{{tc.tcNm}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<p class="info_tit">등록정보</p>
+		<div class="g_table02">
+			<table>
+				<caption>분류,리모컨 등의 정보를 입력하는 표 입니다.</caption>
+				<colgroup>
+					<col style="width:120px;">
+					<col>
+					<col style="width:120px;">
+					<col>
+				</colgroup>
+				<tbody>
+					<tr>
+						<th>측정모델</th>
+						<td>
+							<select  v-model = "report.model">
+								<option value="">선택</option>
+								<option v-for="mId in modelList" :value="mId.modelFullNm">{{mId.modelNm}}({{mId.modelVer}})
+								</option>
+							</select>
+						</td>
+						<td colspan="2"></td>
+					</tr>
+					<tr>
+						<th>리모컨</th>
+						<td>
+							<model-select  ref="rmodel" model-select-text="선택"  :change-fn="setRemote" :auto-init="false" model-type="C203"></model-select>
+						</td>
+						<th>담당자</th>
+						<td>{{user.userNm}}({{user.userGroupNm}})</td>
+					</tr>
+					<tr>
+						<th>Mac</th>
+						<td>
+							<Input v-model="report.mac" type=Text class="full" maxlength="12" @keyup="chkMac" @change="chkMac" placeholder="맥 어드레스를 입력하세요">
+						</td>
+						<th>측정결과</th>
+						<td>
+							<nl:select codeType="B300" v-model="report.tcResultCd"></nl:select>
+						</td>
+					</tr>
+					<tr>
+						<th>파일첨부</th>
+						<td colspan="3">
+							<p class="note">최대 10MB까지 첨부 가능합니다</p>
+							<form id="fileForm" method="post" enctype="multipart/form-data" onsubmit="return false;">
+								<input type="file" class="ir" id="file" name="file" @change="regFile">
+								<label for="file" class="sch_file">파일찾기</label>
+								<ul class="file_list">
+									<li class="full" v-for="(fl, index) in report.fileList">
+										<a @click="getFileDown(fl)">{{fl.orgFileNm}}</a>
+										<button class="del" @click="delFile(index)"></button>
+									</li>
+								</ul>
+							</form>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<div class="btn_wrap">
+		<button class="g_btn01" v-on:click="submit">등록</button>
+		<button class="g_btn02" onclick="hidePopupLayer(); return false">닫기</button>
+	</div>
+</div>
+<script>
+	var vueApp = new Vue({
+		el: '#vueApp',
+		data: {
+			tcCriteria:{
+				pid:'<c:out value="${param.pid}"/>'
+				, tcId:'<c:out value="${param.tcId}"/>'
+			}
+			, report:{
+				model:''
+				, model_id: ''
+				, model_ver:''
+				, mac:''
+				, remocon: '<c:out value="${remocon}"/>' 
+				, chasu: ''
+				, tcTypeCd:'B402'
+				, xqmsTypeCd: 'C401'
+				, botSno: "manual"
+				, tcResultCd:"B301"
+				, xqmsPerson:""
+				, seq: 0
+				, remocon: '<c:out value="${remocon}"/>'
+				, fileList:[]
+				, seq:''
+				, tc_id:''
+			}
+			, user :{
+				userId: '<c:out value="${user.userId}"/>'
+				, userNm: '<c:out value="${user.userNm}"/>'
+				, userGroupNm: '<c:out value="${user.userGroupNm}"/>'
+			}
+			, settopBoxModel: []
+			, tc: { }
+			, importanceCodeNm: '<nl:codeListJson codeType="B100" />'
+			, tcDivisionCodeNm: '<nl:codeListJson codeType="B900" />'
+			, fileDown:"#"
+			, procChk : false
+			, modelSeq:'<c:out value="${modelSeq}"/>'
+			, modelId: '<c:out value="${remocon}"/>'
+			, modelGroupId: "C203"
+			, modelList:[]
+			, chasu:'<c:out value="${param.chasu}"/>'
+		},
+		updated:function(){
+			setPopup(2);
+		},
+		mounted:function(){
+			this.setup();
+		},
+		methods:{
+			setup:function(){					
+				jQuery.ajaxSettings.traditional = true;
+				$.post("/qa/tc/getTc", this.tcCriteria, function(data){
+					vueApp.tc = data.tc;
+				});
+				this.getModelList();
+			}
+			, getModelList: function(){
+				var pid = this.tcCriteria.pid
+				$.post('/qa/tc/getModelList', {pid:pid}, function(data) {
+					vueApp.modelList = data.modelList;
+				});
+			}
+			, delFile: function(index) {
+				this.report.fileList.splice(index, 1);
+			}
+			, getFileDown: function(f) {
+				fileDown(f.filePath, f.fileNm, f.orgFileNm);
+			}
+			, regFile: function() {
+				fileUpload($("#file"), {saveFilePath: "qa/tcReport"}, function(data) {
+					if (data.saveFileNm) {							
+						var f = {
+								fileNm: data.saveFileNm
+								, orgFileNm: data.realFileNm
+								, filePath: data.saveFilePath
+							}
+						vueApp.report.fileList.push(f);
+					}
+				});
+			}
+			, submit:function(){
+				var modelArray = this.report.model.split(';');
+				this.report.selectRemote = this.$refs.rmodel.getData();
+				this.report.modelId = modelArray[0];
+				this.report.remocon = this.report.selectRemote.modelId;
+				this.report.modelVer = modelArray[1];
+				this.report.xqmsPerson = this.user.userNm;
+				this.report.chasu = this.chasu;
+				this.report.tcId = this.tcCriteria.tcId;
+				
+				if(this.report.model == ''){
+					alert("측정모델을 선택해주세요.");
+					return;
+				}
+				if(this.report.remocon == undefined)
+				{
+					alert("리모콘을 선택해주세요.");
+					return;
+				}
+				if(this.report.mac == '')
+				{
+					alert("맥 어드레스를 입력해주세요.");
+					return;
+				}
+				if(this.report.mac.length != 12)
+				{
+					alert("맥 어드레스를 - 기호 제외 12문자로 입력해주세요.");
+					return;
+				}
+				if (this.procChk) return;
+				$.ajax({
+					type: "post"
+					, url : "/qa/tc/regReport"
+					, contentType: "application/json"
+					, data : JSON.stringify(this.report)
+					, beforeSend: function() { 
+						vueApp.procChk = true;
+						parent.startLoading();
+					}
+					, success: function(data) {
+						if (data.save) {
+							alert("리포트가 등록 되었습니다.");
+							parent.list.setup();	
+							hidePopupLayer();
+						} else if (data.message) {
+							alert(data.message);
+						}
+					}
+					, error: function(xhr, status, error) {
+						alert($(xhr.responseText).text());
+					}
+					, complete : function() {
+						vueApp.procChk = false;
+						parent.endLoading();
+					}
+				});
+			}
+			, setRemote: function(data) {
+				this.report.selectRemote = data;
+			}
+			, setStb: function(data) {
+				this.report.selectStb = data;
+			}
+			, chkMac: function(event) {
+				event.target.value = event.target.value.replace(/[\W]/g, "");
+			}
+		}
+		});
+</script>

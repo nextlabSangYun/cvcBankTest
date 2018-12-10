@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.nextlab.hded.mapper.HdedTcMapper">
+	<select id="selectTcChangeHistList" parameterType="heTcTmplVo" resultType="heTcTmplVo">
+		SELECT TOP 30
+			a.tc_id
+			, a.system_id
+			, a.tc_cate_id
+			, a.lcate_id
+			, a.mcate_id
+			, a.tc_nm
+			, a.tc_pre_envir
+			, a.tc_input_val
+			, a.tc_output_val
+			, a.normal_criterion
+			, a.before_result_cd
+			, a.bigo
+			, a.use_yn
+			, a.tc_stat
+			, a.tc_group_id
+			, a.tc_change_cd
+			, a.tc_change_val
+			, CASE a.tc_change_cd 
+				WHEN 'D401' THEN '최초등록' 
+				WHEN 'D402' THEN '임의변경'
+				ELSE (SELECT project_nm FROM tb_he_project b WHERE b.pid = a.tc_change_val)
+			END AS project_nm
+			, a.tc_change_reason
+			, a.reg_id
+			, a.reg_dtm
+			, a.mod_id
+			, a.mod_dtm
+		FROM tb_he_tc_tmpl a
+		WHERE a.tc_change_cd != 'D401'
+		AND a.tc_stat != 'D301'
+		ORDER BY a.reg_dtm DESC
+	</select>
+	
+	<select id="selectTcChangeHistAllList" parameterType="heTcTmplCriteria" resultType="heTcTmplVo">
+		SELECT
+			a.tc_id
+			, a.system_id
+			, a.tc_cate_id
+			, a.lcate_id
+			, a.mcate_id
+			, a.tc_nm
+			, a.tc_pre_envir
+			, a.tc_input_val
+			, a.tc_output_val
+			, a.normal_criterion
+			, a.before_result_cd
+			, a.bigo
+			, a.use_yn
+			, a.tc_stat
+			, a.tc_group_id
+			, a.tc_change_cd
+			, a.tc_change_val
+			, CASE a.tc_change_cd 
+				WHEN 'D401' THEN '최초등록' 
+				WHEN 'D402' THEN '임의변경'
+				ELSE (SELECT project_nm FROM tb_he_project b WHERE b.pid = a.tc_change_val)
+			END AS project_nm
+			, a.tc_change_reason
+			, a.reg_id
+			, a.reg_dtm
+			, a.mod_id
+			, a.mod_dtm
+			, b.tc_cate_nm AS lcate_nm
+			, c.tc_cate_nm AS mcate_nm
+			, d.tc_cate_nm AS scate_nm
+			, b.tc_cate_nm + ' > ' + c.tc_cate_nm + ' > ' + d.tc_cate_nm AS cate_navi
+			, e.system_nm
+		FROM tb_he_tc_tmpl a
+		JOIN tb_he_tc_category b
+		ON a.lcate_id = b.tc_cate_id AND a.system_id = b.system_id
+		JOIN tb_he_tc_category c
+		ON a.mcate_id = c.tc_cate_id AND a.system_id = c.system_id
+		JOIN tb_he_tc_category d
+		ON a.tc_cate_id = d.tc_cate_id AND a.system_id = d.system_id
+		JOIN tb_he_system e
+		ON a.system_id = e.system_id
+		WHERE 1 = 1
+		<if test="systemNm != null and systemNm != ''">
+			AND e.system_nm = #{systemNm}
+		</if>
+		<if test="lcateNm != null and lcateNm != ''">
+			AND b.tc_cate_nm = #{lcateNm}
+		</if>
+		<if test="mcateNm != null and mcateNm != ''">
+			AND c.tc_cate_nm = #{mcateNm}
+		</if>
+		<if test="scateNm != null and scateNm != ''">
+			AND d.tc_cate_nm = #{scateNm}
+		</if>
+		<if test="tcNm != null and tcNm != ''">
+			AND a.tc_nm LIKE '%' + #{tcNm} + '%'
+		</if>
+		ORDER BY a.reg_dtm DESC
+	</select>
+	
+	<select id="selectTcChangeHistByGroupIdList" parameterType="String" resultType="heTcTmplVo">
+		SELECT
+			a.tc_id
+			, a.system_id
+			, a.tc_cate_id
+			, a.lcate_id
+			, a.mcate_id
+			, a.tc_nm
+			, a.tc_pre_envir
+			, a.tc_input_val
+			, a.tc_output_val
+			, a.normal_criterion
+			, a.before_result_cd
+			, a.bigo
+			, a.use_yn
+			, a.tc_stat
+			, a.tc_group_id
+			, a.tc_change_cd
+			, a.tc_change_val
+			, CASE a.tc_change_cd 
+				WHEN 'D401' THEN '최초등록' 
+				WHEN 'D402' THEN '임의변경'
+				ELSE (SELECT project_nm FROM tb_he_project b WHERE b.pid = a.tc_change_val)
+			END AS project_nm
+			, a.tc_change_reason
+			, a.reg_id
+			, (SELECT user_nm FROM tb_user b where b.user_id = a.reg_id) AS reg_nm
+			, a.reg_dtm
+			, a.mod_id
+			, a.mod_dtm
+		FROM tb_he_tc_tmpl a
+		WHERE a.tc_group_id = #{groupId}
+		ORDER BY a.reg_dtm DESC
+	</select>
+	
+	<select id="selectTcChangeHistDetail" parameterType="String" resultType="heTcTmplVo">
+		SELECT
+			a.tc_id
+			, a.system_id
+			, a.tc_cate_id
+			, a.lcate_id
+			, a.mcate_id
+			, a.tc_nm
+			, a.tc_pre_envir
+			, a.tc_input_val
+			, a.tc_output_val
+			, a.normal_criterion
+			, a.before_result_cd
+			, a.bigo
+			, a.use_yn
+			, a.tc_stat
+			, a.tc_group_id
+			, a.tc_change_cd
+			, a.tc_change_val
+			, CASE a.tc_change_cd 
+				WHEN 'D401' THEN '최초등록' 
+				WHEN 'D402' THEN '임의변경'
+				ELSE (SELECT project_nm FROM tb_he_project b WHERE b.pid = a.tc_change_val)
+			END AS project_nm
+			, a.tc_change_reason
+			, a.reg_id
+			, a.reg_dtm
+			, a.mod_id
+			, a.mod_dtm
+		FROM tb_he_tc_tmpl a
+		WHERE a.tc_id = #{tcId}
+			OR a.tc_id = (SELECT b.tc_id FROM tb_he_tc_tmpl b WHERE b.tc_group_id = a.tc_group_id AND b.tc_stat = 'D302')
+		ORDER BY a.reg_dtm DESC
+	</select>
+	
+</mapper>

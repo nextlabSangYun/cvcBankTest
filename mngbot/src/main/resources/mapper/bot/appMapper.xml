@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.nextlab.bot.mapper.AppMapper">
+	<select id="selectAppAuthList" resultType="appAuthVo">
+		SELECT a.app_id
+				, a.app_nm
+				, b.auth_id
+				, b.auth_nm
+		FROM	tb_app a 
+				INNER JOIN tb_app_auth b ON a.app_id = b.app_id
+	</select>
+	
+	<select id="selectAppAuthView" parameterType="appAuthVo" resultType="appAuthVo">
+		SELECT a.app_id
+				, a.app_nm
+				, b.auth_id
+				, b.auth_nm
+		FROM	tb_app a 
+				INNER JOIN tb_app_auth b ON a.app_id = b.app_id
+		WHERE	b.app_id = #{appId}
+				AND b.auth_id = #{authId}
+	</select>
+	
+	<insert id="insertAuthMenu" parameterType="appAuthVo">
+		INSERT INTO tb_auth_menu 
+			(menu_id, auth_id, app_id)
+		VALUES 
+			(#{menuId}, #{authId}, #{appId})
+	</insert>
+	
+	<delete id="deleteAuthMenu" parameterType="appAuthVo">
+		DELETE FROM tb_auth_menu
+		WHERE app_id = #{appId}
+			AND auth_id = #{authId}
+	</delete>
+</mapper>

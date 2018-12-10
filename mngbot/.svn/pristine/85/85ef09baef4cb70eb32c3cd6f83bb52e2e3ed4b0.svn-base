@@ -1,0 +1,414 @@
+/**
+ * @title	: QA test case service 구현
+ * @package	: kr.co.nextlab.qa.service.impl
+ * @file	: QaTcServiceImpl.java
+ * @author	: winolonam
+ * @date	: 2018. 07. 10.
+ * @desc	: 
+ */
+package kr.co.nextlab.qa.service.impl;
+
+import java.util.List;
+
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ejb.access.EjbAccessException;
+import org.springframework.stereotype.Service;
+
+import kr.co.nextlab.comm.model.FileVo;
+import kr.co.nextlab.comm.service.SequenceService;
+import kr.co.nextlab.component.FileComponent;
+import kr.co.nextlab.excel.CommonExcelParser;
+import kr.co.nextlab.excel.model.QaTcExceUpload;
+import kr.co.nextlab.qa.mapper.QaTcMapper;
+import kr.co.nextlab.qa.model.FlawCriteria;
+import kr.co.nextlab.qa.model.QaProjectModelVo;
+import kr.co.nextlab.qa.model.QaTcCategoryVo;
+import kr.co.nextlab.qa.model.QaTcCriteria;
+import kr.co.nextlab.qa.model.QaTcInfotVo;
+import kr.co.nextlab.qa.model.QaXqmsFileVo;
+import kr.co.nextlab.qa.model.QaXqmsFlawVo;
+import kr.co.nextlab.qa.model.QaXqmsVo;
+import kr.co.nextlab.qa.service.QaTcService;
+
+@Service
+public class QaTcServiceImpl implements QaTcService {
+	
+	@Autowired
+	private QaTcMapper qaTcMapper;
+	
+	@Autowired
+	private SequenceService sequenceService;
+	
+	@Autowired
+	private FileComponent fileComponent;
+
+	/**
+	 * 테스트 현황 조회
+	 * @param pid
+	 * @return
+	 */
+	@Override
+	public QaTcInfotVo selectTcStatList(String pid) {
+		return qaTcMapper.selectTcStatList(pid);
+	}
+
+	/**
+	 * 결함 현황 조회
+	 * @param pid
+	 * @return
+	 */
+	@Override
+	public QaTcInfotVo selectFlawStatList(String pid) {
+		return qaTcMapper.selectFlawStatList(pid);
+	}
+	
+	/**
+	 * 결함 관리 리스트 조회
+	 * @param flawCriteria
+	 * @return
+	 */
+	@Override
+	public List<QaTcInfotVo> selectFlawList(FlawCriteria flawCriteria) {
+		return qaTcMapper.selectFlawList(flawCriteria);
+	}
+	
+	/**
+	 * 결함 정보 조회
+	 * @param tcId
+	 * @return
+	 */
+	@Override
+	public QaTcInfotVo selectFlawView(int seq) {
+		return qaTcMapper.selectFlawView(seq);
+	}
+	
+	/**
+	 * 결함 정보 입력
+	 * @param qaXqmsFlawVo
+	 * @return
+	 */
+	@Override
+	public boolean mergeFlaw(QaXqmsFlawVo qaXqmsFlawVo) {
+		return qaTcMapper.mergeFlaw(qaXqmsFlawVo) > 0;
+	}
+
+	/**
+	 * 카테고리 리스트 조회
+	 * @param qaTcCategoryVo
+	 * @return
+	 */
+	@Override
+	public List<QaTcCategoryVo> selectTcCategoryList(QaTcCategoryVo qaTcCategoryVo) {
+		return qaTcMapper.selectTcCategoryList(qaTcCategoryVo);
+	}
+
+	/**
+	 * 카테고리 등록
+	 * @param qaTcCategoryVo
+	 * @return
+	 */
+	@Override
+	public boolean insertTcCategory(QaTcCategoryVo qaTcCategoryVo) {
+		qaTcCategoryVo.setTcCateId(sequenceService.getQaCategoryId());
+		//기존 카테고리명 존재 여부
+		List<QaTcCategoryVo> chk = qaTcMapper.selectCategoryListChk(qaTcCategoryVo);
+		if(chk.size() != 0){
+			//카테고리명있음
+			return true;
+		}
+		int cnt = qaTcMapper.insertTcCategory(qaTcCategoryVo);
+		if (cnt != 1) {
+			throw new EjbAccessException("리포트 등록이 실패하였습니다.");
+		}
+		return true;
+	}
+	
+	
+	/**
+	 * 대량 등록시 TCcateId반환
+	 * @param qaTcCategoryVo
+	 * @return
+	 */
+	public String insertLargeTcCategory(QaTcCategoryVo qaTcCategoryVo) {
+		qaTcCategoryVo.setTcCateId(sequenceService.getQaCategoryId());
+		int cnt = qaTcMapper.insertTcCategory(qaTcCategoryVo);
+		if (cnt != 1) {
+			throw new EjbAccessException("리포트 등록이 실패하였습니다.");
+		}
+		return qaTcCategoryVo.getTcCateId();
+	}
+
+	/**
+	 * 카테고리 수정
+	 * @param qaTcCategoryVo
+	 * @return
+	 */
+	@Override
+	public boolean updateModTcCategory(QaTcCategoryVo qaTcCategoryVo) {
+		int cnt = qaTcMapper.updateModTcCategory(qaTcCategoryVo);
+		if (cnt != 1) {
+			throw new EjbAccessException("카테고리 수정이 실패하였습니다.");
+		}
+		return true;
+	}
+
+	/**
+	 * 카테고리 삭제
+	 * @param qaTcCategoryVo
+	 * @return
+	 */
+	@Override
+	public boolean updateDelTcCategory(QaTcCategoryVo qaTcCategoryVo) {
+		qaTcCategoryVo.setUseYn("N");
+		int cnt = qaTcMapper.updateDelTcCategory(qaTcCategoryVo);
+		if (cnt != 1) {
+			throw new EjbAccessException("카테고리 삭제를 실패하였습니다.");
+		}
+		return true;
+	}
+	
+	/**
+	 * TC 리스트
+	 * @param criteria
+	 * @return
+	 */
+	@Override
+	public List<QaTcInfotVo> selectTcList(QaTcCriteria criteria){
+		return qaTcMapper.selectTcList(criteria);
+	}
+	
+	/**
+	 * tc삭제하기
+	 * @param param
+	 * @return
+	 */
+	public boolean deleteTcPrc(String[] param){
+		if (param.length > 0) {
+			for(int i=0; i<param.length; i++){
+				if (StringUtils.isNotEmpty(param[i])) {
+					qaTcMapper.updateTcUseYnPrc(param[i]);
+				}
+			}
+		}
+		return true;
+	}
+	
+	/**
+	 * TC 추가
+	 * @param qaTcInfotVo
+	 * @return
+	 */
+	@Override
+	public boolean insertTcList(List<QaTcInfotVo> qaTcInfotVo){
+		int cnt = 0;
+		String regId = qaTcInfotVo.get(0).getRegId();
+		for(QaTcInfotVo tcInfo: qaTcInfotVo){
+			tcInfo.setRegId(regId);
+			tcInfo.setModId(regId);
+			cnt += qaTcMapper.insertTc(tcInfo);
+		}
+		if (cnt != qaTcInfotVo.size()){
+			throw new EjbAccessException("TC 등록이 실패하였습니다.");
+		}
+		return true;
+	}
+	
+	/**
+	 * 테스트 케이스 조회(단일)
+	 * @param criteria
+	 * @return
+	 */
+	@Override
+	public QaTcInfotVo selectTc(QaTcCriteria criteria){
+		return qaTcMapper.selectTc(criteria);
+	}
+	
+	
+	/**
+	 * 모델리스트
+	 * @param pid
+	 * @return
+	 */
+	@Override
+	public List<QaProjectModelVo> selectModelList(String pid){
+		return qaTcMapper.selectModelList(pid);
+	}
+	
+	/**
+	 * 리포트 등록
+	 * @param qaXqmsVo
+	 * @return
+	 */
+	public boolean insertRegReport(QaXqmsVo qaXqmsVo){
+		//체크 변수
+		int xqmsChk = 0;
+		int fileChk = 0;
+		int fileSeqNum = 0;
+		int tcChk = 0;
+		xqmsChk = qaTcMapper.insertRegReport(qaXqmsVo);
+		
+		for(QaXqmsFileVo fileVo : qaXqmsVo.getFileList()){
+			fileSeqNum ++;
+			fileVo.setFileSourceCd("C801");
+			fileVo.setSeq(qaXqmsVo.getSeq());
+			fileVo.setFileSeq(fileSeqNum);
+			fileChk = qaTcMapper.insertXqmsFile(fileVo);
+		}
+		
+		QaTcInfotVo qaTcInfotVo = new QaTcInfotVo();
+		qaTcInfotVo.setTcId(qaXqmsVo.getTcId());
+		qaTcInfotVo.setLastResultCd(qaXqmsVo.getTcResultCd());
+		
+		tcChk = qaTcMapper.updateLastResult(qaTcInfotVo);
+		
+		if (xqmsChk <= 0 || fileChk != qaXqmsVo.getFileList().size() || tcChk <= 0) {
+			throw new EjbAccessException("등록 실패");
+		}
+		
+		return true;
+	}
+
+	/**
+	 * 리포트 일괄등록
+	 * @param qaXqmsVo
+	 * @return
+	 */
+	public boolean insertRegReportBatch(QaXqmsVo qaXqmsVo){
+		//등록값 체크용 변수
+		int tcChk = 0;
+		int xqmsChk = 0;
+		
+		for(QaTcInfotVo tcVo : qaXqmsVo.getTcArray()){
+			for(QaXqmsVo vo : qaXqmsVo.getXqmsArray()){
+				vo.setTcId(tcVo.getTcId());
+				vo.setRemocon(qaXqmsVo.getRemocon());
+				vo.setTcTypeCd("B402");
+				vo.setBotSno("manual");
+				vo.setXqmsTypeCd("C401");
+				vo.setTcResultCd(qaXqmsVo.getTcResultCd());
+				vo.setXqmsPerson(qaXqmsVo.getXqmsPerson());
+				vo.setModId(qaXqmsVo.getModId());
+				vo.setChasu(qaXqmsVo.getChasu());
+				xqmsChk += qaTcMapper.insertRegReport(vo);
+				
+				QaTcInfotVo qaTcInfotVo = new QaTcInfotVo();
+				qaTcInfotVo.setTcId(vo.getTcId());
+				qaTcInfotVo.setLastResultCd(vo.getTcResultCd());
+				tcChk += qaTcMapper.updateLastResult(qaTcInfotVo);
+			}
+		}
+		
+		if (xqmsChk <= 0 || tcChk <= 0) {
+			throw new EjbAccessException("등록 실패");
+		}
+		
+		return true;
+	}
+	
+	/**
+	 * 테스트 케이스 대량 등록
+	 * @param fileVo
+	 * @param qaTcInfoVo
+	 * @return
+	 * @throws Exception
+	 */
+	@Override
+	public FileVo insertLargeTcList(FileVo fileVo, QaTcInfotVo qaTcInfoVo) throws Exception {
+		fileVo = this.heTcExcelParsing(fileVo);
+		int chkTc = 0;
+		if (StringUtils.isEmpty(fileVo.getMessage()) && fileVo.getQaTcExcelUploadList().size() > 0) {
+			for(QaTcExceUpload qaTcExcelUpload : fileVo.getQaTcExcelUploadList()){
+				QaTcInfotVo tempQaTcInfoVo = new QaTcInfotVo();
+				BeanUtils.copyProperties(tempQaTcInfoVo, qaTcExcelUpload);
+				//카테고리 체크
+				tempQaTcInfoVo.setPid(qaTcInfoVo.getPid());
+				tempQaTcInfoVo.setLcateId(categoryChkFnc(tempQaTcInfoVo.getLcateNm(),"000000000000000", qaTcInfoVo.getPid(), qaTcInfoVo.getRegId()));
+				tempQaTcInfoVo.setMcateId(categoryChkFnc(tempQaTcInfoVo.getMcateNm(), tempQaTcInfoVo.getLcateId(), qaTcInfoVo.getPid(), qaTcInfoVo.getRegId()));
+				tempQaTcInfoVo.setTcCateId(categoryChkFnc(tempQaTcInfoVo.getScateNm(), tempQaTcInfoVo.getMcateId(),qaTcInfoVo.getPid(), qaTcInfoVo.getRegId()));
+				tempQaTcInfoVo.setUseYn("Y");
+				tempQaTcInfoVo.setTcDiviCd(StringUtils.equalsIgnoreCase(tempQaTcInfoVo.getTcDiviCd(), "서비스품질") ? "B901" : StringUtils.equalsIgnoreCase(tempQaTcInfoVo.getTcDiviCd(), "체감품질") ? "B902" : StringUtils.equalsIgnoreCase(tempQaTcInfoVo.getTcDiviCd(), "신규서비스품질") ? "B903" : "B904");
+				tempQaTcInfoVo.setTcImpoCd(StringUtils.equalsIgnoreCase(tempQaTcInfoVo.getTcImpoCd(),"CRITICAL") ? "B103" : StringUtils.equalsIgnoreCase(tempQaTcInfoVo.getTcImpoCd(), "MAJOR") ? "B101" : StringUtils.equalsIgnoreCase(tempQaTcInfoVo.getTcImpoCd(), "MINOR") ? "B102" :  "B104");
+				tempQaTcInfoVo.setRegId(qaTcInfoVo.getRegId());
+				tempQaTcInfoVo.setModId(qaTcInfoVo.getModId());
+				
+				chkTc += qaTcMapper.insertTc(tempQaTcInfoVo);
+			}
+			if (chkTc != fileVo.getQaTcExcelUploadList().size()) {
+				throw new EjbAccessException("저장 실패");
+			}
+		}
+		return fileVo;
+	}
+	
+	private FileVo heTcExcelParsing(FileVo fileVo) {
+		if (fileVo != null) {
+			List<QaTcExceUpload> qaTcExcelUploadList = null;
+			
+			fileVo.setFileFullPath(fileComponent.getFileFullPath(fileVo));
+			CommonExcelParser<QaTcExceUpload> commonExcelParser = new CommonExcelParser<QaTcExceUpload>(QaTcExceUpload.class, 0, 1, 10000);
+			commonExcelParser.setFileVo(fileVo);
+			
+			/**
+			 * 엑셀 유효성 체크
+			 */
+			if(commonExcelParser.isFileVoValidExcelFile()){
+				qaTcExcelUploadList = commonExcelParser.validResultList(QaTcExceUpload.class, commonExcelParser.getFileVoDataList());
+				fileVo.setQaTcExcelUploadList(qaTcExcelUploadList);
+				for (QaTcExceUpload qaTcExcelUpload : qaTcExcelUploadList) {
+					if (StringUtils.isNotEmpty(qaTcExcelUpload.getResultMsg())) {
+						fileVo.setMessage(qaTcExcelUpload.getResultMsg());
+						break;
+					}
+				}
+			}
+		}
+		return fileVo;
+	}
+	private String categoryChkFnc(String cateNm, String cateId, String pid, String regId){
+		QaTcCategoryVo chkQtc = new QaTcCategoryVo();
+		QaTcCategoryVo newQtc = new QaTcCategoryVo();
+		newQtc.setTcCateNm(cateNm);
+		newQtc.setTcCateParId(cateId);
+		newQtc.setPid(pid);
+		newQtc.setRegId(regId);
+		chkQtc = qaTcMapper.selectCategoryChk(newQtc);
+		
+		if(chkQtc != null){
+			//카테고리명 있음 카테고리ID 반환
+			return chkQtc.getTcCateId();
+		}else{
+			return insertLargeTcCategory(newQtc);
+		}
+	}
+	
+	/**
+	 * Tc수정
+	 * @param qaTcInfoVo
+	 * @return
+	 */
+	@Override
+	public boolean updateTc(QaTcInfotVo qaTcInfoVo){
+		int chk = 0;
+		int fileChk = 0;
+		chk = qaTcMapper.updateTc(qaTcInfoVo);
+		//기존 첨부파일 삭제
+		qaTcMapper.deleteTcFile(qaTcInfoVo.getTcId());
+		//첨부파일 추가 및 수정
+		fileChk = qaTcMapper.insertTcFile(qaTcInfoVo);
+		if (chk != 1 || fileChk > 1)
+			throw new EjbAccessException("테스트 케이스 수정이 실패하였습니다.");
+		return true;
+	}
+	
+	/**
+	 * 카테고리 리스트 조회
+	 * @param criteria
+	 * @return
+	 */
+	@Override
+	public List<QaTcInfotVo> selectCateList(String pid){
+		return qaTcMapper.selectCateList(pid);
+	}
+}

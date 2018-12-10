@@ -1,0 +1,29 @@
+/**
+ * @title	: 테스트 케이스 컨트롤러 
+ * @package	: kr.co.nextlab.hded.controller
+ * @file	: HdedTcController.java
+ * @author	: winolonam
+ * @date	: 2018. 4. 25.
+ * @desc	: 
+ */
+package kr.co.nextlab.hded.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import kr.co.nextlab.comm.controller.BaseController;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Controller
+public class HdedTcController extends BaseController {
+
+	/**
+	 * 테스트 케이스 리스트 페이지 
+	 * @param model
+	 */
+	@RequestMapping("/hded/tc/tcList")
+	public void tcList(Model model) {
+	}
+}

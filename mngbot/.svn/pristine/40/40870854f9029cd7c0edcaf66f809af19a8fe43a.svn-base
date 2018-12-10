@@ -1,0 +1,332 @@
+/**
+ * @title	: 이슈 service impl
+ * @package	: kr.co.nextlab.bmt.service.impl
+ * @file	: IssueServiceImpl.java
+ * @author	: jnlee
+ * @date	: 2018. 1. 4.
+ * @desc	: 
+ */
+package kr.co.nextlab.bmt.service.impl;
+
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ejb.access.EjbAccessException;
+import org.springframework.stereotype.Service;
+
+import kr.co.nextlab.bmt.mapper.IssueMapper;
+import kr.co.nextlab.bmt.model.IssueCateVo;
+import kr.co.nextlab.bmt.model.IssueCommentVo;
+import kr.co.nextlab.bmt.model.IssueCriteria;
+import kr.co.nextlab.bmt.model.IssueFileVo;
+import kr.co.nextlab.bmt.model.IssueModelVo;
+import kr.co.nextlab.bmt.model.IssuePartiVo;
+import kr.co.nextlab.bmt.model.IssueTcVo;
+import kr.co.nextlab.bmt.model.IssueVo;
+import kr.co.nextlab.bmt.service.IssueService;
+import kr.co.nextlab.comm.service.SequenceService;
+
+@Service
+public class IssueServiceImpl implements IssueService {
+	
+	@Autowired
+	private IssueMapper issueMapper;
+	
+	@Autowired
+	private SequenceService sequenceService;
+	
+	/**
+	 * 이슈 리스트
+	 * @param criteria
+	 * @return
+	 */
+	@Override
+	public List<IssueVo> selectIssueList(IssueCriteria criteria) {
+		return issueMapper.selectIssueList(criteria);
+	}
+	
+	@Override
+	public List<IssueCateVo> selectIssueCategoryList(String pid) {
+		return issueMapper.selectIssueCategoryList(pid);
+	}
+	
+	/**
+	 * 이슈 상세조회
+	 * @param issueId 이슈아이디
+	 * @return 이슈 상세정보
+	 */
+	@Override
+	public IssueVo selectIssueView(String issueId) {
+		return issueMapper.selectIssueView(issueId);
+	}
+	
+	/**
+	 * 이슈 테스트케이스리스트
+	 * @param issueId 이슈아이디
+	 * @return 이슈 테스트케이스리스트
+	 */
+	@Override
+	public List<IssueTcVo> selectIssueTcList(String issueId) {
+		return issueMapper.selectIssueTcList(issueId);
+	}
+	
+	/**
+	 * 이슈 대상자 리스트
+	 * @param issueId 이슈아이디
+	 * @return 이슈 대상자 리스트
+	 */
+	@Override
+	public List<IssuePartiVo> selectIssuePartiList(String issueId) {
+		return issueMapper.selectIssuePartiList(issueId);
+	}
+	
+	/**
+	 * 이슈 파일 리스트
+	 * @param issueId 이슈아이디
+	 * @return 이슈 파일 리스트
+	 */
+	@Override
+	public List<IssueFileVo> selectIssueFileList(String issueId) {
+		return issueMapper.selectIssueFileList(issueId);
+	}
+	
+	/**
+	 * 이슈 코멘트 리스트
+	 * @param issueId 이슈아이디
+	 * @return 이슈 코멘트 리스트
+	 */
+	@Override
+	public List<IssueCommentVo> selectIssueCommentList(String issueId) {
+		return issueMapper.selectIssueCommentList(issueId);
+	}
+	
+	/**
+	 * 이슈 등록
+	 * @param issueVo 이슈 정보
+	 * @return 등록 결과
+	 */
+	@Override
+	public boolean insertIssue(IssueVo issueVo) {
+		// 등록값 체크 용 변수
+		int cnt = 0;
+		int cntTc = 0;
+		int cntParti = 0;
+		int cntFile = 0;
+		int cntCate = 0;
+		int cntModel = 0;
+
+		// 이슈 아이디 생성
+		issueVo.setIssueId(sequenceService.getIssueId());
+		
+		// 기본값 생성
+		issueVo.setProgressStat("B201");
+		
+		// 기본정보 생성
+		cnt = issueMapper.insertIssue(issueVo);
+		
+		// 선택된 테스트케이스 등록
+		for (IssueTcVo issueTcVo : issueVo.getTcList()) {
+			issueTcVo.setIssueId(issueVo.getIssueId());
+			cntTc += issueMapper.insertIssueTc(issueTcVo);
+		}
+		
+		// 이슈할당대상 등록
+		for (IssuePartiVo issuePartiVo : issueVo.getPartiList()) {
+			issuePartiVo.setIssueId(issueVo.getIssueId());
+			issuePartiVo.setRegId(issueVo.getRegId());
+			cntParti += issueMapper.insertIssueParti(issuePartiVo);
+		}
+		
+		// 카테고리
+		if (StringUtils.isNotEmpty(issueVo.getTcCateId())) {
+			cntCate += issueMapper.insertIssueCate(issueVo);
+		}
+		
+		// 측정모델
+		for (IssueModelVo issueModelVo : issueVo.getModelList()) {
+			issueModelVo.setIssueId(issueVo.getIssueId());
+			issueModelVo.setModId(issueVo.getRegId());
+			cntModel += issueMapper.insertIssueModel(issueModelVo);
+		}
+		
+		// 첨부파일 정보 등록
+		for (IssueFileVo issueFileVo : issueVo.getFileList()) {
+			issueFileVo.setIssueId(issueVo.getIssueId());
+			cntFile += issueMapper.insertIssueFile(issueFileVo);
+		}
+		
+		// 등록결과 확인
+		if (cnt <= 0 
+				|| cntTc != issueVo.getTcList().size()
+				|| cntParti != issueVo.getPartiList().size()
+				|| cntFile != issueVo.getFileList().size()
+				|| cntCate < 0
+				|| cntModel != issueVo.getModelList().size())
+			throw new EjbAccessException("이슈 등록이 실패하였습니다.");
+		
+		return true;
+	}
+	
+	/**
+	 * 이슈 할당대상 수정
+	 * @param issueVo 이슈 정보 (issueId, partiList)
+	 * @return 수정 결과
+	 */
+	public boolean updateIssuePartiList(IssueVo issueVo) {
+		int cntParti = 0;
+		
+		// 기존 이슈할당대상 삭제
+		issueMapper.deleteIssueParti(issueVo.getIssueId());
+		
+		// 이슈할당대상 등록
+		for (IssuePartiVo issuePartiVo : issueVo.getPartiList()) {
+			issuePartiVo.setIssueId(issueVo.getIssueId());
+			issuePartiVo.setRegId(issueVo.getModId());
+			cntParti += issueMapper.insertIssueParti(issuePartiVo);
+		}
+		
+		if (cntParti != issueVo.getPartiList().size())
+			throw new EjbAccessException("이슈 할당 대상 저장이 실패하였습니다.");
+		
+		return true;
+	}
+
+	/**
+	 * 이슈 코멘트 등록
+	 * @param issueCommentVo 이슈 코멘트 정보
+	 * @return 등록 결과
+	 */
+	@Override
+	public boolean insertIssueComment(IssueCommentVo issueCommentVo, IssueVo issueVo) {
+		if(issueVo.getProgressStat().equals("B201")){
+			issueVo.setProgressStat("B202");
+			issueMapper.updateIssueProgressStatComment(issueVo);
+		}
+		return issueMapper.insertIssueComment(issueCommentVo) > 0;
+	}
+	/**
+	 * 이슈 코멘트 수정
+	 * @param issueCommentVo 이슈 코멘트 정보
+	 * @return 등록결과
+	 */
+	@Override
+	public boolean updateIssueComment(IssueCommentVo issueCommentVo){		
+		return issueMapper.updateIssueComment(issueCommentVo);
+	}
+	/**
+	 * 이슈 진행상태 변경
+	 * @param issueVo 이슈 정보
+	 * @return 처리 결과
+	 */
+	@Override
+	public boolean updateIssueProgressStat(IssueVo issueVo) {
+		return issueMapper.updateIssueProgressStat(issueVo);
+	}
+	
+	/**
+	 * 코멘트 등록시 이슈 진행상태 변경
+	 * @param issueVo 이슈 정보
+	 * @return 처리 결과
+	 */
+	@Override
+	public boolean updateIssueProgressStatComment(IssueVo issueVo) {
+		return issueMapper.updateIssueProgressStatComment(issueVo);
+	}
+	/**
+	 * 이슈 삭제하기
+	 * @param issueId
+	 * @return
+	 */
+	@Override
+	public boolean deleteIssuePrc(String[] param) {
+		String issueId = "";
+		if (param.length > 0) {
+			for(int i=0; i<param.length; i++){
+				issueId = param[i];
+				if (StringUtils.isNotEmpty(issueId)) {
+					// 기존 이슈TC삭제
+					issueMapper.deleteIssueTc(issueId);
+					// 기존 이슈 할당 대상 삭제
+					issueMapper.deleteIssueParti(issueId);
+					// 기존 이슈 파일 삭제
+					issueMapper.deleteIssueFile(issueId);
+					//기존 카테고리 제거
+					issueMapper.deleteIssueCate(issueId);
+					//기존 측정모델 제거
+					issueMapper.deleteIssueModel(issueId);
+					//이슈 코멘트 삭제
+					issueMapper.deleteIssueComment(issueId);
+					//이슈 삭제
+					issueMapper.deleteIssuePrc(issueId);
+				}
+				issueId = "";
+			}
+		}
+		return true;
+	}
+	
+	@Override
+	public boolean updateIssuePrc(IssueVo issueVo){
+		//등록값 체크용 변수
+		int cntParti = 0;
+		int cntFile = 0;
+		int cntCate = 0;
+		int cntModel = 0;
+		//이슈 내역 업데이트
+		issueMapper.updateIssuePrc(issueVo);
+		//기존 이슈할당 제거
+		issueMapper.deleteIssueParti(issueVo.getIssueId());
+		//기존 파일리스트 제거
+		issueMapper.deleteIssueFile(issueVo.getIssueId());
+		//기존 카테고리 제거
+		issueMapper.deleteIssueCate(issueVo.getIssueId());
+		//기존 측정모델 제거
+		issueMapper.deleteIssueModel(issueVo.getIssueId());
+		
+		//이슈파일등록
+		for (IssueFileVo issueFileVo : issueVo.getFileList()){
+			issueFileVo.setIssueId(issueVo.getIssueId());
+			cntFile += issueMapper.insertIssueFile(issueFileVo);
+			
+		}
+		
+		// 이슈할당대상 등록
+		for (IssuePartiVo issuePartiVo : issueVo.getPartiList()) {
+			issuePartiVo.setIssueId(issueVo.getIssueId());
+			issuePartiVo.setRegId(issueVo.getModId());
+			cntParti += issueMapper.insertIssueParti(issuePartiVo);
+		}
+		
+		// 카테고리
+		if (StringUtils.isNotEmpty(issueVo.getTcCateId())) {
+			issueVo.setRegId(issueVo.getModId());
+			cntCate += issueMapper.insertIssueCate(issueVo);
+		}
+		
+		// 측정모델
+		for (IssueModelVo issueModelVo : issueVo.getModelList()) {
+			issueModelVo.setIssueId(issueVo.getIssueId());
+			issueModelVo.setModId(issueVo.getModId());
+			cntModel += issueMapper.insertIssueModel(issueModelVo);
+		}
+		
+		if (cntParti != issueVo.getPartiList().size() 
+				|| cntFile != issueVo.getFileList().size()
+				|| cntCate < 0
+				|| cntModel != issueVo.getModelList().size()){
+			throw new EjbAccessException("이슈 수정이 실패하였습니다.");
+		}
+		return true;
+	}
+	
+	@Override
+	public List<IssueCateVo> selectIssueCateList(String issueId) {
+		return issueMapper.selectIssueCateList(issueId);
+	}
+
+	@Override
+	public List<IssueModelVo> selectIssueModelList(String issueId) {
+		return issueMapper.selectIssueModelList(issueId);
+	}
+}

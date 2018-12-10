@@ -1,0 +1,52 @@
+#server
+server.charset=MS949
+
+#websocket
+websocket.web.url=http://1.255.87.99:8003/ws-web
+websocket.was.url=ws://1.255.87.99:8003/ws-was
+websocket.retry.max.cnt=5
+websocket.retry.delay.time=10000
+
+# site
+site.company.name=SK broadband
+site.company.logo=/images/common/com_logo.png
+site.bot.name=CVCBank
+site.bot.headername=Btv Commercial Verification & Certification Bank
+site.url=http://cvcbank.skbroadband.com
+site.port=1219
+site.charset=UTF-8
+site.cookie.domain=cvcbank.skbroadband.com
+site.ip=1.255.87.98
+
+# db
+db.driver-class-name=com.microsoft.sqlserver.jdbc.SQLServerDriver
+db.url=jdbc:sqlserver://1.255.87.97:1433;databasename=mngbot;useCursors=false;sendStringParametersAsUnicode=false
+db.username=mngbot
+db.password=sprtmxmfoq1@
+db.validation-query=SELECT 1
+db.max-active=150
+db.test-while-idle=true
+db.time-between-eviction-runs-millis=7200000
+
+# file
+file.root-path=/mngbot/upload
+file.max-size=10485760
+file.excel-parsing-url=http://1.255.87.98:8110/
+
+# log
+log.path=/mngbot/logs
+
+# mail
+mail.host=smtp.gmail.com
+mail.port=587
+mail.username=nextlab2020@gmail.com
+mail.password=nextlab1@
+mail.transport.protocol=smtp
+mail.smtp.auth=true
+mail.smtp.starttls.enable=true
+mail.debug=false
+mail.admin=pepsi@sk.com,firstuse@sandeul.co.kr
+
+#report
+report.url=http://1.255.87.98:5000
+report.path=/Report/share/CVCBankReport/

@@ -1,0 +1,87 @@
+<%@ page contentType="text/html" pageEncoding="UTF-8" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://www.nextlab.co.kr/tags/nextlab" prefix="nl"%>
+<div class="pop_wrap" style="width:610px;">
+	<div class="pop_tit">
+		<p v-if="projectView.pid">프로젝트 정보수정</p>
+		<p v-else>새 프로젝트</p>
+	</div>
+	<div class="pop_cont pop_new_prj">
+		<div class="g_table02">
+			<table>
+				<caption>프로젝트 이름. 기간, checklist 등의 정보를 입력하는 표 입니다.</caption>
+				<colgroup>
+					<col style="width:120px;">
+					<col>
+				</colgroup>
+				<tbody>
+					<tr>
+						<th>프로젝트명*</th>
+						<td>
+							<input type="text" class="full" id="projectNm" maxlength="50" placeholder="프로젝트명을 입력하세요.">
+						</td>
+					</tr>
+					<tr class="period">
+						<th>기간*</th>
+						<td>
+							<input type="text" class="input_date" id="projectStDt" name="projectStDt" readonly>
+							<span class="bar">~</span>
+							<input type="text" class="input_date" id="projectEndDt" name="projectEndDt" readonly>
+						</td>
+					</tr>
+					<tr>
+						<th>시스템*</th>
+						<td>
+							<input type="text" class="full" id="systemNm" maxlength="50" placeholder="시스템명을 입력하세요.">
+						</td>
+					</tr>
+					<tr>
+						<th>참여인력*</th>
+						<td class="reg">
+							<multi-user-select :add-fn="addPartiList"></multi-user-select>
+						</td>
+						<div class="reg_list" v-show="projectView.managerList.length>0">
+							<ul>
+								<li v-for="(p, index) in projectView.managerList"><span>{{p.userNm}}({{p.userGroupNm}})</span><button class="del" @click="delManagerList(index)"></button></li>
+							</ul>
+						</div>
+					</tr>
+					<tr>
+						<th>비고</th>
+						<td>
+							<input type="text" class="full" placeholder="비고를 입력하세요.">
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<div class="btn_wrap">
+		<button v-if="projectView.pid" class="btn_proc">수정</button>
+		<button v-else class="btn_proc">등록</button>
+		<button class="btn_cancel" onclick="hidePopupLayer(); return false">닫기</button>
+	</div>
+</div>
+<script>
+	var frm = new Vue({
+		el: '.pop_wrap'
+		, data: {
+			projectView: {
+				managerList: []
+			}
+		}
+		, updated: function() {
+			setPopup(2);
+		}
+		, mounted: function() {
+			setPopup(2);
+		}
+		, methods: {
+			addPartiList: function(data) {
+			}
+			, delManagerList: function(index) {
+				this.view.managerList.splice(index, 1);
+			}
+		}
+	});
+</script>

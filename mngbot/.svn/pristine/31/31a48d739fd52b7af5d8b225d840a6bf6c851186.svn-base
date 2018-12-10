@@ -1,0 +1,71 @@
+<%@ page contentType="text/html" pageEncoding="UTF-8" %>
+<%@ taglib uri="http://www.nextlab.co.kr/tags/nextlab" prefix="nl"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<link href="/css/kendo.common-material.min.css" rel="stylesheet">
+<link href="/css/kendo.material.min.css" rel="stylesheet">
+<script type="text/javascript" src="/js/kendo.all.min.js"></script>
+<div class="content">
+	<div class="sub_layout has_snb">
+		<div class="cont_wrap">
+			<p class="cate_tit"></p>
+			<div class="g_table04">
+				<table>
+					<caption>기간, 현재상태, 참여인력 등을 확인할 수 있는 표 입니다.</caption>
+					<colgroup>
+						<col style="width:170px;">
+						<col>
+					</colgroup>
+					<tbody>
+						<tr>
+							<th>프로젝트명</th>
+							<td>{{ projectView.projectNm }}</td>
+						</tr>
+						<tr>
+							<th>기간</th>
+							<td>{{ projectView.projectStDt }} ~ {{ projectView.projectEndDt }}</td>
+						</tr>
+						<tr>
+							<th>등급</th>
+							<td>{{ projectView.projectGrade | code(projectGradeNm) }}</td>
+						</tr>
+						<tr>
+							<th>차수</th>
+							<td v-if="projectView.chasuWaitYn == 'Y'">{{ projectView.projectChasu }}차 (대기중)</td>
+							<td v-else>{{ projectView.projectChasu }}차</td>
+						</tr>
+						<tr>
+							<th>현재상태</th>
+							<td>{{ projectView.projectStat | code(projectStatNm) }}</td>
+						</tr>
+						<tr>
+							<th>검증결과</th>
+							<td>{{projectView.projectResult | code(codeListD100)}}</td>
+						</tr>
+						<tr>
+							<th>비고</th>
+							<td>{{ projectView.bigo }}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	var cont = new Vue({
+		el: '.content'
+		, data: {
+			projectView: {}
+			, projectStatNm: '<nl:codeListJson codeType="C300" />'
+			, projectGradeNm: '<nl:codeListJson codeType="B500" />'
+			, codeListD100: '<nl:codeListJson codeType="D100" />'
+		}
+		, mounted: function() {
+			this.$nextTick(function() {
+			});
+		}
+		, methods: {
+		}
+	});
+</script>

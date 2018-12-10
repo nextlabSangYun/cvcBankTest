@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>DIMS</title>    
+    <link href="../css/style.css" rel="stylesheet">    
+</head>
+<body class="sub">
+   
+	<div class="wrapper">
+		
+		<div class="right_box">
+			<div class="content_top">
+				<h2><img src="../images/bullet_title.png" alt=""><span>재활용 입고</span></h2>
+				<ul class="path_list">
+					<li><a href="#"><img src="../images/icon_home.png" alt="home"></a></li>
+					<li><a href="#">물류센터</a></li>
+					<li><a href="#">입고관리</a></li>
+					<li><a href="#">부속물신품등록</a></li>
+				</ul>
+			</div><!-- end content_top -->
+			<div class="content_middle">
+				<ul class="dims_tab_list">
+					<li><button type="button" class="on" data-tab="tab1">입고 기본정보</button></li>
+					<li><button type="button" class="" data-tab="tab2">입고 부속물 목록</button></li>
+				</ul>
+				<div class="dims_tab_content on" data-tab="tab1">
+					<div class="height20"></div>
+					<div class="page_title"><img src="../images/bullet_subtitle.png" alt=""><span>재활용 입고 기본정보</span></div>
+					<div class="height20"></div>
+					<section>						
+						<div class="table_horizon">
+							<table summary="">
+								<caption></caption>
+								<tbody>
+									<tr>
+										<th scope="row">입고일</th>
+										<td>2018-03-13</td>
+										<th class="temp"></th>
+										<td></td>
+										<th scope="row">작업상태</th>
+										<td>입고대기</td>
+									</tr>
+									<tr>
+										<th scope="row">관할본부</th>
+										<td>수도권</td>
+										<th scope="row">관할팀</th>
+										<td>강남품질솔루션팀</td>
+										<th scope="row">홈 센터명</th>
+										<td>홈 클리닉 안양</td>
+									</tr>
+									<tr>
+										<th scope="row">담당자명</th>
+										<td colspan="3">홍길동</td>
+										<th scope="row">담당자 연락처</th>
+										<td>02-1234-5678</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</section>
+					<div class="height20"></div>
+					<section>
+						<div class="table_vertical">
+							<table summary="검색결과">
+								<caption>검색결과</caption>
+								<colgroup>                        
+									<col width="55">
+									<col style="width: calc(100% - 55px)/4;">
+									<col style="width: calc(100% - 55px)/4;">
+									<col style="width: calc(100% - 55px)/4;">
+									<col style="width: calc(100% - 55px)/4;">
+								</colgroup>
+								<thead>
+									<tr>								
+										<th scope="col">No.</th>
+										<th scope="col">분류</th>
+										<th scope="col">제조사</th>
+										<th scope="col">제품명</th>
+										<th scope="col">입고수량</th>		
+									</tr>
+								</thead> 
+								<tbody> 
+									<tr>
+										<td>1</td>
+										<td>리모컨</td>
+										<td>(주)제조사1</td>
+										<td>UHD용 리모컨</td>
+										<td>20</td>
+									</tr>
+									<tr>
+										<td>2</td>
+										<td>리모컨</td>
+										<td>(주)제조사1</td>
+										<td>UHD용 리모컨</td>
+										<td>20</td>
+									</tr>
+									<tr>
+										<td>3</td>
+										<td>리모컨</td>
+										<td>(주)제조사1</td>
+										<td>UHD용 리모컨</td>
+										<td>20</td>
+									</tr>
+									<tr>
+										<td>4</td>
+										<td>리모컨</td>
+										<td>(주)제조사1</td>
+										<td>UHD용 리모컨</td>
+										<td>20</td>
+									</tr>
+								</tbody>
+								<tfoot>
+									<tr>
+										<th colspan="4">계</th>
+										<td>100</td>
+									</tr>
+								</tfoot> 
+							</table>						
+						</div><!-- end table_wrap -->
+					</section>
+					<section>
+						<div class="table_top_wrap">
+							<div class="count">Total <span>2,000</span> 건</div>					
+						</div><!-- end .table_option_wrap -->		
+						
+						<div class="table_vertical scroll">
+							<div class="header_wrap">
+								<table summary="검색결과">
+									<caption>검색결과</caption>
+									<colgroup>                        
+										<col width="60"><col width="125"><col width="125">
+										<col width=""><col width=""><col width="">
+										<col width="120"><col width="125"><col width="125">						
+									</colgroup>
+									<thead>
+										<tr>								
+											<th scope="col">
+												No.
+												<label class="btn_sort">
+													<input type="checkbox">
+													<span class="arrow"></span>
+												</label>
+											</th>
+											<th scope="col">
+												등록일
+												<label class="btn_sort">
+													<input type="checkbox">
+													<span class="arrow"></span>
+												</label>
+											</th>
+											<th scope="col">
+												입고일
+												<label class="btn_sort">
+													<input type="checkbox" checked>
+													<span class="arrow"></span>
+												</label>
+											</th>
+											<th scope="col">
+												납품사
+												<label class="btn_sort">
+													<input type="checkbox">
+													<span class="arrow"></span>
+												</label>											
+											</th>
+											<th scope="col">
+												분류
+												<label class="btn_sort">
+													<input type="checkbox" checked>
+													<span class="arrow"></span>
+												</label>
+											</th>
+											<th scope="col">
+												제품명
+												<label class="btn_sort">
+													<input type="checkbox">
+													<span class="arrow"></span>
+												</label>
+											</th>
+											<th scope="col">
+												박스수량
+												<label class="btn_sort">
+													<input type="checkbox">
+													<span class="arrow"></span>
+												</label>
+											</th>
+											<th scope="col">
+												수량
+												<label class="btn_sort">
+													<input type="checkbox">
+													<span class="arrow"></span>
+												</label>
+											</th>
+											<th scope="col">
+												작업상태
+												<label class="btn_sort">
+													<input type="checkbox" checked>
+													<span class="arrow"></span>
+												</label>
+											</th>		
+										</tr>
+									</thead>
+								</table>
+							</div>
+							<!-- end.header_wrap -->
+							<div class="scroll_wrap">
+								<table>
+									<colgroup>                        
+										<col width="60"><col width="125"><col width="125">
+										<col width=""><col width=""><col width="">
+										<col width="120"><col width="125"><col width="125">						
+									</colgroup>
+									<tbody> 
+										<tr>
+											<td>10</td>
+											<td>2018-03-12</td>
+											<td>2018-03-12</td>
+											<td>(주)넥스트랩</td>
+											<td>리모컨</td>
+											<td>UHD용 리모컨</td>
+											<td>5</td>
+											<td>25,000</td>
+											<td>입고대기</td>
+										</tr>
+										<tr>
+											<td>9</td>
+											<td>2018-03-12</td>
+											<td>2018-03-12</td>
+											<td>(주)넥스트랩</td>
+											<td>리모컨</td>
+											<td>UHD용 리모컨</td>
+											<td>2</td>
+											<td>25,000</td>
+											<td>입고대기</td>
+										</tr>
+										<tr>
+											<td>8</td>
+											<td>2018-03-12</td>
+											<td>2018-03-12</td>
+											<td>(주)넥스트랩</td>
+											<td>리모컨</td>
+											<td>UHD용 리모컨</td>
+											<td>5</td>
+											<td>25,000</td>
+											<td>입고대기</td>
+										</tr>
+										<tr>
+											<td>7</td>
+											<td>2018-03-12</td>
+											<td>2018-03-12</td>
+											<td>(주)넥스트랩</td>
+											<td>리모컨</td>
+											<td>UHD용 리모컨</td>
+											<td>7</td>
+											<td>25,000</td>
+											<td>입고대기</td>
+										</tr>
+										<tr>
+											<td>6</td>
+											<td>2018-03-12</td>
+											<td>2018-03-12</td>
+											<td>(주)넥스트랩</td>
+											<td>리모컨</td>
+											<td>UHD용 리모컨</td>
+											<td>5</td>
+											<td>25,000</td>
+											<td>입고완료</td>
+										</tr>
+										<tr>
+											<td>5</td>
+											<td>2018-03-12</td>
+											<td>2018-03-12</td>
+											<td>(주)넥스트랩</td>
+											<td>리모컨</td>
+											<td>UHD용 리모컨</td>
+											<td>5</td>
+											<td>25,000</td>
+											<td>입고대기</td>
+										</tr>
+										<tr>
+											<td>4</td>
+											<td>2018-03-12</td>
+											<td>2018-03-12</td>
+											<td>(주)넥스트랩</td>
+											<td>리모컨</td>
+											<td>UHD용 리모컨</td>
+											<td>5</td>
+											<td>25,000</td>
+											<td>입고완료</td>
+										</tr>
+										<tr>
+											<td>3</td>
+											<td>2018-03-12</td>
+											<td>2018-03-12</td>
+											<td>(주)넥스트랩</td>
+											<td>리모컨</td>
+											<td>UHD용 리모컨</td>
+											<td>5</td>
+											<td>25,000</td>
+											<td>입고대기</td>
+										</tr>
+										<tr>
+											<td>2</td>
+											<td>2018-03-12</td>
+											<td>2018-03-12</td>
+											<td>(주)넥스트랩</td>
+											<td>리모컨</td>
+											<td>UHD용 리모컨</td>
+											<td>5</td>
+											<td>25,000</td>
+											<td>입고완료</td>
+										</tr>
+										<tr>
+											<td>1</td>
+											<td>2018-03-12</td>
+											<td>2018-03-12</td>
+											<td>(주)넥스트랩</td>
+											<td>리모컨</td>
+											<td>UHD용 리모컨</td>
+											<td>5</td>
+											<td>25,000</td>
+											<td>입고대기</td>
+										</tr>
+									</tbody> 
+								</table>
+							</div>
+							<!-- end.scroll_wrap -->
+						</div><!-- end .table_vertical.scroll -->
+						<div class="table_bottom_wrap">
+							<div class="button_wrap left">					
+								<button type="button" class="btn_tbl white exceldownload">엑셀 다운로드</button>
+								<button type="button" class="btn_tbl white excelupload">엑셀 업로드</button>
+							</div>
+							<div class="button_wrap right">					
+								<button type="button" class="btn_tbl white">엑셀양식 다운로드</button>
+								<button type="button" class="btn_tbl white">직접 등록</button>
+								<button type="button" class="btn_tbl white">정보 입력 완료</button>
+							</div>
+						</div>
+						<!-- end.table_bottom_wrap -->
+					</section>
+				</div>
+				<!-- end tab1 -->
+				<div class="dims_tab_content" data-tab="tab2">	
+					<div class="height20"></div>
+					<div class="page_title">재활용 입고 부속물 목록</div>
+					<div class="height20"></div>
+					<section>						
+						<div class="table_vertical">
+							<table summary="검색결과">
+								<caption>검색결과</caption>
+								<colgroup>                        
+									<col width="55">
+									<col style="width: calc(100% - 55px)/4;">
+									<col style="width: calc(100% - 55px)/4;">
+									<col style="width: calc(100% - 55px)/4;">
+									<col style="width: calc(100% - 55px)/4;">
+								</colgroup>
+								<thead>
+									<tr>								
+										<th scope="col">No.</th>
+										<th scope="col">분류</th>
+										<th scope="col">제조사</th>
+										<th scope="col">제품명</th>
+										<th scope="col">입고수량</th>		
+									</tr>
+								</thead> 
+								<tbody> 
+									<tr>
+										<td>1</td>
+										<td>리모컨</td>
+										<td>(주)제조사1</td>
+										<td>UHD용 리모컨</td>
+										<td>20</td>
+									</tr>
+									<tr>
+										<td>2</td>
+										<td>리모컨</td>
+										<td>(주)제조사1</td>
+										<td>UHD용 리모컨</td>
+										<td>20</td>
+									</tr>
+									<tr>
+										<td>3</td>
+										<td>리모컨</td>
+										<td>(주)제조사1</td>
+										<td>UHD용 리모컨</td>
+										<td>20</td>
+									</tr>
+									<tr>
+										<td>4</td>
+										<td>리모컨</td>
+										<td>(주)제조사1</td>
+										<td>UHD용 리모컨</td>
+										<td>20</td>
+									</tr>
+								</tbody>
+								<tfoot>
+									<tr>
+										<td colspan="5">계 : 100</td>
+									</tr>
+								</tfoot> 
+							</table>						
+						</div><!-- end table_wrap -->
+					</section>
+				</div>		
+				<!-- end tab2 -->						
+			</div><!-- end.content_middle -->
+			
+		</div><!-- end right_box -->
+	</div><!-- end .wrapper -->	
+    
+    <script src="../js/lib/jquery-3.2.1.min.js"></script>
+    <script src="../js/lib/jquery-ui.min.js"></script>	
+	<script src="../js/ui.js"></script>
+    <script src="../js/lib/prefixfree.min.js"></script>		
+    <script src="../js/lib/jquery.form.min.js"></script>
+	<script src="../js/lib/calendar.js"></script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tiles-definitions PUBLIC
+		"-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN"
+		"http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+<tiles-definitions>
+
+	<definition name="default" template="/WEB-INF/views/common/tiles/default.jsp">
+		<put-attribute name="resource" value="/WEB-INF/views/common/tiles/resource.jsp" />
+		<put-attribute name="top" value="/WEB-INF/views/common/tiles/top.jsp" />
+		<put-attribute name="body" value=""/>
+	</definition>
+	
+	<definition name="contents" template="/WEB-INF/views/common/tiles/contents.jsp">
+		<put-attribute name="resource" value="/WEB-INF/views/common/tiles/resource.jsp" />
+		<put-attribute name="body" value=""/>
+	</definition>
+	
+	<definition name="none" template="/WEB-INF/views/common/tiles/none.jsp">
+		<put-attribute name="body" value=""/>
+	</definition>
+	
+	<definition name="mail"	template="/WEB-INF/views/common/tiles/mail.jsp">
+		<put-attribute name="body" />
+	</definition>
+	
+	<definition name="mail/*" extends="mail">
+		<put-attribute name="body" value="/WEB-INF/views/mail/{1}.jsp" />
+	</definition>
+	
+	<definition name="mail/*/*" extends="mail">
+		<put-attribute name="body" value="/WEB-INF/views/mail/{1}/{2}.jsp" />
+	</definition>
+	
+	<definition name="error/*" extends="none">
+		<put-attribute name="body" value="/WEB-INF/views/error/{1}.jsp" />
+	</definition>
+	
+	<definition name="*" extends="default">
+		<put-attribute name="body" value="/WEB-INF/views/{1}.jsp" />
+	</definition>
+	
+	<definition name="*/*" extends="default">
+		<put-attribute name="body" value="/WEB-INF/views/{1}/{2}.jsp" />
+	</definition>
+	
+	<definition name="*/*/*" extends="default">
+		<put-attribute name="body" value="/WEB-INF/views/{1}/{2}/{3}.jsp" />
+	</definition>
+	
+	<definition name="bot/login"	extends="contents">
+		<put-attribute name="body" value="/WEB-INF/views/bot/login.jsp" />
+	</definition>
+</tiles-definitions>

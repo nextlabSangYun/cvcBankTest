@@ -1,0 +1,46 @@
+/**
+ * @title	: 테스트케이스 관련 mapper
+ * @package	: kr.co.nextlab.hded.mapper
+ * @file	: HdedTcMapper.java
+ * @author	: winolonam
+ * @date	: 2018. 06. 05.
+ * @desc	: 
+ */
+package kr.co.nextlab.hded.mapper;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import kr.co.nextlab.hded.model.HeTcTmplCriteria;
+import kr.co.nextlab.hded.model.HeTcTmplVo;
+
+@Mapper
+public interface HdedTcMapper {
+	
+	/**
+	 * 참여한 프로젝트 리스트 조회
+	 * @param heProjectVo
+	 * @return 참여한 프로젝트 리스트
+	 */
+	public List<HeTcTmplVo> selectTcChangeHistList();
+	
+	/**
+	 * 테스트 케이스 변경 이력 전체 리스트 조회
+	 * @return
+	 */
+	public List<HeTcTmplVo> selectTcChangeHistAllList(HeTcTmplCriteria heTcTmplCriteria);
+	
+	/**
+	 * 해당 그룹 아이디에 속하는 이력 리스트 조회
+	 * @return
+	 */
+	public List<HeTcTmplVo> selectTcChangeHistByGroupIdList(String groupId);
+	
+	/**
+	 * 선택데이터 와 현재데이터 비교 리스트
+	 * @param tcId
+	 * @return
+	 */
+	public List<HeTcTmplVo> selectTcChangeHistDetail(String tcId);
+}

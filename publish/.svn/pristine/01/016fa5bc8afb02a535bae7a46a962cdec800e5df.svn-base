@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>CVCBank</title>
+	<link rel="shortcut icon" href="../../images/favicon.ico" type="image/x-icon">
+	<link rel="stylesheet" href="../../css/common.css">
+	<link rel="stylesheet" href="../../css/bot.css">
+	<script src="../../js/jquery-3.2.1.min.js"></script>
+	<script src="../../js/jquery-ui.min.js"></script>
+	<script src="../../js/jquery.form.min.js"></script>
+	<script src="../../js/vue.min.js"></script>
+	<script src="../../js/lodash.min.js"></script>
+	<script src="../../js/calendar.js"></script>
+	<script src="../../js/common.js"></script>
+</head>
+<body>
+	<div class="pop_wrap">
+		<div class="pop_tit">
+			<p>시나리오 선택</p>
+		</div>
+		<div class="pop_cont">
+			<p class="info_tit">선택장비 정보</p>
+			<div class="g_table">
+				<table>
+					<caption></caption>
+					<colgroup>
+						<col style="width: 35%;">
+						<col>
+						<col>
+					</colgroup>
+					<thead>
+						<th>Bot이름</th>
+						<th>모델명</th>
+						<th>시리얼번호</th>
+					</thead>
+					<tbody>
+						<tr>
+							<td>STB Station 4호기</td>
+							<td>BTTSD-QC-MIRS</td>
+							<td>S18B004</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<div class="btn_wrap sel_scen">
+			<select>
+				<option value="">- 시나리오 선택 -</option>
+				<option>테스트 시나리오 01</option>
+				<option>테스트 시나리오 02</option>
+				<option>테스트 시나리오 03</option>
+				<option>테스트 시나리오 04</option>
+				<option>테스트 시나리오 05</option>
+				<option>테스트 시나리오 06</option>
+			</select>
+			<button class="btn_proc">테스트 실행</button>
+			<button class="btn_cancel">취소</button>
+		</div>
+	</div>
+</body>
+</html>

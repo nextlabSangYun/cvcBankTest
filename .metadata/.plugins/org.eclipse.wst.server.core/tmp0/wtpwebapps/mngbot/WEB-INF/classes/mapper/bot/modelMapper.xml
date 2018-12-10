@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.nextlab.bot.mapper.ModelMapper">
+
+	<select id="selectModelUseList" resultType="modelVo">
+		SELECT	a.model_id
+				, a.model_nm
+				, b.model_group_id
+				, b.model_group_nm
+				, b.model_type
+				, a.use_yn
+		FROM	tb_model a LEFT JOIN tb_model_group b ON (a.model_group_id = b.model_group_id)
+		WHERE a.use_yn = 'Y'
+		
+	</select>
+
+	<select id="selectModelList" resultType="modelVo" parameterType="modelCriteria">
+		SELECT	a.model_id
+				, a.model_nm
+				, (SELECT model_group_nm FROM TB_MODEL_GROUP WHERE model_group_id = a.model_group_id) AS model_group_nm
+				, a.model_group_id
+				, a.use_yn
+		FROM	tb_model a
+		WHERE 1=1
+		<if test="modelGroupId != null and modelGroupId != '' ">
+			AND a.model_group_id = #{modelGroupId}
+		</if>
+		<if test="useYn != null and useYn != '' ">
+			AND a.use_yn = #{useYn}
+		</if>
+		ORDER BY a.reg_dtm DESC		
+	</select>
+		
+	<select id="selectModelView" resultType="ModelVo" parameterType="String">
+		SELECT	model_id
+				, model_nm
+				, use_yn
+				, model_group_id
+		FROM	tb_model
+		WHERE	model_id = #{modelId}
+	</select>
+	<insert id="insertModel" parameterType="modelVo">
+		INSERT	INTO tb_model
+				(
+					model_id
+					, model_nm
+					, use_yn
+					, reg_id
+					, model_group_id
+				)
+		VALUES	(
+					#{modelId}
+					, #{modelNm}
+					, #{useYn}
+					, #{regId}
+					, #{modelGroupId}
+				)
+	</insert>
+	
+	<update id="updateModel" parameterType="modelVo">
+		UPDATE tb_model
+		SET
+			model_nm = #{modelNm}
+			, model_group_id = #{modelGroupId}
+			, use_yn = #{useYn}
+		WHERE model_id = #{modelId}
+	</update>
+	
+	<select id="selectModelNm"  resultType="modelVo" parameterType="String">
+		SELECT	model_id
+				, model_nm
+		FROM	tb_model
+		WHERE	model_nm = #{modelNm}	
+	</select>
+	
+</mapper>

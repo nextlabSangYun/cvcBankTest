@@ -1,0 +1,652 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.nextlab.bmt.mapper.XqmsMapper">
+
+	<sql id="xqmsWhere">
+		WHERE a.yyyymmdd BETWEEN #{startDt} AND #{endDt}
+		<if test=" modelIdArray != null ">
+			AND a.model_id IN
+			<foreach collection="modelIdArray" item="array" open="(" separator="," close=")">
+				#{array}
+			</foreach>
+		</if>
+		<if test=" pidArray != null ">
+			AND a.pid IN
+			<foreach collection="pidArray" item="array" open="(" separator="," close=")">
+				#{array}
+			</foreach>
+		</if>
+	</sql>
+	<select id="selectXqmsRemoconRobotList" parameterType="xqmsCriteria" resultType="xqmsVo">
+		SELECT a.xqms_seq
+			, a.xqms_type
+			, a.prj_chasu
+			, a.seq
+			, a.xqms_dtm
+			, (SELECT model_nm FROM tb_model c WHERE c.model_id = a.model_id) model_nm
+			, a.testcase
+			, a.mac
+			, a.model_ver
+			, a.person
+			, a.report_id
+			, (SELECT bot_nm FROM tb_bot c WHERE a.bot_sno = c.bot_sno) bot_nm
+			, (SELECT project_nm FROM tb_project c WHERE a.pid = c.pid) project_nm
+			, (SELECT model_nm FROM tb_model c WHERE c.model_id = a.remocon) remocon
+			, b.target_repeat
+			, b.result_repeat
+			, b.target_daq
+			, b.result_daq
+		FROM tb_xqms a
+		JOIN tb_robot b ON (a.xqms_seq = b.xqms_seq)
+		<include refid="xqmsWhere"/>
+		ORDER BY a.xqms_seq desc
+	</select>
+	<select id="selectXqmsBmtList" parameterType="xqmsCriteria" resultType="xqmsVo">
+		SELECT a.xqms_seq
+			, a.xqms_type
+			, a.prj_chasu
+			, a.seq
+			, a.xqms_dtm
+			, (SELECT model_nm FROM tb_model c WHERE c.model_id = a.model_id) model_nm
+			, a.testcase
+			, a.mac
+			, a.model_ver
+			, a.person
+			, a.report_id
+			, (SELECT bot_nm FROM tb_bot c WHERE a.bot_sno = c.bot_sno) bot_nm
+			, (SELECT project_nm FROM tb_project c WHERE a.pid = c.pid) project_nm
+			, (SELECT model_nm FROM tb_model c WHERE c.model_id = a.remocon) remocon
+			, b.bmt_result
+			, b.reg_dtm
+		FROM tb_xqms a
+		JOIN tb_bmt b ON (a.xqms_seq = b.xqms_seq)
+		<include refid="xqmsWhere"/>
+		ORDER BY a.xqms_seq desc
+	</select>
+	<select id="selectLastReport" parameterType="xqmsCriteria" resultType="xqmsVo">
+		SELECT	top(1) 
+			xqms_seq
+			, model_seq
+			, xqms_type
+			, prj_chasu
+			, seq
+			, model_id
+			, remocon
+			, testcase
+			, mac
+			, model_ver
+			, person
+			, yyyymmdd
+			, report_id
+			, pid
+			, bot_sno
+			, xqms_dtm
+			, tc_type
+		FROM tb_xqms
+		WHERE	pid = #{pid} AND person = #{person}
+		ORDER BY xqms_seq DESC
+	</select>
+	<select id="selectXqmsChannelList" parameterType="xqmsCriteria" resultType="xqmsVo">
+		SELECT a.xqms_seq
+			, a.xqms_type
+			, a.prj_chasu
+			, a.seq
+			, a.xqms_dtm
+			, (SELECT model_nm FROM tb_model c WHERE c.model_id = a.model_id) model_nm
+			, a.testcase
+			, a.mac
+			, a.model_ver
+			, a.person
+			, a.report_id
+			, (SELECT bot_nm FROM tb_bot c WHERE a.bot_sno = c.bot_sno) bot_nm
+			, (SELECT project_nm FROM tb_project c WHERE a.pid = c.pid) project_nm
+			, (SELECT model_nm FROM tb_model c WHERE c.model_id = a.remocon) remocon
+			, b.tot_time
+			, b.remocon_react_time
+			, b.first_stop_time
+			, b.second_stop_time
+			, b.ntw_time
+		FROM tb_xqms a
+		JOIN tb_channel b ON (a.xqms_seq = b.xqms_seq)
+		<include refid="xqmsWhere"/>
+		ORDER BY a.xqms_seq desc
+	</select>
+	
+	<select id="selectXqmsUiReactionList" parameterType="xqmsCriteria" resultType="xqmsVo">
+		SELECT a.xqms_seq
+			, a.xqms_type
+			, a.prj_chasu
+			, a.seq
+			, a.xqms_dtm
+			, (SELECT model_nm FROM tb_model c WHERE c.model_id = a.model_id) model_nm
+			, a.testcase
+			, a.mac
+			, a.model_ver
+			, a.person
+			, a.report_id
+			, (SELECT bot_nm FROM tb_bot c WHERE a.bot_sno = c.bot_sno) bot_nm
+			, (SELECT project_nm FROM tb_project c WHERE a.pid = c.pid) project_nm
+			, (SELECT model_nm FROM tb_model c WHERE c.model_id = a.remocon) remocon
+			, b.react_time
+			, b.match_time
+			, b.reg_dtm
+			, b.diff_time
+		FROM tb_xqms a
+		JOIN tb_cold_reset b ON (a.xqms_seq = b.xqms_seq)
+		<include refid="xqmsWhere"/>
+		ORDER BY a.xqms_seq desc
+	</select>
+	
+	<select id="selectXqmsModelVerList" parameterType="String" resultType="xqmsVo">
+		SELECT (SELECT project_nm FROM tb_project WHERE pid = a.pid) project_nm
+			, a.model_id
+			, a.model_ver
+			, a.pid
+		FROM tb_xqms a
+		WHERE a.yyyymmdd BETWEEN CONVERT(CHAR(8), DATEADD("yy",-1, GETDATE()), 112) AND CONVERT(CHAR(8), GETDATE(), 112)
+		AND a.model_id = #{modelId}
+		GROUP BY a.pid, a.model_id, a.model_ver
+		ORDER BY a.model_ver desc
+	</select>
+	
+	<sql id="xqmsSearchWhere">
+		<if test="pid != null and pid != '' ">
+			AND a.pid = #{pid}
+		</if>
+		<if test="seqArray != null and seqArray != ''">
+			AND d.seq IN
+			<foreach collection="seqArray" item ="array" open="(" separator="," close=")">
+				#{array}
+			</foreach>			
+		</if> 
+		<if test="bigCateId != null and bigCateId != '' ">
+			AND d.big_cate_id = #{bigCateId}
+		</if>
+		<if test="importanceArray != null ">
+			AND d.importance IN
+			<foreach collection="importanceArray" item ="array" open="(" separator="," close=")">
+				#{array}
+			</foreach>
+		</if>
+		<if test="modelSeqArray != null ">
+			AND a.model_seq IN
+			<foreach collection="modelSeqArray" item="array" open="(" separator="," close=")">
+				#{array}
+			</foreach>
+		</if>
+	</sql>
+	<select id="selectProjectXqmsRemoconRobotList" parameterType="xqmsCriteria"  resultType="xqmsVo" >
+	SELECT a.xqms_seq
+			, a.xqms_type
+			, a.seq
+			, a.xqms_dtm
+			, a.testcase
+			, a.prj_chasu
+			, (SELECT model_nm FROM tb_model c WHERE c.model_id = a.remocon) remocon
+			, a.mac
+			, (SELECT model_nm FROM tb_model c WHERE c.model_id = a.model_id) model_nm
+			, a.model_ver
+			, a.person
+			, a.report_id
+			, b.target_repeat
+			, b.result_repeat
+			, b.target_daq
+			, b.result_daq
+			, b.repeat_result
+			, d.big_cate_id
+			, d.importance
+			, d.tc_id
+			, d.tc_division
+			, (SELECT e.tc_cate_nm FROM tb_bmt_tc_category e WHERE e.pid = a.pid AND e.tc_cate_id = d.big_cate_id) big_cate_nm
+			, (SELECT count(1) FROM tb_xqms_attach WHERE xqms_seq = a.xqms_seq) isYn
+		FROM tb_xqms a
+		JOIN tb_robot b ON (a.xqms_seq = b.xqms_seq)
+		JOIN tb_bmt_tc_info d ON (d.seq = a.seq)
+		WHERE a.yyyymmdd BETWEEN #{startDt} AND #{endDt}
+		<if test="bmtResult != null and bmtResult != ''">
+			AND b.repeat_result = #{bmtResult}
+		</if>
+		<include refid="xqmsSearchWhere" />
+		ORDER By a.xqms_seq DESC
+	</select>
+	
+	<select id="selectProjectXqmsBmtList" parameterType="xqmsCriteria"  resultType="xqmsVo"  >
+		SELECT a.xqms_seq
+			, a.xqms_type
+			, a.seq
+			, a.xqms_dtm
+			, a.testcase
+			, a.prj_chasu
+			, (SELECT model_nm FROM tb_model c WHERE c.model_id = a.remocon) remocon
+			, a.mac
+			, (SELECT model_nm FROM tb_model c WHERE c.model_id = a.model_id) model_nm
+			, a.model_ver
+			, a.person
+			, a.report_id
+			, b.bmt_result
+			, d.big_cate_id
+			, d.importance
+			, d.tc_id
+			, d.tc_division
+			, (SELECT e.tc_cate_nm FROM tb_bmt_tc_category e WHERE e.pid = a.pid AND e.tc_cate_id = d.big_cate_id) big_cate_nm
+			, (SELECT count(1) FROM tb_xqms_attach WHERE xqms_seq = a.xqms_seq) isYn
+		FROM tb_xqms a
+		JOIN tb_bmt b ON (a.xqms_seq = b.xqms_seq)
+		JOIN tb_bmt_tc_info d ON (d.seq = a.seq)
+		WHERE a.yyyymmdd BETWEEN #{startDt} AND #{endDt}
+		<if test="bmtResult != null and bmtResult != ''">
+			AND b.bmt_result = #{bmtResult}
+		</if>
+		<include refid="xqmsSearchWhere" />
+		ORDER By a.xqms_seq DESC
+	</select>	
+
+	<select id="selectProjectXqmsChannelList" parameterType="xqmsCriteria" resultType="xqmsVo">
+		SELECT a.xqms_seq
+			, a.xqms_type
+			, a.seq
+			, a.xqms_dtm
+			, (SELECT model_nm FROM tb_model c WHERE c.model_id = a.model_id) model_nm
+			, a.testcase
+			, a.mac
+			, a.model_ver
+			, a.person
+			, a.report_id			
+			, a.prj_chasu
+			, (SELECT model_nm FROM tb_model c WHERE c.model_id = a.remocon) remocon
+			, b.tot_time
+			, b.remocon_react_time
+			, b.first_stop_time
+			, b.second_stop_time
+ 			, b.ntw_time
+ 			, b.channel_result
+ 			, d.importance
+			, d.big_cate_id
+			, d.tc_id
+			, d.tc_division
+			, (SELECT e.tc_cate_nm FROM tb_bmt_tc_category e WHERE e.pid = a.pid AND e.tc_cate_id = d.big_cate_id) big_cate_nm
+			, (SELECT count(1) FROM tb_xqms_attach WHERE xqms_seq = a.xqms_seq) isYn		
+		FROM tb_xqms a
+		JOIN tb_channel b ON (a.xqms_seq = b.xqms_seq)
+		JOIN tb_bmt_tc_info d ON (d.seq = a.seq)
+		WHERE a.yyyymmdd BETWEEN #{startDt} AND #{endDt}
+		<if test="bmtResult != null and bmtResult != ''">
+			AND b.channel_result = #{bmtResult}
+		</if>
+		<include refid="xqmsSearchWhere"/>
+		ORDER BY a.xqms_seq DESC
+	</select>
+
+	<select id="selectProjectXqmsUiReationList" parameterType="xqmsCriteria" resultType="xqmsVo">
+		SELECT a.xqms_seq
+			, a.xqms_type
+			, a.seq
+			, a.xqms_dtm
+			, (SELECT model_nm FROM tb_model c WHERE c.model_id = a.model_id) model_nm
+			, a.testcase
+			, a.mac
+			, a.model_ver
+			, a.person
+			, a.report_id
+			, a.prj_chasu
+			, (SELECT model_nm FROM tb_model c WHERE c.model_id = a.remocon) remocon
+			, b.react_time
+			, b.match_time
+			, b.diff_time
+			, b.cold_reset_result
+			, d.importance
+			, d.tc_id
+			, d.big_cate_id
+			, d.tc_division
+			, (SELECT e.tc_cate_nm FROM tb_bmt_tc_category e WHERE e.pid = a.pid AND e.tc_cate_id = d.big_cate_id) big_cate_nm
+			, (SELECT count(1) FROM tb_xqms_attach WHERE xqms_seq = a.xqms_seq) isYn
+		FROM tb_xqms a
+		JOIN tb_cold_reset b ON (a.xqms_seq = b.xqms_seq)
+		JOIN tb_bmt_tc_info d ON (d.seq = a.seq)
+		WHERE a.yyyymmdd BETWEEN #{startDt} AND #{endDt}
+		<if test="bmtResult != null and bmtResult != ''">
+			AND b.cold_reset_result = #{bmtResult}
+		</if>
+		<include refid="xqmsSearchWhere"/>
+		ORDER BY a.xqms_seq DESC
+	</select>
+
+	<select id="selectProjectXqmsBmtView" parameterType="String" resultType="xqmsVo">
+		SELECT a.xqms_seq
+			, a.xqms_type
+			, a.seq
+			, a.xqms_dtm
+			, d.big_cate_id
+			, a.testcase
+			, d.importance
+			, a.prj_chasu
+			, (SELECT model_nm FROM tb_model c WHERE c.model_id = a.remocon) remocon
+			, (SELECT model_nm FROM tb_model c WHERE c.model_id = a.model_id) model_nm
+			, a.person
+			, b.bmt_result
+		FROM tb_xqms a
+		JOIN tb_bmt b ON (a.xqms_seq = b.xqms_seq)
+		JOIN tb_bmt_tc_info d ON (d.seq = a.seq)
+		WHERE a.xqms_seq = #{xqmsSeq}
+	</select>
+	
+	<update id="updateProjectXqmsBmtResult" parameterType="xqmsVo">
+		UPDATE tb_bmt
+		SET
+			bmt_result = #{bmtResult}
+		WHERE xqms_seq = #{xqmsSeq}
+	</update>
+
+	<update id="updateLastBmtResult" parameterType="String">
+		MERGE INTO TB_BMT_TC_INFO T
+		USING (SELECT TOP 1 B.BMT_RESULT, A.SEQ
+				 FROM TB_XQMS A, TB_BMT B
+				 WHERE A.SEQ = #{seq}
+					AND B.XQMS_SEQ = A.XQMS_SEQ
+				 ORDER BY B.XQMS_SEQ DESC) V
+		ON (T.SEQ = V.SEQ)
+			WHEN MATCHED THEN
+			UPDATE SET T.LAST_BMT_RESULT = V.BMT_RESULT;
+	</update>
+
+	<update id="updateLastChannelResult" parameterType="String">
+		MERGE INTO TB_BMT_TC_INFO T
+		USING (SELECT TOP 1 b.channel_result, A.SEQ
+				 FROM TB_XQMS A, tb_channel B
+				 WHERE A.SEQ = #{seq}
+					AND B.XQMS_SEQ = A.XQMS_SEQ
+				 ORDER BY B.XQMS_SEQ DESC) V
+		ON (T.SEQ = V.SEQ)
+			WHEN MATCHED THEN
+			UPDATE SET T.LAST_BMT_RESULT = V.channel_result;
+	</update>
+
+	<update id="updateLastRemoconRobotResult" parameterType="String">
+		MERGE INTO TB_BMT_TC_INFO T
+		USING (SELECT TOP 1 b.repeat_result, A.SEQ
+				 FROM TB_XQMS A, tb_robot B
+				 WHERE A.SEQ = #{seq}
+					AND B.XQMS_SEQ = A.XQMS_SEQ
+				 ORDER BY B.XQMS_SEQ DESC) V
+		ON (T.SEQ = V.SEQ)
+			WHEN MATCHED THEN
+			UPDATE SET T.LAST_BMT_RESULT = V.repeat_result;
+	</update>
+	
+	<update id="updateLastUiReactionResult" parameterType="String">
+		MERGE INTO TB_BMT_TC_INFO T
+		USING (SELECT TOP 1 b.cold_reset_result, A.SEQ
+				 FROM TB_XQMS A, tb_cold_reset B
+				 WHERE A.SEQ = #{seq}
+					AND B.XQMS_SEQ = A.XQMS_SEQ
+				 ORDER BY B.XQMS_SEQ DESC) V
+		ON (T.SEQ = V.SEQ)
+			WHEN MATCHED THEN
+			UPDATE SET T.LAST_BMT_RESULT = V.cold_reset_result;	
+	</update>
+	
+	<update id="updateLastBmtResultNull" parameterType="String">
+		UPDATE tb_bmt_tc_info
+		SET
+			last_bmt_result = NULL
+		WHERE seq = #{seq}
+	</update>
+		
+	<select id="selectProjectXqmsChannelView" parameterType="String" resultType="xqmsVo">
+		SELECT a.xqms_seq
+			, a.xqms_type
+			, a.seq
+			, a.xqms_dtm
+			, a.testcase
+			, (SELECT model_nm FROM tb_model c WHERE c.model_id = a.model_id) model_nm
+			, a.prj_chasu
+			, (SELECT model_nm FROM tb_model c WHERE c.model_id = a.remocon) remocon
+			, a.person
+			, b.tot_time
+			, b.remocon_react_time
+			, b.first_stop_time
+			, b.second_stop_time
+ 			, b.ntw_time
+ 			, b.channel_result
+ 			, d.big_cate_id
+ 			, d.importance
+ 		FROM tb_xqms a
+		JOIN tb_channel b ON (a.xqms_seq = b.xqms_seq)
+		JOIN tb_bmt_tc_info d ON (d.seq = a.seq)
+		WHERE a.xqms_seq = #{xqmsSeq}
+	</select>	
+	<update id="updateProjectXqmsChannelResult" parameterType="xqmsVo">
+		UPDATE tb_channel
+		SET
+			tot_time = #{totTime}
+			, remocon_react_time = #{remoconReactTime}
+			, first_stop_time = #{firstStopTime}
+			, second_stop_time = #{secondStopTime}
+			, ntw_time = #{ntwTime}
+			, channel_result = #{channelResult}
+		WHERE xqms_seq = #{xqmsSeq}
+	</update>	
+	
+	<select id="selectProjectXqmsUiReactionView" parameterType="String" resultType="xqmsVo">
+		SELECT a.xqms_seq
+			, a.xqms_type
+			, a.seq
+			, a.xqms_dtm
+			, a.testcase
+			, (SELECT model_nm FROM tb_model c WHERE c.model_id = a.model_id) model_nm
+			, a.prj_chasu
+			, (SELECT model_nm FROM tb_model c WHERE c.model_id = a.remocon) remocon
+			, a.person
+			, b.match_time
+			, b.react_time
+			, b.diff_time
+			, b.cold_reset_result
+			, d.big_cate_id
+			, d.importance
+		FROM tb_xqms a
+		JOIN tb_cold_reset b ON (a.xqms_seq = b.xqms_seq)
+		JOIN tb_bmt_tc_info d ON (d.seq = a.seq)
+		WHERE a.xqms_seq = #{xqmsSeq}		
+	</select>
+	
+	<select id="selectProjectXqmsRemoconRobotView" parameterType="String" resultType="xqmsVo">
+		SELECT a.xqms_seq
+			, a.xqms_type
+			, a.seq
+			, a.xqms_dtm
+			, a.testcase
+			, (SELECT model_nm FROM tb_model c WHERE c.model_id = a.model_id) model_nm
+			, a.prj_chasu
+			, (SELECT model_nm FROM tb_model c WHERE c.model_id = a.remocon) remocon
+			, a.person
+			, b.target_repeat
+			, b.result_repeat
+			, b.target_daq
+			, b.result_daq
+			, b.repeat_result
+			, d.big_cate_id
+			, d.importance
+		FROM tb_xqms a
+		JOIN tb_robot b ON (a.xqms_seq = b.xqms_seq)
+		JOIN tb_bmt_tc_info d ON (d.seq = a.seq)
+		WHERE a.xqms_seq = #{xqmsSeq}		
+	</select>
+	
+	<update id="updateProjectXqmsUiReactionResult" parameterType="xqmsVo">
+		UPDATE tb_cold_reset
+		SET
+			react_time = #{reactTime}
+			, match_time = #{matchTime}
+			, diff_time = #{diffTime}
+			, cold_reset_result = #{coldResetResult}
+		WHERE xqms_seq = #{xqmsSeq}
+	</update>	
+	
+	<update id="updateProjectXqmsRemoconRobotResult" parameterType="xqmsVo">
+		UPDATE tb_robot
+		SET
+			target_repeat = #{targetRepeat}
+			, result_repeat = #{resultRepeat}
+			, target_daq = #{targetDaq}
+			, result_daq = #{resultDaq}
+			, repeat_result = #{repeatResult}
+		WHERE xqms_seq = #{xqmsSeq}
+	</update>
+
+	<delete id="deleteBmtData" parameterType="String">
+		DELETE
+		FROM tb_bmt
+		WHERE xqms_seq = #{xqmsSeq}
+	</delete>
+	
+	<delete id="deleteXqmsFileData" parameterType="String">
+		DELETE
+		FROM tb_xqms_attach
+		WHERE xqms_seq = #{xqmsSeq}
+	</delete>
+		
+	<delete id="deleteProjectXqmsBmt" parameterType="String">
+		DELETE 
+		FROM tb_xqms
+		WHERE xqms_seq = #{xqmsSeq}
+	</delete>
+	
+	<delete id="deleteChannelData" parameterType="String">
+		DELETE
+		FROM tb_channel
+		WHERE xqms_seq = #{xqmsSeq}	
+	</delete>
+	
+	<delete id="deleteProjectXqmsChannel" parameterType="String">
+		DELETE
+		FROM tb_xqms
+		WHERE xqms_seq = #{xqmsSeq}	
+	</delete>
+	
+	<delete id="deleteUiReactionData" parameterType="String">
+		DELETE
+		FROM tb_cold_reset
+		WHERE xqms_seq = #{xqmsSeq}		
+	</delete>
+	
+	<delete id="deleteRemoconRobotData" parameterType="String">
+		DELETE
+		FROM tb_robot
+		WHERE xqms_seq = #{xqmsSeq}		
+	</delete>
+	
+	<delete id="deleteProjectXqmsRemoconRobot" parameterType="String">
+		DELETE
+		FROM tb_xqms
+		WHERE xqms_seq = #{xqmsSeq}		
+	</delete>
+	
+	<delete id="deleteProjectXqmsUiReatction" parameterType="String">
+		DELETE
+		FROM tb_xqms
+		WHERE xqms_seq = #{xqmsSeq}		
+	</delete>
+		
+	<select id="selectXqmsChannelStsView" parameterType="xqmsCriteria" resultType="xqmsVo">
+		SELECT (SELECT project_nm FROM tb_project WHERE pid = a.pid) project_nm
+			, (SELECT model_nm FROM tb_model WHERE model_id = a.model_id) model_nm
+			, a.model_id
+			, a.model_ver
+			, a.pid
+			, ISNULL(COUNT(b.tot_time),0) tot_cnt
+			, ISNULL(MIN(b.tot_time),0) tot_min
+			, ISNULL(MAX(b.tot_time),0) tot_max
+			, ISNULL(AVG(b.tot_time),0) tot_avg
+			, ISNULL(AVG(b.remocon_react_time),0) tot_remocon_react_time
+			, ISNULL(AVG(b.first_stop_time),0) tot_first_stop_time
+			, ISNULL(AVG(b.second_stop_time),0) tot_second_stop_time
+			, ISNULL(AVG(b.ntw_time),0) tot_ntw_time
+		FROM tb_xqms a
+		JOIN tb_channel b ON (a.xqms_seq = b.xqms_seq)
+		WHERE model_id = #{modelId}
+		AND a.pid = #{pid}
+		AND a.model_ver = #{modelVer}
+		AND b.tot_time is not null
+		GROUP BY a.pid, a.model_id, a.model_ver
+	</select>
+	
+	<select id="selectXqmsChannelDetailList" parameterType="xqmsCriteria" resultType="xqmsVo">
+		SELECT 
+			(SELECT model_nm FROM tb_model WHERE model_id = a.model_id) model_nm
+			, a.model_ver
+			, a.xqms_dtm
+			, b.remocon_react_time
+			, b.first_stop_time
+			, b.second_stop_time
+			, b.tot_time
+			, b.ntw_time
+		FROM tb_xqms a
+		JOIN tb_channel b ON (a.xqms_seq = b.xqms_seq)
+		WHERE model_id = #{modelId}
+		AND a.pid = #{pid}
+		AND a.model_ver = #{modelVer}
+		AND b.tot_time is not null
+		ORDER BY a.xqms_dtm desc
+	</select>
+	
+	<select id="selectXqmsUiReactionStsView" parameterType="xqmsCriteria" resultType="xqmsVo">
+		SELECT (SELECT project_nm FROM tb_project WHERE pid = a.pid) project_nm
+			, (SELECT model_nm FROM tb_model WHERE model_id = a.model_id) model_nm
+			, a.model_id
+			, a.model_ver
+			, a.pid
+			, ISNULL(SUM(b.match_time),0) match_time_sum
+			, ISNULL(MAX(b.match_time),0) match_time_max
+			, ISNULL(MIN(b.match_time),0) match_time_min
+			, ISNULL(AVG(b.match_time),0) match_time_avg
+			, ISNULL(SUM(b.react_time),0) react_time_sum
+			, ISNULL(MAX(b.react_time),0) react_time_max
+			, ISNULL(MIN(b.react_time),0) react_time_min
+			, ISNULL(AVG(b.react_time),0) react_time_avg
+			, ISNULL(SUM(b.diff_time),0) diff_time_sum
+			, ISNULL(MAX(b.diff_time),0) diff_time_max
+			, ISNULL(MIN(b.diff_time),0) diff_time_min
+			, ISNULL(AVG(b.diff_time),0) diff_time_avg
+			, ISNULL(COUNT(a.pid),0) tot_cnt
+		FROM tb_xqms a
+		JOIN tb_cold_reset b ON (a.xqms_seq = b.xqms_seq)
+		WHERE model_id = #{modelId}
+		AND a.pid = #{pid}
+		AND a.model_ver = #{modelVer}
+		AND (b.react_time is not null or b.match_time is not null or b.diff_time is not null)
+		GROUP BY a.pid, a.model_id, a.model_ver
+	</select>
+	
+	<select id="selectXqmsUiReactionDetailList" parameterType="xqmsCriteria" resultType="xqmsVo">
+		SELECT 
+			(SELECT model_nm FROM tb_model WHERE model_id = a.model_id) model_nm
+			, a.model_ver
+			, a.xqms_dtm
+			, b.react_time
+			, b.match_time
+			, b.diff_time
+		FROM tb_xqms a
+		JOIN tb_cold_reset b ON (a.xqms_seq = b.xqms_seq)
+		WHERE model_id = #{modelId}
+		AND a.pid = #{pid}
+		AND a.model_ver = #{modelVer}
+		AND (b.react_time is not null or b.match_time is not null or b.diff_time is not null)
+		ORDER BY a.xqms_dtm desc
+	</select>
+	
+	<select id = "selectXqmsAttachList" parameterType="String" resultType="xqmsAttachVo">
+		SELECT 
+			file_source
+			, file_nm
+			, file_path
+			, org_file_nm
+		FROM tb_xqms_attach
+		WHERE xqms_seq = #{xqmsSeq}
+	</select>
+	
+	<select id="selectXqmsSeqByPid" parameterType="String" resultType="xqmsVo">
+		SELECT xqms_seq
+		FROM tb_xqms
+		WHERE pid = #{pid}
+	</select>
+</mapper>

@@ -1,0 +1,31 @@
+/**
+ * @title	: H/E 테스트 케이스 서비스 impl
+ * @package	: kr.co.nextlab.hded.service.impl
+ * @file	: HdedTcServiceImpl.java
+ * @author	: winolonam
+ * @date	: 2018. 4. 26.
+ * @desc	: 
+ */
+package kr.co.nextlab.hded.service.impl;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import kr.co.nextlab.comm.model.FileVo;
+import kr.co.nextlab.component.FileComponent;
+import kr.co.nextlab.hded.service.HdedTcService;
+
+@Service
+public class HdedTcServiceImpl implements HdedTcService{
+
+	@Autowired
+	private FileComponent fileComponent;
+
+	@Override
+	public boolean insertLargeTcList(FileVo fileVo) {
+		
+		fileComponent.readExcel(fileVo.getFilePath(), fileVo.getFileNm());
+		
+		return false;
+	}
+}

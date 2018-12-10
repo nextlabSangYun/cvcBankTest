@@ -1,0 +1,43 @@
+/**
+ * @title	: QA test case service 구현
+ * @package	: kr.co.nextlab.qa.service.impl
+ * @file	: QaTcServiceImpl.java
+ * @author	: winolonam
+ * @date	: 2018. 07. 10.
+ * @desc	: 
+ */
+package kr.co.nextlab.qa.service.impl;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import kr.co.nextlab.qa.mapper.QaTcMapper;
+import kr.co.nextlab.qa.model.QaTcInfotVo;
+import kr.co.nextlab.qa.service.QaTcService;
+
+@Service
+public class QaTcServiceImpl implements QaTcService {
+	
+	@Autowired
+	private QaTcMapper qaTcMapper;
+
+	/**
+	 * 테스트 현황 조회
+	 * @param pid
+	 * @return
+	 */
+	@Override
+	public QaTcInfotVo selectTcStatList(String pid) {
+		return qaTcMapper.selectTcStatList(pid);
+	}
+
+	/**
+	 * 결함 현황 조회
+	 * @param pid
+	 * @return
+	 */
+	@Override
+	public QaTcInfotVo selectFlawStatList(String pid) {
+		return qaTcMapper.selectFlawStatList(pid);
+	}
+}

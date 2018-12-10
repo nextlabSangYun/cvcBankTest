@@ -1,0 +1,212 @@
+/**
+ * @title	: 이슈 mapper
+ * @package	: kr.co.nextlab.bmt.mapper
+ * @file	: IssueMapper.java
+ * @author	: jnlee
+ * @date	: 2018. 1. 4.
+ * @desc	: 
+ */
+package kr.co.nextlab.bmt.mapper;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import kr.co.nextlab.bmt.model.IssueCateVo;
+import kr.co.nextlab.bmt.model.IssueCommentVo;
+import kr.co.nextlab.bmt.model.IssueCriteria;
+import kr.co.nextlab.bmt.model.IssueFileVo;
+import kr.co.nextlab.bmt.model.IssueModelVo;
+import kr.co.nextlab.bmt.model.IssuePartiVo;
+import kr.co.nextlab.bmt.model.IssueTcVo;
+import kr.co.nextlab.bmt.model.IssueVo;
+
+@Mapper
+public interface IssueMapper {
+
+	/**
+	 * 이슈 리스트
+	 * @param criteria
+	 * @return
+	 */
+	public List<IssueVo> selectIssueList(IssueCriteria criteria);
+	
+	/**
+	 * 이슈 상세조회
+	 * @param issueId 이슈아이디
+	 * @return 이슈 상세정보
+	 */
+	public IssueVo selectIssueView(String issueId);
+	
+	/**
+	 * 이슈 테스트케이스리스트
+	 * @param issueId 이슈아이디
+	 * @return 이슈 테스트케이스리스트
+	 */
+	public List<IssueTcVo> selectIssueTcList(String issueId);
+	
+	/**
+	 * 이슈 대상자 리스트
+	 * @param issueId 이슈아이디
+	 * @return 이슈 대상자 리스트
+	 */
+	public List<IssuePartiVo> selectIssuePartiList(String issueId);
+	
+	/**
+	 * 이슈 파일 리스트
+	 * @param issueId 이슈아이디
+	 * @return 이슈 파일 리스트
+	 */
+	public List<IssueFileVo> selectIssueFileList(String issueId);
+	
+	/**
+	 * 이슈 코멘트 리스트
+	 * @param issueId 이슈아이디
+	 * @return 이슈 코멘트 리스트
+	 */
+	public List<IssueCommentVo> selectIssueCommentList(String issueId);
+	
+	/**
+	 * 이슈 카테고리 리스트
+	 * @param issueId 이슈아이디
+	 * @return 이슈 카테고리 리스트
+	 */
+	public List<IssueCateVo> selectIssueCateList(String issueId);
+	
+	/**
+	 * 이슈 카테고리 리스트
+	 * @param issueId 이슈아이디
+	 * @return 이슈 카테고리 리스트
+	 */
+	public List<IssueCateVo> selectIssueCategoryList(String pid);
+	
+	/**
+	 * 이슈 측정모델 리스트
+	 * @param issueId 이슈아이디
+	 * @return 이슈 측정모델 리스트
+	 */
+	public List<IssueModelVo> selectIssueModelList(String issueId);
+	
+	/**
+	 * 이슈 등록
+	 * @param issueVo 이슈 정보
+	 * @return 등록 건수
+	 */
+	public int insertIssue(IssueVo issueVo);
+	
+	/**
+	 * 이슈 테스트케이스 등록
+	 * @param issueTcVo 이슈 테스트케이스 정보
+	 * @return 등록 건수
+	 */
+	public int insertIssueTc(IssueTcVo issueTcVo);
+	
+	/**
+	 * 이슈 대상 등록
+	 * @param issuePartiVo 이슈 대상 정보
+	 * @return 등록 건수
+	 */
+	public int insertIssueParti(IssuePartiVo issuePartiVo);
+	
+	/**
+	 * 이슈 대상 삭제
+	 * @param issueId 이슈 아이디
+	 * @return 삭제 건수
+	 */
+	public int deleteIssueParti(String issueId);
+
+	/**
+	 * 이슈 파일 등록
+	 * @param issuePartiVo 이슈 파일 정보
+	 * @return 등록 건수
+	 */
+	public int insertIssueFile(IssueFileVo issueFileVo);
+	
+	/**
+	 * 이슈 코멘트 등록
+	 * @param issueCommentVo 이슈 코멘트 정보
+	 * @return 등록 건수
+	 */
+	public int insertIssueComment(IssueCommentVo issueCommentVo);
+	
+	/**
+	 * 이슈 카테고리 등록
+	 * @param issueVo 이슈 정보
+	 * @return 등록 건수
+	 */
+	public int insertIssueCate(IssueVo issueVo);
+	
+	/**
+	 * 이슈 측정모델 등록
+	 * @param IssueModelVo 이슈 측정모델 정보
+	 * @return 등록 건수
+	 */
+	public int insertIssueModel(IssueModelVo issueModelVo);
+	
+	/**
+	 * 이슈 코멘트 수정
+	 * @param issueCommentVo 이슈 코멘트 정보
+	 * @return 등록 건수
+	 */
+	public boolean updateIssueComment(IssueCommentVo issueCommentVo);
+	/**
+	 * 이슈 진행상태 변경
+	 * @param issueVo 이슈 정보
+	 * @return 처리 결과
+	 */
+	public boolean updateIssueProgressStat(IssueVo issueVo);
+	/**
+	 * 이슈 진행상태 변경
+	 * @param issueVo 이슈 정보
+	 * @return 처리 결과
+	 */
+	public boolean updateIssueProgressStatComment(IssueVo issueVo);
+	/**
+	 * 이슈 삭제하기
+	 * @param issueId
+	 * @return
+	 */
+	public boolean deleteIssuePrc(String issueId);
+	
+	/**
+	 * 이슈TC삭제
+	 * @param issueId
+	 * @return
+	 */
+	public boolean deleteIssueTc(String issueId);
+	
+	/**
+	 * 이슈 File 삭제
+	 * @param issueId
+	 * @return
+	 */
+	public boolean deleteIssueFile(String issueId);
+	
+	/**
+	 * 이슈 카테고리 삭제
+	 * @param issueId
+	 * @return
+	 */
+	public boolean deleteIssueCate(String issueId);
+	
+	/**
+	 * 이슈 측정모델 삭제
+	 * @param issueId
+	 * @return
+	 */
+	public boolean deleteIssueModel(String issueId);
+	
+	/**
+	 * 이슈 측정코멘트 삭제
+	 * @param issueId
+	 * @return
+	 */
+	public boolean deleteIssueComment(String issueId);
+	
+	/**
+	 * 이슈 내역 수정
+	 * @param issueVo
+	 * @return
+	 */
+	public boolean updateIssuePrc(IssueVo issueVo);
+}

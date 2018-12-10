@@ -1,0 +1,50 @@
+#server
+server.charset=MS949
+
+#websocket
+websocket.web.url=http://14.63.43.220:8003/ws-web
+websocket.was.url=ws://14.63.43.220:8003/ws-was
+websocket.retry.max.cnt=5
+websocket.retry.delay.time=10000
+
+# site
+site.company.name=SK broadband
+site.company.logo=/images/common/com_logo.png
+site.bot.name=CVCBank
+site.bot.headername=Btv Commercial Verification & Certification Bank
+site.url=http://localhost
+site.port=8080
+site.charset=UTF-8
+site.cookie.domain=local.mngbot.co.kr
+
+# db
+db.driver-class-name=com.microsoft.sqlserver.jdbc.SQLServerDriver
+db.url=jdbc:sqlserver://www.nextlab.co.kr:1433;databasename=MNGBOT;useCursors=false;sendStringParametersAsUnicode=false
+db.username=mngbot
+db.password=nextlab1@
+db.validation-query=SELECT 1
+db.max-active=150
+db.test-while-idle=true
+db.time-between-eviction-runs-millis=7200000
+
+# file
+file.root-path=/mngbot/mngbot/upload
+file.max-size=10485760
+
+# log
+log.path=/mngbot/mngbot/logs
+
+# mail
+mail.host=smtp.gmail.com
+mail.port=587
+mail.username=sist818@gmail.com
+mail.password=qqokjuzlcgypxdxv
+mail.transport.protocol=smtp
+mail.smtp.auth=true
+mail.smtp.starttls.enable=true
+mail.debug=false
+mail.admin=eunbi0322@nextlab.co.kr,jnlee@nextlab.co.kr
+
+#report
+report.url=http://192.168.0.165:5000
+report.path=/Report/share/Samples/

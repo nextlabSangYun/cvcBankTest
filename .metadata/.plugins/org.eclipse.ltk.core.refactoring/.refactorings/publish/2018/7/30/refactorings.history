@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Copy element &apos;ico_set_000109.png&apos; to &apos;bot&apos;&#x0D;&#x0A;- Original project: &apos;publish&apos;&#x0D;&#x0A;- Destination element: &apos;bot&apos;&#x0D;&#x0A;- Original element: &apos;ico_set_000109.png&apos;" description="Copy file" element1="mngbot/images/qa/ico_set_000109.png" files="1" flags="589830" folders="0" id="org.eclipse.jdt.ui.copy" policy="org.eclipse.jdt.ui.copyResources" stamp="1532672811309" target="/mngbot/src/main/webapp/resources/images/bot" units="0" version="1.0"/>
+</session>

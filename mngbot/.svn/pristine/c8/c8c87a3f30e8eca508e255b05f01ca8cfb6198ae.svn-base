@@ -1,0 +1,120 @@
+/**
+ * @title	: QA TC 관리 관련 컨트롤러
+ * @package	: kr.co.nextlab.qa.controller
+ * @file	: QaTcController.java
+ * @author	: winolonam
+ * @date	: 2018. 07. 23.
+ * @desc	: 
+ */
+package kr.co.nextlab.qa.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.View;
+import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
+
+import kr.co.nextlab.annotation.security.Auth;
+import kr.co.nextlab.comm.controller.BaseController;
+import kr.co.nextlab.qa.model.QaTcCategoryVo;
+import kr.co.nextlab.qa.service.QaTcService;
+
+@Controller
+public class QaTcController extends BaseController {
+	
+	
+	@Autowired
+	private QaTcService qaTcService;
+	
+	/**
+	 * 테스트 카테고리 폼
+	 * @param model
+	 */
+	@RequestMapping("/qa/tc/tcCategoryForm")
+	public void tcCategoryForm(Model model){
+	}
+	
+	/**
+	 * 테스트 카테고리 리스트 조회
+	 * @param model
+	 * @param tcCategoryVo 카테고리정보
+	 * @return 테스트 카테고리 리스트
+	 */
+	@RequestMapping("/qa/tc/getTcCategoryList")
+	public View getTcCategoryList(Model model, QaTcCategoryVo qaTcCategoryVo) {
+		model.addAttribute("tcCategoryList", qaTcService.selectTcCategoryList(qaTcCategoryVo));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 테스트 카테고리 등록
+	 * @param model
+	 * @param tcCategoryVo
+	 * @return
+	 */
+	@Auth(url={"/qa/tc/tcCategoryForm"}) 
+	@RequestMapping("/qa/tc/regTcCategory")
+	public View regTcCategory(Model model, @RequestBody QaTcCategoryVo qaTcCategoryVo)
+	{
+		boolean result = false;
+		try {
+			qaTcCategoryVo.setRegId(super.getUser().getUserId());
+			result = qaTcService.insertTcCategory(qaTcCategoryVo);
+			if (!result) model.addAttribute("message", "카테고리 등록 실패");
+		} catch(Exception e) {
+			if (e.getCause() != null) model.addAttribute("message", "카테고리 등록 실패");
+			else model.addAttribute("message", e.getMessage());
+		}
+		model.addAttribute("result", result);
+		model.addAttribute("tcCategoryVo", qaTcCategoryVo);
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 테스트 카테고리 수정
+	 * @param model
+	 * @param categoryVo
+	 * @return
+	 */
+	@Auth(url={"/qa/tc/tcCategoryForm"}) 
+	@RequestMapping("/qa/tc/modTcCategory")
+	public View modTcCategory(Model model, @RequestBody QaTcCategoryVo qaTcCategoryVo)
+	{
+		boolean result = false;
+		try {
+			result = qaTcService.updateModTcCategory(qaTcCategoryVo);
+			if (!result) model.addAttribute("message", "카테고리 수정 실패");
+		} catch(Exception e) {
+			if (e.getCause() != null) model.addAttribute("message", "카테고리 수정 실패");
+			else model.addAttribute("message", e.getMessage());
+		}
+		model.addAttribute("result", result);
+		model.addAttribute("tcCategoryVo", qaTcCategoryVo);
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 테스트 카테고리 삭제
+	 * @param model
+	 * @param categoryVo
+	 * @return
+	 */
+	@Auth(url={"/qa/tc/tcCategoryForm"}) 
+	@RequestMapping("/qa/tc/delTcCategory")
+	public View delTcCategory(Model model, @RequestBody QaTcCategoryVo qaTcCategoryVo)
+	{
+		boolean result = false;
+		try {
+			result = qaTcService.updateDelTcCategory(qaTcCategoryVo);
+			if (!result) model.addAttribute("message", "카테고리 삭제 실패");
+		} catch(Exception e) {
+			if (e.getCause() != null) model.addAttribute("message", "카테고리 삭제 실패");
+			else model.addAttribute("message", e.getMessage());
+		}
+		model.addAttribute("result", result);
+		model.addAttribute("tcCategoryVo", qaTcCategoryVo);
+		return new MappingJackson2JsonView();
+	}
+}

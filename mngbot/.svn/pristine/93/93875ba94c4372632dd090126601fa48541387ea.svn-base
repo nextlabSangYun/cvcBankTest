@@ -1,0 +1,34 @@
+/**
+ * @title	: 이슈관리 controller
+ * @package	: kr.co.nextlab.hded.controller
+ * @file	: HdedIssueController.java
+ * @author	: winolonam
+ * @date	: 2018. 6. 1.
+ * @desc	: 
+ */
+package kr.co.nextlab.hded.controller;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import org.apache.commons.lang3.time.DateUtils;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import kr.co.nextlab.comm.controller.BaseController;
+
+@Controller
+public class HdedIssueController extends BaseController {
+	
+	
+	/**
+	 * 이슈 리스트 화면
+	 * @param model
+	 */
+	@RequestMapping("/hded/issue/issueList")
+	public void issueList(Model model, String pid, String bigCateId, String issueId) {
+		model.addAttribute("startDt", new SimpleDateFormat("yyyy-MM-dd").format(DateUtils.addDays(new Date(), -7)));
+		model.addAttribute("endDt", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+	}
+}

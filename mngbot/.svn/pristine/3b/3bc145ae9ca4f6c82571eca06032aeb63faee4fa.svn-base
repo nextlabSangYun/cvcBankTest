@@ -1,0 +1,571 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.nextlab.hded.mapper.HdedTcMapper">
+	<select id="selectTcChangeHistList" parameterType="heTcTmplVo" resultType="heTcTmplVo">
+		SELECT TOP 30
+			a.tc_id
+			, a.system_id
+			, a.tc_cate_id
+			, a.lcate_id
+			, a.mcate_id
+			, a.tc_nm
+			, a.tc_pre_envir
+			, a.tc_input_val
+			, a.tc_output_val
+			, a.normal_criterion
+			, a.before_result_cd
+			, a.bigo
+			, a.use_yn
+			, a.tc_stat
+			, a.tc_group_id
+			, a.tc_change_cd
+			, a.tc_change_val
+			, CASE a.tc_change_cd 
+				WHEN 'D401' THEN '최초등록' 
+				WHEN 'D402' THEN '임의변경'
+				ELSE (SELECT project_nm FROM tb_he_project b WHERE b.pid = a.tc_change_val)
+			END AS project_nm
+			, a.tc_change_reason
+			, a.reg_id
+			, a.reg_dtm
+			, a.mod_id
+			, a.mod_dtm
+		FROM tb_he_tc_tmpl a
+		WHERE a.tc_change_cd != 'D401'
+		AND a.tc_stat != 'D301'
+		ORDER BY a.reg_dtm DESC
+	</select>
+	
+	<select id="selectTcChangeHistAllList" parameterType="heTcTmplCriteria" resultType="heTcTmplVo">
+		SELECT
+			a.tc_id
+			, a.system_id
+			, a.tc_cate_id
+			, a.lcate_id
+			, a.mcate_id
+			, a.tc_nm
+			, a.tc_pre_envir
+			, a.tc_input_val
+			, a.tc_output_val
+			, a.normal_criterion
+			, a.before_result_cd
+			, a.bigo
+			, a.use_yn
+			, a.tc_stat
+			, a.tc_group_id
+			, a.tc_change_cd
+			, a.tc_change_val
+			, CASE a.tc_change_cd 
+				WHEN 'D401' THEN '최초등록' 
+				WHEN 'D402' THEN '임의변경'
+				ELSE (SELECT project_nm FROM tb_he_project b WHERE b.pid = a.tc_change_val)
+			END AS project_nm
+			, a.tc_change_reason
+			, a.reg_id
+			, a.reg_dtm
+			, a.mod_id
+			, a.mod_dtm
+			, b.tc_cate_nm AS lcate_nm
+			, c.tc_cate_nm AS mcate_nm
+			, d.tc_cate_nm AS scate_nm
+			, b.tc_cate_nm + ' > ' + c.tc_cate_nm + ' > ' + d.tc_cate_nm AS cate_navi
+			, e.system_nm
+		FROM tb_he_tc_tmpl a
+		JOIN tb_he_tc_category b
+		ON a.lcate_id = b.tc_cate_id AND a.system_id = b.system_id
+		JOIN tb_he_tc_category c
+		ON a.mcate_id = c.tc_cate_id AND a.system_id = c.system_id
+		JOIN tb_he_tc_category d
+		ON a.tc_cate_id = d.tc_cate_id AND a.system_id = d.system_id
+		JOIN tb_he_system e
+		ON a.system_id = e.system_id
+		WHERE 1 = 1
+		<if test="systemNm != null and systemNm != ''">
+			AND e.system_nm = #{systemNm}
+		</if>
+		<if test="lcateNm != null and lcateNm != ''">
+			AND b.tc_cate_nm = #{lcateNm}
+		</if>
+		<if test="mcateNm != null and mcateNm != ''">
+			AND c.tc_cate_nm = #{mcateNm}
+		</if>
+		<if test="scateNm != null and scateNm != ''">
+			AND d.tc_cate_nm = #{scateNm}
+		</if>
+		<if test="tcNm != null and tcNm != ''">
+			AND a.tc_nm LIKE '%' + #{tcNm} + '%'
+		</if>
+		ORDER BY a.reg_dtm DESC
+	</select>
+	
+	<select id="selectTcChangeHistByGroupIdList" parameterType="String" resultType="heTcTmplVo">
+		SELECT
+			a.tc_id
+			, a.system_id
+			, a.tc_cate_id
+			, a.lcate_id
+			, a.mcate_id
+			, a.tc_nm
+			, a.tc_pre_envir
+			, a.tc_input_val
+			, a.tc_output_val
+			, a.normal_criterion
+			, a.before_result_cd
+			, a.bigo
+			, a.use_yn
+			, a.tc_stat
+			, a.tc_group_id
+			, a.tc_change_cd
+			, a.tc_change_val
+			, CASE a.tc_change_cd 
+				WHEN 'D401' THEN '최초등록' 
+				WHEN 'D402' THEN '임의변경'
+				ELSE (SELECT project_nm FROM tb_he_project b WHERE b.pid = a.tc_change_val)
+			END AS project_nm
+			, a.tc_change_reason
+			, a.reg_id
+			, (SELECT user_nm FROM tb_user b where b.user_id = a.reg_id) AS reg_nm
+			, a.reg_dtm
+			, a.mod_id
+			, a.mod_dtm
+		FROM tb_he_tc_tmpl a
+		WHERE a.tc_group_id = #{groupId}
+		ORDER BY a.reg_dtm DESC
+	</select>
+	
+	<select id="selectTcChangeHistDetail" parameterType="String" resultType="heTcTmplVo">
+		SELECT
+			a.tc_id
+			, a.system_id
+			, a.tc_cate_id
+			, a.lcate_id
+			, a.mcate_id
+			, a.tc_nm
+			, a.tc_pre_envir
+			, a.tc_input_val
+			, a.tc_output_val
+			, a.normal_criterion
+			, a.before_result_cd
+			, a.bigo
+			, a.use_yn
+			, a.tc_stat
+			, a.tc_group_id
+			, a.tc_change_cd
+			, a.tc_change_val
+			, CASE a.tc_change_cd 
+				WHEN 'D401' THEN '최초등록' 
+				WHEN 'D402' THEN '임의변경'
+				ELSE (SELECT project_nm FROM tb_he_project b WHERE b.pid = a.tc_change_val)
+			END AS project_nm
+			, a.tc_change_reason
+			, a.reg_id
+			, a.reg_dtm
+			, a.mod_id
+			, a.mod_dtm
+			, (SELECT user_nm FROM tb_user b where b.user_id = a.reg_id) AS reg_nm
+		FROM tb_he_tc_tmpl a
+		WHERE a.tc_id = #{tcId}
+		UNION ALL
+		SELECT
+			a.tc_id
+			, a.system_id
+			, a.tc_cate_id
+			, a.lcate_id
+			, a.mcate_id
+			, a.tc_nm
+			, a.tc_pre_envir
+			, a.tc_input_val
+			, a.tc_output_val
+			, a.normal_criterion
+			, a.before_result_cd
+			, a.bigo
+			, a.use_yn
+			, a.tc_stat
+			, a.tc_group_id
+			, a.tc_change_cd
+			, a.tc_change_val
+			, CASE a.tc_change_cd 
+				WHEN 'D401' THEN '최초등록' 
+				WHEN 'D402' THEN '임의변경'
+				ELSE (SELECT project_nm FROM tb_he_project b WHERE b.pid = a.tc_change_val)
+			END AS project_nm
+			, a.tc_change_reason
+			, a.reg_id
+			, a.reg_dtm
+			, a.mod_id
+			, a.mod_dtm
+			, (SELECT user_nm FROM tb_user b where b.user_id = a.reg_id) AS reg_nm
+		FROM tb_he_tc_tmpl a
+		WHERE a.tc_id = (SELECT c.tc_id FROM tb_he_tc_tmpl c WHERE c.tc_group_id = (SELECT b.tc_group_id FROM tb_he_tc_tmpl b WHERE b.tc_id = #{tcId}) AND c.tc_stat = 'D302')
+	</select>
+	
+	<select id='selectBucketList' parameterType="HeTcTmplCriteria" resultType="HeTcTmplVo">
+		SELECT a.tc_id 
+		   , a.system_id
+		   , c.system_nm
+		   , a.mcate_id
+		   , e.tc_cate_nm as m_cate_nm
+		   , a.lcate_id
+		   , f.tc_cate_nm as l_cate_nm
+		   , a.tc_cate_id
+		   , b.tc_cate_nm as s_cate_nm
+		   , a.tc_nm
+		   , a.use_yn
+		   , a.tc_change_cd
+		   , a.tc_group_id
+		   , a.tc_pre_envir
+		   , a.tc_input_val
+		   , a.tc_output_val
+		   , a.normal_criterion
+		   , a.before_result_cd
+		   , a.bigo
+		   , a.tc_group_id
+		   , a.tc_stat
+		   , a.tc_change_cd
+		   , a.tc_change_val
+		   , a.tc_change_reason
+		   , a.reg_id
+		   , a.mod_id
+		FROM tb_he_tc_tmpl a
+		JOIN tb_he_tc_category b ON (b.tc_cate_id = a.tc_cate_id AND b.system_id = a.system_id)
+		JOIN tb_he_system c ON (c.system_id = b.system_id)
+		JOIN tb_he_tc_category e ON (e.tc_cate_id = a.mcate_id AND e.system_id = a.system_id)
+		JOIN tb_he_tc_category f ON (f.tc_cate_id = a.lcate_id AND f.system_id = a.system_id)
+		WHERE a.tc_stat = #{tcStat} 
+		<if test="tcNm != null and tcNm != '' ">
+			AND a.tc_nm = #{tcNm}
+		</if> 
+		<if test="systemNm != null and systemNm != '' ">
+			AND c.system_nm = #{systemNm}
+		</if> 
+		<if test="lcateNm != null and lcateNm != '' ">
+			AND f.tc_cate_nm = #{lcateNm}
+		</if>
+		<if test="mcateNm != null and mcateNm != '' ">
+			AND e.tc_cate_nm = #{mcateNm}
+		</if> 
+		<if test="scateNm != null and scateNm != '' ">
+			AND b.tc_cate_nm = #{scateNm}
+		</if>
+		<if test="useYn != null and useYn != '' ">
+			AND a.use_yn = #{useYn}
+		</if>
+		ORDER BY a.mod_dtm DESC
+	</select>
+	
+	<select id='selectSystemIdBucketList' parameterType="HeTcTmplCriteria" resultType="HeTcTmplVo">
+		SELECT a.tc_id 
+		   , a.system_id
+		   , c.system_nm
+		   , a.mcate_id
+		   , e.tc_cate_nm as m_cate_nm
+		   , a.lcate_id
+		   , f.tc_cate_nm as l_cate_nm
+		   , a.tc_cate_id
+		   , b.tc_cate_nm as s_cate_nm
+		   , a.tc_nm
+		   , a.use_yn
+		   , a.tc_change_cd
+		   , a.tc_group_id
+		   , a.tc_pre_envir
+		   , a.tc_input_val
+		   , a.tc_output_val
+		   , a.normal_criterion
+		   , a.before_result_cd
+		   , a.bigo
+		   , a.tc_group_id
+		   , a.tc_stat
+		   , a.tc_change_cd
+		   , a.tc_change_val
+		   , a.tc_change_reason
+		   , a.reg_id
+		   , a.mod_id
+		FROM tb_he_tc_tmpl a
+		JOIN tb_he_tc_category b ON (b.tc_cate_id = a.tc_cate_id AND b.system_id = a.system_id)
+		JOIN tb_he_system c ON (c.system_id = b.system_id)
+		JOIN tb_he_tc_category e ON (e.tc_cate_id = a.mcate_id AND e.system_id = a.system_id)
+		JOIN tb_he_tc_category f ON (f.tc_cate_id = a.lcate_id AND f.system_id = a.system_id)
+		WHERE a.tc_stat = #{tcStat} 
+			AND a.system_id = #{systemId}
+		<if test="tcNm != null and tcNm != '' ">
+			AND a.tc_nm = #{tcNm}
+		</if> 
+		<if test="systemNm != null and systemNm != '' ">
+			AND c.system_nm = #{systemNm}
+		</if> 
+		<if test="lcateNm != null and lcateNm != '' ">
+			AND f.tc_cate_nm = #{lcateNm}
+		</if>
+		<if test="mcateNm != null and mcateNm != '' ">
+			AND e.tc_cate_nm = #{mcateNm}
+		</if> 
+		<if test="scateNm != null and scateNm != '' ">
+			AND b.tc_cate_nm = #{scateNm}
+		</if>
+		<if test="useYn != null and useYn != '' ">
+			AND a.use_yn = #{useYn}
+		</if>
+		ORDER BY a.mod_dtm DESC
+	</select>
+	
+	<insert id="insertSystem" parameterType="heSystemVo">
+		INSERT INTO tb_he_system
+			(system_id, system_nm, use_yn, bigo, reg_id, reg_dtm)
+		VALUES
+			(#{systemId}, #{systemNm}, #{useYn}, #{bigo}, #{regId}, GETDATE())
+	</insert>
+	<select id="selectSysNmChk" parameterType="String" resultType="heSystemVo">
+		SELECT a.system_id
+			 , a.system_nm
+		FROM tb_he_system a
+		WHERE a.system_nm = #{systemNm} 
+	</select>
+	<select id="selectCategoryChk" parameterType="heTcCategoryVo" resultType="heTcCategoryVo">
+		SELECT a.system_id
+			, a.tc_cate_id
+			, a.tc_cate_nm
+		FROM tb_he_tc_category a
+		WHERE a.system_id = #{systemId}
+			AND a.tc_cate_nm = #{tcCateNm}
+			AND a.tc_cate_par_id = #{tcCateParId}
+	</select>
+	<insert id="insertHeTcCategory" parameterType="heTcCategoryVo">
+		INSERT INTO tb_he_tc_category
+			(system_id, tc_cate_id, tc_cate_nm, tc_cate_par_id, tc_cate_order, use_yn, reg_id, reg_dtm)
+		VALUES
+			(#{systemId}, #{tcCateId}, #{tcCateNm}, #{tcCateParId}, (SELECT ISNULL(MAX(a.tc_cate_order), 0) as tc_cate_order FROM tb_he_tc_category a WHERE a.system_id = #{systemId} AND a.tc_cate_par_id = #{tcCateParId})+1, #{useYn}, #{regId}, GETDATE())
+	</insert>
+	<insert id="insertBuckTc" parameterType="HeTcTmplVo">
+		INSERT INTO tb_he_tc_tmpl
+			(tc_id, system_id, tc_cate_id, lcate_id, mcate_id
+			, tc_nm, tc_pre_envir, tc_input_val, tc_output_val, normal_criterion
+			, before_result_cd, bigo, use_yn, tc_stat, tc_group_id
+			, tc_change_cd, tc_change_val, tc_change_reason
+			, reg_id, reg_dtm, mod_id, mod_dtm)
+		VALUES
+			(#{tcId}, #{systemId}, #{tcCateId}, #{lcateId}, #{mcateId}
+			, #{tcNm}, #{tcPreEnvir}, #{tcInputVal}, #{tcOutputVal}, #{normalCriterion}
+			, #{beforeResultCd}, #{bigo}, #{useYn}, #{tcStat}, #{tcGroupId}
+			, #{tcChangeCd}, #{tcChangeVal}, #{tcChangeReason}
+			, #{regId}, GETDATE(), #{modId}, GETDATE());
+	</insert>
+	<select id="selectTcView" parameterType="String" resultType="HeTcTmplVo">
+		SELECT a.tc_id ,
+		       a.system_id ,
+		       c.system_nm ,
+		       a.mcate_id ,
+		       e.tc_cate_nm as m_cate_nm ,
+		       a.lcate_id ,
+		       f.tc_cate_nm as l_cate_nm ,
+		       a.tc_cate_id ,
+		       b.tc_cate_nm as s_cate_nm ,
+		       a.tc_nm ,
+		       a.use_yn ,
+		       a.tc_group_id ,
+			   a.tc_pre_envir ,
+			   a.tc_input_val ,
+			   a.tc_output_val ,
+			   a.normal_criterion ,
+			   a.before_result_cd ,
+			   a.bigo ,
+			   a.use_yn ,
+			   a.reg_id ,
+			   (SELECT user_nm FROM tb_user WHERE user_id = a.reg_id) AS reg_nm, 
+			   a.reg_dtm
+		FROM   tb_he_tc_tmpl a
+		JOIN tb_he_tc_category b ON (b.tc_cate_id = a.tc_cate_id AND b.system_id = a.system_id)
+		JOIN tb_he_system c ON (c.system_id = b.system_id)
+		JOIN tb_he_tc_category e ON (e.tc_cate_id = a.mcate_id AND e.system_id = a.system_id)
+		JOIN tb_he_tc_category f ON (f.tc_cate_id = a.lcate_id AND f.system_id = a.system_id)
+		WHERE a.tc_id = #{tcId}
+	</select>
+	<update id="updateExistTc" parameterType="heTcTmplVo">
+		UPDATE tb_he_tc_tmpl SET
+			tc_stat = #{tcStat}
+		WHERE tc_id = #{tcId}
+	</update>
+	
+	<insert id="insertProjectTc" parameterType="heProjectTcVo">
+		INSERT INTO tb_project_tc (
+			pid
+			, sys_seq
+			, tc_id
+			, use_yn
+			, reg_id
+			, reg_dtm
+		) VALUES (
+			#{pid}
+			, #{sysSeq}
+			, #{tcId}
+			, #{useYn}
+			, #{regId}
+			, GETDATE()
+		)
+	</insert>
+	
+	<select id='selectProjectTcList' parameterType="HeTcTmplCriteria" resultType="HeProjectTcVo">
+		SELECT a.pid
+			, a.project_tc_seq	
+			, a.sys_seq
+			, (SELECT system_nm FROM tb_he_system WHERE system_id = b.system_id) as system_nm
+			, a.tc_id
+			, ISNULL(a.last_result_cd, 'B305') as last_result_cd
+			, a.use_yn
+			, g.tc_cate_nm as l_cate_nm
+			, f.tc_cate_nm as m_cate_nm
+			, d.tc_cate_nm as s_cate_nm
+			, c.tc_nm
+			, c.tc_pre_envir
+			, c.tc_input_val
+			, c.tc_output_val
+			, c.normal_criterion
+			, c.before_result_cd
+			, (SELECT TOP 1 inspector_opinion FROM tb_tc_result WHERE project_tc_seq = a.project_tc_seq ORDER BY reg_dtm DESC) as inspector_opinion
+			, (SELECT TOP 1 tc_result_seq FROM tb_tc_result WHERE project_tc_seq = a.project_tc_seq ORDER BY reg_dtm DESC) as tc_result_seq
+		FROM tb_project_tc a
+		JOIN tb_project_system b ON (b.pid = a.pid AND b.sys_seq = a.sys_seq)
+		JOIN tb_he_tc_tmpl c ON (c.tc_id = a.tc_id)
+		JOIN tb_he_tc_category d ON (d.tc_cate_id = c.tc_cate_id AND d.system_id = c.system_id)
+		JOIN tb_he_system e ON (e.system_id = d.system_id)
+		JOIN tb_he_tc_category f ON (f.tc_cate_id = c.mcate_id AND f.system_id = c.system_id)
+		JOIN tb_he_tc_category g ON (g.tc_cate_id = c.lcate_id AND g.system_id = c.system_id)
+		WHERE a.pid = #{pid} 
+			AND a.use_yn = 'Y'
+		<if test="tcNm != null and tcNm != '' ">
+			AND c.tc_nm = #{tcNm}
+		</if> 
+		<if test="lcateNm != null and lcateNm != '' ">
+			AND g.tc_cate_nm = #{lcateNm}
+		</if>
+		<if test="mcateNm != null and mcateNm != '' ">
+			AND f.tc_cate_nm = #{mcateNm}
+		</if> 
+		<if test="scateNm != null and scateNm != '' ">
+			AND d.tc_cate_nm = #{scateNm}
+		</if>
+		<if test="lastResultCd != null and lastResultCd != '' and lastResultCd != 'B305'">
+			AND a.last_result_cd = #{lastResultCd}
+		</if>
+		<if test="lastResultCd == 'B305'">
+			AND a.last_result_cd IS NULL
+		</if>
+		<if test=" projectTcSeqArray != null ">
+			AND a.project_tc_seq IN
+			<foreach collection="projectTcSeqArray" item="array" open="(" separator="," close=")">
+				#{array}
+			</foreach>
+		</if>
+		ORDER BY a.reg_dtm DESC
+	</select>
+	<update id="updateProjectTcUseYnPrc" parameterType="String">
+		UPDATE tb_project_tc
+		SET use_yn = 'N'
+		WHERE project_tc_seq = #{projectTcSeq}
+	</update>
+	
+	<select id="selectProjectTc" parameterType="String" resultType="HeProjectTcVo">
+		SELECT a.project_tc_seq 
+			, b.tc_nm
+			, c.tc_cate_nm as s_cate_nm
+			, d.tc_cate_nm as m_cate_nm
+			, e.tc_cate_nm as l_cate_nm
+			, f.system_nm
+			, a.last_result_cd
+			, (SELECT TOP 1 inspector_opinion FROM tb_tc_result WHERE project_tc_seq = a.project_tc_seq ORDER BY reg_dtm DESC) as inspector_opinion
+			, (SELECT TOP 1 tc_result_text FROM tb_tc_result WHERE project_tc_seq = a.project_tc_seq ORDER BY reg_dtm DESC) as tc_result_text
+			, (SELECT TOP 1 tc_result_seq FROM tb_tc_result WHERE project_tc_seq = a.project_tc_seq ORDER BY reg_dtm DESC) as tc_result_seq
+			, (SELECT TOP 1 chasu FROM tb_system_chasu_hst WHERE pid = a.pid AND sys_seq = a.sys_seq ORDER BY chasu DESC) as chasu
+		FROM tb_project_tc a
+		JOIN tb_he_tc_tmpl b ON (b.tc_id = a.tc_id)
+		JOIN tb_he_tc_category c ON (c.tc_cate_id = b.tc_cate_id AND c.system_id = b.system_id)
+		JOIN tb_he_system f ON (f.system_id = c.system_id)
+		JOIN tb_he_tc_category d ON (d.tc_cate_id = b.mcate_id AND d.system_id = b.system_id)
+		JOIN tb_he_tc_category e ON (e.tc_cate_id = b.lcate_id AND e.system_id = b.system_id)
+		WHERE a.project_tc_seq = #{projectTcSeq}
+	</select>
+	
+	<select id="selectProjectTcResult" parameterType="String" resultType="HeTcResultVo">
+		SELECT a.tc_result_seq
+			, a.project_tc_seq
+			, a.chasu
+			, a.tc_result_cd
+			, (SELECT code_nm FROM tb_code WHERE code_id = tc_result_cd) As tc_result_nm
+			, a.inspector_opinion
+			, a.reg_id
+			, a.reg_dtm 
+		FROM tb_tc_result a
+		WHERE a.project_tc_seq = #{projectTcSeq}
+		ORDER BY a.reg_dtm DESC
+	</select>
+	
+	<insert id="insertTcResult" parameterType="heTcResultVo">
+		INSERT INTO tb_tc_result (
+			project_tc_seq
+			, chasu
+			, tc_result_cd
+			, inspector_opinion
+			, tc_result_text
+			, reg_id
+			, reg_dtm
+		) VALUES (
+			#{projectTcSeq}
+			, #{chasu}
+			, #{tcResultCd}
+			, #{inspectorOpinion}
+			, #{tcResultText}
+			, #{regId}
+			, GETDATE()
+		)
+		<selectKey resultType="Integer" keyProperty="tcResultSeq" order="AFTER">
+			SELECT TOP 1 a.tc_result_seq 
+			FROM tb_tc_result a
+			WHERE a.project_tc_seq = #{projectTcSeq}
+			ORDER BY a.reg_dtm DESC
+		</selectKey>
+	</insert>
+	
+	<insert id="insertTcResultFile" parameterType="heTcResultFileVo">
+		INSERT INTO tb_tc_result_file(
+			tc_result_seq
+			, file_seq
+			, file_nm
+			, file_path
+			, org_file_nm
+		) VALUES (
+			#{tcResultSeq}
+			, #{fileSeq}
+			, #{fileNm}
+			, #{filePath}
+			, #{orgFileNm}
+		)
+	</insert>
+	
+	<update id="updateProjectTcResult" parameterType="heProjectTcVo">
+		UPDATE tb_project_tc
+		SET last_result_cd = #{lastResultCd} 
+		WHERE project_tc_seq = #{projectTcSeq}
+	</update>
+	
+	<select id="selectProjectTcFileList" parameterType="Integer" resultType="HeTcResultFileVo">
+		SELECT a.tc_result_seq
+			, a.file_seq
+			, a.file_nm
+			, a.file_path
+			, a.org_file_nm
+		FROM tb_tc_result_file a
+		WHERE a.tc_result_seq = #{tcResultSeq};
+	</select>
+	
+	<select id="selectTcResultData" parameterType="String" resultType="HeTcResultVo">
+		SELECT a.tc_result_seq
+			, a.tc_result_text
+		FROM tb_tc_result a
+		WHERE a.tc_result_seq = #{tcResultSeq}
+	</select>
+	
+	<update id="updateLastHdedResultInit" parameterType="string">
+		UPDATE	tb_project_tc SET
+				last_result_cd = null
+		WHERE	pid = #{pid}
+	</update>
+</mapper>

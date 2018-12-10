@@ -1,0 +1,157 @@
+/**
+ * @title	: 프로젝트관리 mapper
+ * @package	: kr.co.nextlab.hded.mapper
+ * @file	: HdedProjectMapper.java
+ * @author	: winolonam
+ * @date	: 2018. 06. 04.
+ * @desc	: 
+ */
+package kr.co.nextlab.hded.mapper;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import kr.co.nextlab.hded.model.HeProjectCriteria;
+import kr.co.nextlab.hded.model.HeProjectMemberVo;
+import kr.co.nextlab.hded.model.HeProjectSystemVo;
+import kr.co.nextlab.hded.model.HeProjectVo;
+import kr.co.nextlab.hded.model.HeSystemChasuHstVo;
+
+@Mapper
+public interface HdedProjectMapper {
+	
+	/**
+	 * 참여한 프로젝트 리스트 조회
+	 * @param heProjectVo
+	 * @return 참여한 프로젝트 리스트
+	 */
+	public List<HeProjectVo> selectMyProjectList(HeProjectVo heProjectVo);
+	
+	/**
+	 * 참여한 프로젝트 리스트 차수 조회
+	 * @param heProjectVo
+	 * @return 참여한 프로젝트 차수 리스트
+	 */
+	public List<HeProjectVo> selectMyProjectChasuList(HeProjectVo heProjectVo);
+	
+	/**
+	 * 전체프로젝트 조회
+	 * @param heProjectCriteria
+	 * @return
+	 */
+	public List<HeProjectVo> selectProjectList(HeProjectCriteria heProjectCriteria);
+	
+	/**
+	 * 프로젝트 등록
+	 * @param heProjectVo
+	 * @return
+	 */
+	public int insertHeProject(HeProjectVo heProjectVo);
+	
+	/**
+	 * 프로젝트 참여인력 등록
+	 * @param heProjectMemberVo
+	 * @return
+	 */
+	public int insertHeProjectMember(HeProjectMemberVo heProjectMemberVo);
+	
+	/**
+	 * 프로젝트시스템 관리 정보 등록
+	 * @param heProjectSystemVo
+	 * @return
+	 */
+	public int insertHeProjectSystem(HeProjectSystemVo heProjectSystemVo);
+	
+	/**
+	 * 시스템 순번 체크(pid, systemId)
+	 * @param heProjectSystemVo
+	 * @return sysSeq;
+	 */
+	public int selectProjectSystemSeq(HeProjectSystemVo heProjectSystemVo);
+	
+	/**
+	 * 시스템차수 관리 정보 등록
+	 * @param heSystemChasuHstVo
+	 * @return
+	 */
+	public int insertHeSystemChasuHst(HeSystemChasuHstVo heSystemChasuHstVo);
+	
+	/**
+	 * HE 프로젝트 조회
+	 * @param pid
+	 * @return
+	 */
+	public HeProjectVo selectHeProjectView(String pid);
+	
+	/**
+	 * HE 프로젝트 참여인력 리스트 조회
+	 * @param pid 프로젝트 아이디
+	 * @return 프로젝트 참여인력 리스트
+	 */
+	public List<HeProjectMemberVo> selectHeProjectManagerList(String pid);
+	
+	/**
+	 * HE 프로젝트 정보수정 참여인력 리스트 조회
+	 * @param pid 프로젝트 아이디
+	 * @return 프로젝트 참여인력 리스트
+	 */
+	public List<HeProjectMemberVo> selectHeProjectEditManagerList(String pid);
+
+	/**
+	 * He 프로젝트 정보 수정하기
+	 * @param heProjectVo
+	 * @return
+	 */
+	public int updateHeProject(HeProjectVo heProjectVo);
+	
+	/**
+	 * He 프로젝트 정보 수정시 시스템차수히스토리 수정
+	 * @param heProjectVo
+	 * @return
+	 */
+	public int updateSystemChasuHst(HeProjectVo heProjectVo);
+	
+	/**
+	 * HE 프로젝트에 참여한 기존 참여인력 삭제
+	 * @param pid
+	 * @return
+	 */
+	public int deleteProjectMember(String pid);
+	
+	/**
+	 * He 프로젝트 완료처리
+	 * @param heProjectVo
+	 * @return
+	 */
+	public int updateCompleteHeProject(HeProjectVo heProjectVo);
+	
+	/**
+	 * He 프로젝트 시스템 완료처리
+	 * @param heProjectVo
+	 * @return
+	 */
+	public int updateCompleteProjectSystem(HeProjectVo heProjectVo);
+	
+	
+	/**
+	 * He 차수 변경처리(차수 -> 수정개발상태)
+	 * @param heSystemChasuHstVo
+	 * @return
+	 */
+	public int updateNextHeSystemChasuHst(HeSystemChasuHstVo heSystemChasuHstVo);
+	/**
+	 * He 차수 변경처리(수정개발상태 -> 차수)
+	 * @param heSystemChasuHstVo
+	 * @return
+	 */
+	public int insertNextHeSystemChasuHst(HeSystemChasuHstVo heSystemChasuHstVo);
+	
+	/**
+	 * He 차수 변경처리(수정개발상태 -> 차수)
+	 * 프로젝트 시스템 관리 업데이트
+	 * @param HeProjectSystemVo
+	 * @return
+	 */
+	public int updateNextProjectSystem(HeProjectSystemVo heProjectSystemVo);
+}

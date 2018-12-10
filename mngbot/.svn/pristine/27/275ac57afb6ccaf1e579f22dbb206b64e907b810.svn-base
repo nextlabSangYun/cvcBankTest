@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>Management Bot</title>
+	<link rel="stylesheet" href="../css/common.css">
+	<link rel="stylesheet" href="../css/bmt.css">
+	<script src="../js/jquery-3.2.1.min.js"></script>
+	<script src="../js/jquery-ui.min.js"></script>
+	<script src="../js/jquery.form.min.js"></script>
+	<script src="../js/vue.min.js"></script>
+	<script src="../js/lodash.min.js"></script>
+	<script src="../js/calendar.js"></script>
+	<script src="../js/common.js"></script>
+</head>
+<body>
+	<div class="pop_wrap" style="width:1080px;">
+		<div class="pop_tit">
+			<p>이슈 수동 등록</p>
+		</div>
+		<!-- 18.01.09 수정 -->
+		<div class="pop_cont">
+			<div class="g_table02">
+				<table>
+					<caption>분류, 중요도, Test Case 이름을 확인 할 수 있는 표 입니다.</caption>
+					<colgroup>
+						<col style="width:120px;">
+						<col>
+					</colgroup>
+					<tbody>
+						<tr>
+							<th>이슈 제목 </th>
+							<td><input type="text" class="full"></td>
+						</tr>
+						<tr>
+							<th>이슈 내용</th>
+							<td><input type="text" class="full"></td>
+						</tr>
+						<tr>
+							<th>이슈 중요도</th>
+							<td>
+								<select name="" id="">
+									<option value="">Major</option>	
+								</select>
+							</td>
+						</tr>
+						<tr>
+							<th>파일 첨부</th>
+							<!-- 18.01.15 수정 -->
+							<td colspan="3">
+								<input type="file" class="ir" id="file"><label for="file" class="sch_file">파일찾기</label>
+								<ul class="file_list">
+									<li><a href="#">UHD4Q_checklist.xlsx (356kb)</a><button class="del"></button></li>
+
+								</ul>
+							</td>
+						</tr>
+						<tr>
+							<th>이슈할당 대상</th>
+							<td colspan="3" class="sel_target">
+								<select name="" id="">
+									<option value="">사용자선택</option>
+								</select>
+								<div class="reg_list">
+									<ul>
+										<li><span>김승용(미디어솔루션팀)</span><button class="del"></button></li>
+										<li><span>박윤아(미디어팀)</span><button class="del"></button></li>
+										<li><span>박윤아(미디어팀)</span><button class="del"></button></li>
+										<li><span>김승용(미디어솔루션팀)</span><button class="del"></button></li>
+										<li><span>김승용(미디어솔루션팀)</span><button class="del"></button></li>
+
+									</ul>
+								</div>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<p class="area_tit">선택한 측정이력</p>
+			<div class="tab_wrap">
+				<ul class="g_tab">
+					<li><a href="#">BMT</a></li>
+					<li><a href="#">채널변경시간</a></li>
+					<li><a href="#">UI반응시간</a></li>
+				</ul>
+				<div class="tab_con_wrap">
+					<div class="tab_con">
+						<div class="g_table">
+							<table>
+								<colgroup>
+									<col>
+									<col style="width:13%;">
+									<col style="width:8%;">
+									<col style="width:8%;">
+									<col style="width:7%;">
+									<col style="width:7%;">
+									<col style="width:8%;">
+									<col style="width:13%;">
+									<col style="width:10%;">
+								</colgroup>
+								<thead>
+									<tr>
+										<th>Test Case 이름</th>
+										<th>측정 모델 </th>
+										<th>중요도</th>
+										<th>대분류</th>
+										<th>차수</th>
+										<th>리모컨</th>
+										<th>담당자</th>
+										<th>측정일시</th>
+										<th>측정결과</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>콘텐츠 제목 / 속성정보 / 평점 정보 제공</td>
+										<td>BHX-UH200(5.4.2)</td>
+										<td>Minor</td>
+										<td>홈</td>
+										<td>2차</td>
+										<td>신규</td>
+										<td>김현우</td>
+										<td>2017/04/28/09:06</td>
+										<td><span class="state04">PASS</span></td>
+									</tr>
+									<tr>
+										<td>콘텐츠 제목 / 속성정보 / 평점 정보 제공</td>
+										<td>BHX-UH200(5.4.2)</td>
+										<td>Minor</td>
+										<td>홈</td>
+										<td>2차</td>
+										<td>신규</td>
+										<td>김현우</td>
+										<td>2017/04/28/09:06</td>
+										<td><span class="state04">PASS</span></td>
+									</tr>
+									<tr>
+										<td>콘텐츠 제목 / 속성정보 / 평점 정보 제공</td>
+										<td>BHX-UH200(5.4.2)</td>
+										<td>Minor</td>
+										<td>홈</td>
+										<td>2차</td>
+										<td>신규</td>
+										<td>김현우</td>
+										<td>2017/04/28/09:06</td>
+										<td><span class="state04">PASS</span></td>
+									</tr>
+									<tr>
+										<td>콘텐츠 제목 / 속성정보 / 평점 정보 제공</td>
+										<td>BHX-UH200(5.4.2)</td>
+										<td>Minor</td>
+										<td>홈</td>
+										<td>2차</td>
+										<td>신규</td>
+										<td>김현우</td>
+										<td>2017/04/28/09:06</td>
+										<td><span class="state01">FAIL</span></td>
+									</tr>
+									<tr>
+										<td>콘텐츠 제목 / 속성정보 / 평점 정보 제공</td>
+										<td>BHX-UH200(5.4.2)</td>
+										<td>Minor</td>
+										<td>홈</td>
+										<td>2차</td>
+										<td>신규</td>
+										<td>김현우</td>
+										<td>2017/04/28/09:06</td>
+										<td><span class="state04">PASS</span></td>
+									</tr>
+								</tbody>
+							</table>
+							<div class="pagination">
+								<ol>
+									<li class="btn_first"><button>처음</button></li>
+									<li class="btn_prev"><button>이전</button></li>
+									<li class="num on"><button>1</button></li>
+									<li class="num"><button>2</button></li>
+									<li class="num"><button>3</button></li>
+									<li class="num"><button>4</button></li>
+									<li class="num"><button>5</button></li>
+									<li class="btn_next"><button>다음</button></li>
+									<li class="btn_last"><button>마지막</button></li>
+								</ol>
+							</div>
+						</div>
+					</div>
+					<div class="tab_con">
+						<div class="g_table">
+							<table>
+								<colgroup>
+									<col>
+									<col style="width:11%;">
+									<col style="width:7%;">
+									<col style="width:7%;">
+									<col style="width:6%;">
+									<col style="width:6%;">
+									<col style="width:7%;">
+									<col style="width:13%;">
+									<col style="width:5%;">
+									<col style="width:5%;">
+									<col style="width:5%;">
+									<col style="width:6%;">
+									<col style="width:6%;">
+								</colgroup>
+								<thead>
+									<tr>
+										<th rowspan="2">Test Case 이름</th>
+										<th rowspan="2">측정 모델 </th>
+										<th rowspan="2">중요도</th>
+										<th rowspan="2">대분류</th>
+										<th rowspan="2">차수</th>
+										<th rowspan="2">리모컨</th>
+										<th rowspan="2">담당자</th>
+										<th rowspan="2">측정일시</th>
+										<th colspan="5">측정결과</th>
+									</tr>
+									<tr>
+										<th>A구간</th>
+										<th>B구간</th>
+										<th>C구간</th>
+										<th>총소요</th>
+										<th>네트워크</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>콘텐츠 제목 / 속성정보 / 평점 정보 제공</td>
+										<td>BHX-UH200(5.4.2)</td>
+										<td>Minor</td>
+										<td>홈</td>
+										<td>2차</td>
+										<td>신규</td>
+										<td>김현우</td>
+										<td>2017/04/28/09:06</td>
+										<td>358</td>
+										<td>247</td>
+										<td>918</td>
+										<td>1523</td>
+										<td>30</td>
+									</tr>
+									<tr>
+										<td>콘텐츠 제목 / 속성정보 / 평점 정보 제공</td>
+										<td>BHX-UH200(5.4.2)</td>
+										<td>Minor</td>
+										<td>홈</td>
+										<td>2차</td>
+										<td>신규</td>
+										<td>김현우</td>
+										<td>2017/04/28/09:06</td>
+										<td>358</td>
+										<td>247</td>
+										<td>918</td>
+										<td>1523</td>
+										<td>30</td>
+									</tr>
+									<tr>
+										<td>콘텐츠 제목 / 속성정보 / 평점 정보 제공</td>
+										<td>BHX-UH200(5.4.2)</td>
+										<td>Minor</td>
+										<td>홈</td>
+										<td>2차</td>
+										<td>신규</td>
+										<td>김현우</td>
+										<td>2017/04/28/09:06</td>
+										<td>358</td>
+										<td>247</td>
+										<td>918</td>
+										<td>1523</td>
+										<td>30</td>
+									</tr>
+									<tr>
+										<td>콘텐츠 제목 / 속성정보 / 평점 정보 제공</td>
+										<td>BHX-UH200(5.4.2)</td>
+										<td>Minor</td>
+										<td>홈</td>
+										<td>2차</td>
+										<td>신규</td>
+										<td>김현우</td>
+										<td>2017/04/28/09:06</td>
+										<td>358</td>
+										<td>247</td>
+										<td>918</td>
+										<td>1523</td>
+										<td>30</td>
+									</tr>
+									<tr>
+										<td>콘텐츠 제목 / 속성정보 / 평점 정보 제공</td>
+										<td>BHX-UH200(5.4.2)</td>
+										<td>Minor</td>
+										<td>홈</td>
+										<td>2차</td>
+										<td>신규</td>
+										<td>김현우</td>
+										<td>2017/04/28/09:06</td>
+										<td>358</td>
+										<td>247</td>
+										<td>918</td>
+										<td>1523</td>
+										<td>30</td>
+									</tr>
+								</tbody>
+							</table>
+							<div class="pagination">
+								<ol>
+									<li class="btn_first"><button>처음</button></li>
+									<li class="btn_prev"><button>이전</button></li>
+									<li class="num on"><button>1</button></li>
+									<li class="num"><button>2</button></li>
+									<li class="num"><button>3</button></li>
+									<li class="num"><button>4</button></li>
+									<li class="num"><button>5</button></li>
+									<li class="btn_next"><button>다음</button></li>
+									<li class="btn_last"><button>마지막</button></li>
+								</ol>
+							</div>
+						</div>
+					</div>
+					<div class="tab_con">
+						<div class="g_table">
+							<table>
+								<colgroup>
+									<col>
+									<col style="width:13%;">
+									<col style="width:7%;">
+									<col style="width:7%;">
+									<col style="width:6%;">
+									<col style="width:6%;">
+									<col style="width:8%;">
+									<col style="width:13%;">
+									<col style="width:6%;">
+									<col style="width:6%;">
+									<col style="width:6%;">
+								</colgroup>
+								<thead>
+									<tr>
+										<th rowspan="2">Test Case 이름</th>
+										<th rowspan="2">측정 모델 </th>
+										<th rowspan="2">중요도</th>
+										<th rowspan="2">대분류</th>
+										<th rowspan="2">차수</th>
+										<th rowspan="2">리모컨</th>
+										<th rowspan="2">담당자</th>
+										<th rowspan="2">측정일시</th>
+										<th colspan="3">측정결과</th>
+									</tr>
+									<tr>
+										<th>매칭</th>
+										<th>커서</th>
+										<th>변화율</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>콘텐츠 제목 / 속성정보 / 평점 정보 제공</td>
+										<td>BHX-UH200(5.4.2)</td>
+										<td>Minor</td>
+										<td>홈</td>
+										<td>2차</td>
+										<td>신규</td>
+										<td>김현우</td>
+										<td>2017/04/28/09:06</td>
+										<td>358</td>
+										<td>247</td>
+										<td>918</td>
+									</tr>
+									<tr>
+										<td>콘텐츠 제목 / 속성정보 / 평점 정보 제공</td>
+										<td>BHX-UH200(5.4.2)</td>
+										<td>Minor</td>
+										<td>홈</td>
+										<td>2차</td>
+										<td>신규</td>
+										<td>김현우</td>
+										<td>2017/04/28/09:06</td>
+										<td>358</td>
+										<td>247</td>
+										<td>918</td>
+									</tr>
+									<tr>
+										<td>콘텐츠 제목 / 속성정보 / 평점 정보 제공</td>
+										<td>BHX-UH200(5.4.2)</td>
+										<td>Minor</td>
+										<td>홈</td>
+										<td>2차</td>
+										<td>신규</td>
+										<td>김현우</td>
+										<td>2017/04/28/09:06</td>
+										<td>358</td>
+										<td>247</td>
+										<td>918</td>
+									</tr>
+									<tr>
+										<td>콘텐츠 제목 / 속성정보 / 평점 정보 제공</td>
+										<td>BHX-UH200(5.4.2)</td>
+										<td>Minor</td>
+										<td>홈</td>
+										<td>2차</td>
+										<td>신규</td>
+										<td>김현우</td>
+										<td>2017/04/28/09:06</td>
+										<td>358</td>
+										<td>247</td>
+										<td>918</td>
+									</tr>
+									<tr>
+										<td>콘텐츠 제목 / 속성정보 / 평점 정보 제공</td>
+										<td>BHX-UH200(5.4.2)</td>
+										<td>Minor</td>
+										<td>홈</td>
+										<td>2차</td>
+										<td>신규</td>
+										<td>김현우</td>
+										<td>2017/04/28/09:06</td>
+										<td>358</td>
+										<td>247</td>
+										<td>918</td>
+									</tr>
+								</tbody>
+							</table>
+							<div class="pagination">
+								<ol>
+									<li class="btn_first"><button>처음</button></li>
+									<li class="btn_prev"><button>이전</button></li>
+									<li class="num on"><button>1</button></li>
+									<li class="num"><button>2</button></li>
+									<li class="num"><button>3</button></li>
+									<li class="num"><button>4</button></li>
+									<li class="num"><button>5</button></li>
+									<li class="btn_next"><button>다음</button></li>
+									<li class="btn_last"><button>마지막</button></li>
+								</ol>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+		</div>
+		<div class="btn_wrap">
+			<button class="g_btn01">등록</button>
+			<button class="g_btn02" onclick="hidePopupLayer(); return false">취소</button>
+		</div>
+	</div>
+	<script>
+		setPopup(2);
+	</script>
+</body>
+</html>

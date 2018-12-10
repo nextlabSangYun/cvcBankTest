@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>Management Bot</title>
+	<link rel="stylesheet" href="../css/common.css">
+	<link rel="stylesheet" href="../css/bot.css">
+	<script src="../js/jquery-3.2.1.min.js"></script>
+	<script src="../js/jquery-ui.min.js"></script>
+	<script src="../js/jquery.form.min.js"></script>
+	<script src="../js/vue.min.js"></script>
+	<script src="../js/lodash.min.js"></script>
+	<script src="../js/calendar.js"></script>
+	<script src="../js/common.js"></script>
+</head>
+<body>
+	<div class="pop_wrap" style="width:580px;">
+		<div class="pop_tit">
+			<p>측정모델분류 등록</p>
+		</div>
+		<div class="pop_cont">
+			<div class="g_table02">
+				<table>
+					<caption>측정모델의 분류명칭, 아이콘 등록하는 표 입니다.</caption>
+					<colgroup>
+						<col style="width:120px;">
+						<col>
+					</colgroup>
+					<tbody>
+						<tr>
+							<th>분류명칭</th>
+							<td class="verify">
+								<input type="text" class="full" placeholder="3~20자 사이로 입력"><button class="g_btn02">중복확인</button>
+							</td>
+						</tr>
+						<tr>
+							<th>아이콘</th>
+							<td>
+							<input type="radio" id="none" name="radio"><label for="none">없음</label>
+							<input type="radio" id="ico01" name="radio"><label for="ico01" class="ico_label"><img src="../images/bot/ico_model_C601.png" alt=""></label>
+							<input type="radio" id="ico02" name="radio"><label for="ico02" class="ico_label"><img src="../images/bot/ico_model_C602.png" alt=""></label>
+							<input type="radio" id="ico03" name="radio"><label for="ico03" class="ico_label"><img src="../images/bot/ico_model_C603.png" alt=""></label>
+							<input type="radio" id="ico04" name="radio"><label for="ico04" class="ico_label"><img src="../images/bot/ico_model_C604.png" alt=""></label>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<div class="btn_wrap">
+			<button class="g_btn01">등록</button>
+			<button class="g_btn02">닫기</button>
+		</div>
+	</div>
+	<script>
+		setPopup(2);
+	</script>
+</body>
+</html>

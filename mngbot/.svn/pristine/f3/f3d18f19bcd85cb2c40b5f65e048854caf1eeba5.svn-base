@@ -1,0 +1,954 @@
+/**
+ * @title	: TC측정이력 controller
+ * @package	: kr.co.nextlab.bmt.controller
+ * @file	: XqmsController.java
+ * @author	: eunbi
+ * @date	: 2017. 12. 18.
+ * @desc	: 
+ */
+package kr.co.nextlab.bmt.controller;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.View;
+import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
+
+import kr.co.nextlab.annotation.security.Auth;
+import kr.co.nextlab.bmt.model.XqmsAttachVo;
+import kr.co.nextlab.bmt.model.XqmsCriteria;
+import kr.co.nextlab.bmt.model.XqmsVo;
+import kr.co.nextlab.bmt.service.ProjectService;
+import kr.co.nextlab.bmt.service.XqmsService;
+import kr.co.nextlab.comm.controller.BaseController;
+import kr.co.nextlab.component.FileComponent;
+import kr.co.nextlab.excel.ExcelDownloadView;
+import kr.co.nextlab.excel.ExcelHeader;
+import kr.co.nextlab.excel.ExcelResource;
+
+@Controller
+public class XqmsController extends BaseController{
+
+	@Autowired
+	private XqmsService xqmsService;
+
+	@Autowired
+	private ProjectService projectService;
+	
+	/**
+	 * 전체 측정이력 리스트 조회 폼
+	 * @param model
+	 */
+	@RequestMapping("/bmt/xqms/xqmsAllList")
+	public void xqmlAllList(Model model) {
+		// 검색조건 정의
+		model.addAttribute("startDt", new SimpleDateFormat("yyyy-MM-dd").format(DateUtils.addDays(new Date(), -7)));
+		model.addAttribute("endDt", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+	}
+	
+	/**
+	 * 전체 tc측정이력 > bmt 측정이력 리스트 조회
+	 * @param model
+	 * @param criteria 검색조건
+	 * @return bmt 측정이력 리스트
+	 */
+	@RequestMapping("/bmt/xqms/getXqmsBmtList")
+	public View getXqmsBmtList(Model model, XqmsCriteria criteria) {
+		criteria.setStartDt(criteria.getStartDt().replaceAll("-", ""));
+		criteria.setEndDt(criteria.getEndDt().replaceAll("-", ""));
+		model.addAttribute("xqmsBmtList", xqmsService.selectXqmsBmtList(criteria));
+		return new MappingJackson2JsonView();
+	}
+	/**
+	 * 전체 tc측정이력 > 리모컨 로봇 테스트 측정이력 리스트 조회
+	 * @param model
+	 * @param criteria 검색조건
+	 * @return 리모컨 로봇 테스트  측정이력 리스트
+	 */
+	@RequestMapping("/bmt/xqms/getXqmsRemoconRobotList")
+	public View getXqmsRemoconRobotList(Model model, XqmsCriteria criteria) {
+		criteria.setStartDt(criteria.getStartDt().replaceAll("-", ""));
+		criteria.setEndDt(criteria.getEndDt().replaceAll("-", ""));
+		model.addAttribute("xqmsRemoconRobotList", xqmsService.selectXqmsRemoconRobotList(criteria));
+		return new MappingJackson2JsonView();
+	}
+	/**
+	 * 전체 tc측정이력 > lkfs 측정이력 리스트 조회
+	 * @param model
+	 * @param criteria 검색조건
+	 * @return 리모컨 로봇 테스트  측정이력 리스트
+	 */
+	@RequestMapping("/bmt/xqms/getXqmslkfsList")
+	public View getXqmslkfsList(Model model, XqmsCriteria criteria) {
+		criteria.setStartDt(criteria.getStartDt().replaceAll("-", ""));
+		criteria.setEndDt(criteria.getEndDt().replaceAll("-", ""));
+		model.addAttribute("xqmsLkfsList", xqmsService.selectXqmsLkfsList(criteria));
+		return new MappingJackson2JsonView();
+	}
+	/**
+	 * 전체 tc측정이력 > 채널변경시간 측정이력 리스트 조회
+	 * @param model
+	 * @param criteria 검색조건
+	 * @return 채널변경시간 측정이력 리스트
+	 */
+	@RequestMapping("/bmt/xqms/getXqmsChannelList")
+	public View getXqmsChannelList(Model model, XqmsCriteria criteria) {
+		criteria.setStartDt(criteria.getStartDt().replaceAll("-", ""));
+		criteria.setEndDt(criteria.getEndDt().replaceAll("-", ""));
+		model.addAttribute("xqmsChannelList", xqmsService.selectXqmsChannelList(criteria));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 전체 tc측정이력 > UI Reaction 측정이력 리스트 조회
+	 * @param model
+	 * @param criteria 검색조건
+	 * @return UI Reaction 측정이력 리스트
+	 */
+	@RequestMapping("/bmt/xqms/getXqmsUiReactionList")
+	public View getXqmsUiReactionList(Model model, XqmsCriteria criteria) {
+		criteria.setStartDt(criteria.getStartDt().replaceAll("-", ""));
+		criteria.setEndDt(criteria.getEndDt().replaceAll("-", ""));
+		model.addAttribute("xqmsUiReactionList", xqmsService.selectXqmsUiReactionList(criteria));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * bmt 측정이력 엑셀다운로드
+	 * @param model
+	 * @param criteria 검색조건
+	 * @return bmt 측정이력 엑셀
+	 */
+	@RequestMapping("/bmt/xqms/getXqmsBmtExcel")
+	public ExcelDownloadView getXqmsBmtExcel(Model model, XqmsCriteria criteria) {
+		
+		criteria.setStartDt(criteria.getStartDt().replaceAll("-", ""));
+		criteria.setEndDt(criteria.getEndDt().replaceAll("-", ""));
+		List<XqmsVo> list = xqmsService.selectXqmsBmtList(criteria);
+		
+		ExcelHeader[] headers = new ExcelHeader[] {
+			new ExcelHeader("projectNm", "대상 프로젝트")
+			, new ExcelHeader("testcase", "Test Case")
+			, new ExcelHeader("modelNm", "측정모델", HorizontalAlignment.CENTER)
+			, new ExcelHeader("modelVer", "S/W 버전", HorizontalAlignment.CENTER)
+			, new ExcelHeader("remocon", "리모컨", HorizontalAlignment.CENTER)
+			, new ExcelHeader("person", "담당자", HorizontalAlignment.CENTER)
+			, new ExcelHeader("botNm", "Bot 이름", HorizontalAlignment.CENTER)
+			, new ExcelHeader("xqmsDtm", "측정일시", HorizontalAlignment.CENTER)
+			, new ExcelHeader("bmtResult", "측정결과", "", "B300", HorizontalAlignment.CENTER)
+		};
+		
+		return new ExcelDownloadView(new ExcelResource(list, headers),"TESTCASE 측정이력.xlsx");
+	}
+	
+	/**
+	 * 채널변경시간 측정이력 엑셀다운로드
+	 * @param model
+	 * @param criteria 검색조건
+	 * @return 채널변경시간 측정이력 엑셀
+	 */
+	@RequestMapping("/bmt/xqms/getXqmsChannelExcel")
+	public ExcelDownloadView getXqmsChannelExcel(Model model, XqmsCriteria criteria) {
+		
+		criteria.setStartDt(criteria.getStartDt().replaceAll("-", ""));
+		criteria.setEndDt(criteria.getEndDt().replaceAll("-", ""));
+		List<XqmsVo> list = xqmsService.selectXqmsChannelList(criteria);
+		
+		ExcelHeader[] headers = new ExcelHeader[] {
+				new ExcelHeader("projectNm", "대상 프로젝트")
+				, new ExcelHeader("testcase", "Test Case")
+				, new ExcelHeader("modelNm", "측정모델", HorizontalAlignment.CENTER)
+				, new ExcelHeader("modelVer", "S/W 버전", HorizontalAlignment.CENTER)
+				, new ExcelHeader("remocon", "리모컨", HorizontalAlignment.CENTER)
+				, new ExcelHeader("person", "담당자", HorizontalAlignment.CENTER)
+				, new ExcelHeader("botNm", "Bot 이름", HorizontalAlignment.CENTER)
+				, new ExcelHeader("xqmsDtm", "측정일시", HorizontalAlignment.CENTER)
+				, new ExcelHeader("remoconReactTime", "A구간")
+				, new ExcelHeader("firstStopTime", "B구간")
+				, new ExcelHeader("secondStopTime", "C구간")
+				, new ExcelHeader("totTime", "총소요")
+				, new ExcelHeader("ntwTime", "네트워크")
+		};
+		
+		return new ExcelDownloadView(new ExcelResource(list, headers),"채널변경시간 측정이력.xlsx");
+	}
+	
+	/**
+	 * UI Reaction 측정이력 엑셀다운로드
+	 * @param model
+	 * @param criteria 검색조건
+	 * @return UI Reaction 측정이력 엑셀
+	 */
+	@RequestMapping("/bmt/xqms/getXqmsUiReactionExcel")
+	public ExcelDownloadView getXqmsUiReactionExcel(Model model, XqmsCriteria criteria) {
+		
+		criteria.setStartDt(criteria.getStartDt().replaceAll("-", ""));
+		criteria.setEndDt(criteria.getEndDt().replaceAll("-", ""));
+		List<XqmsVo> list = xqmsService.selectXqmsUiReactionList(criteria);
+		
+		ExcelHeader[] headers = new ExcelHeader[] {
+				new ExcelHeader("projectNm", "대상 프로젝트")
+				, new ExcelHeader("testcase", "Test Case")
+				, new ExcelHeader("modelNm", "측정모델", HorizontalAlignment.CENTER)
+				, new ExcelHeader("modelVer", "S/W 버전", HorizontalAlignment.CENTER)
+				, new ExcelHeader("remocon", "리모컨", HorizontalAlignment.CENTER)
+				, new ExcelHeader("person", "담당자", HorizontalAlignment.CENTER)
+				, new ExcelHeader("botNm", "Bot 이름", HorizontalAlignment.CENTER)
+				, new ExcelHeader("xqmsDtm", "측정일시", HorizontalAlignment.CENTER)
+				, new ExcelHeader("matchTime", "매칭")
+				, new ExcelHeader("reactTime", "커서")
+				, new ExcelHeader("diffTime", "변화율")
+		};
+		
+		return new ExcelDownloadView(new ExcelResource(list, headers),"UI 반응시간 측정이력.xlsx");
+	}
+	
+	/**
+	 * 리모컨 로봇 테스트 측정이력 엑셀다운로드
+	 * @param model
+	 * @param criteria 검색조건
+	 * @return 리모컨 로봇 테스트 측정이력 엑셀
+	 */
+	@RequestMapping("/bmt/xqms/getXqmsRemoconRobotExcel")
+	public ExcelDownloadView getXqmsRemoconRobotExcel(Model model, XqmsCriteria criteria) {
+		
+		criteria.setStartDt(criteria.getStartDt().replaceAll("-", ""));
+		criteria.setEndDt(criteria.getEndDt().replaceAll("-", ""));
+		List<XqmsVo> list = xqmsService.selectXqmsRemoconRobotList(criteria);
+		
+		ExcelHeader[] headers = new ExcelHeader[] {
+				new ExcelHeader("projectNm", "대상 프로젝트")
+				, new ExcelHeader("testcase", "Test Case")
+				, new ExcelHeader("modelNm", "측정모델", HorizontalAlignment.CENTER)
+				, new ExcelHeader("modelVer", "S/W 버전", HorizontalAlignment.CENTER)
+				, new ExcelHeader("remocon", "리모컨", HorizontalAlignment.CENTER)
+				, new ExcelHeader("person", "담당자", HorizontalAlignment.CENTER)
+				, new ExcelHeader("botNm", "Bot 이름", HorizontalAlignment.CENTER)
+				, new ExcelHeader("xqmsDtm", "측정일시", HorizontalAlignment.CENTER)
+				, new ExcelHeader("targetRepeat", "측정모델 요청")
+				, new ExcelHeader("resultRepeat", "측정모델 이동")
+				, new ExcelHeader("targetDaq", "리모컨 요청")
+				, new ExcelHeader("resultDaq", "리모컨 이동")
+		};
+		
+		return new ExcelDownloadView(new ExcelResource(list, headers),"리모컨 로못 테스트 측정이력.xlsx");
+	}
+	
+	/**
+	 * 리모컨 로봇 테스트 측정이력 엑셀다운로드
+	 * @param model
+	 * @param criteria 검색조건
+	 * @return 리모컨 로봇 테스트 측정이력 엑셀
+	 */
+	@RequestMapping("/bmt/xqms/getXqmsLkfsExcel")
+	public ExcelDownloadView getXqmsLkfsExcel(Model model, XqmsCriteria criteria) {
+		
+		criteria.setStartDt(criteria.getStartDt().replaceAll("-", ""));
+		criteria.setEndDt(criteria.getEndDt().replaceAll("-", ""));
+		List<XqmsVo> list = xqmsService.selectXqmsLkfsList(criteria);
+		
+		ExcelHeader[] headers = new ExcelHeader[] {
+				new ExcelHeader("projectNm", "대상 프로젝트")
+				, new ExcelHeader("testcase", "Test Case")
+				, new ExcelHeader("modelNm", "측정모델", HorizontalAlignment.CENTER)
+				, new ExcelHeader("modelVer", "S/W 버전", HorizontalAlignment.CENTER)
+				, new ExcelHeader("remocon", "리모컨", HorizontalAlignment.CENTER)
+				, new ExcelHeader("person", "담당자", HorizontalAlignment.CENTER)
+				, new ExcelHeader("botNm", "Bot 이름", HorizontalAlignment.CENTER)
+				, new ExcelHeader("xqmsDtm", "측정일시", HorizontalAlignment.CENTER)
+				, new ExcelHeader("startDtm", "측정시작", HorizontalAlignment.CENTER)
+				, new ExcelHeader("endDtm", "측정종료", HorizontalAlignment.CENTER)
+				, new ExcelHeader("avgMLkfs", "평균-M-LKFS")
+				, new ExcelHeader("avgSLkfs", "평균-S-LKFS")
+				, new ExcelHeader("lastILkfs", "최종-I-LKFS")
+		};
+		
+		return new ExcelDownloadView(new ExcelResource(list, headers),"lkfs 측정이력.xlsx");
+	}
+	
+	/**
+	 * tc측정에 사용한 모델의 버전 리스트 조회
+	 * @param model
+	 * @return tc측정에 사용한 모델의 버전 리스트
+	 */
+	@RequestMapping("/bmt/xqms/getXqmsModelVerList")
+	public View getXqmsModelVerList(Model model, String modelId) {
+		model.addAttribute("xqmsModelVerList", xqmsService.selectXqmsModelVerList(modelId));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 모델의 버전별 통계 데이터 조회
+	 * @param model
+	 * @param criteria 검색조건
+	 * @return 모델의 버전별 통계 데이터
+	 */
+	@RequestMapping("/bmt/xqms/getStsView")
+	public View getStsView(Model model, XqmsCriteria criteria) {
+		// 측정모델
+		XqmsVo currChSts = xqmsService.selectXqmsChannelStsView(criteria);
+		XqmsVo currUiSts = xqmsService.selectXqmsUiReactionStsView(criteria);
+		model.addAttribute("currChSts", currChSts);
+		model.addAttribute("currUiSts", currUiSts);
+		
+		if (StringUtils.equals(criteria.getPerformYn(), "N")) {
+			// 상용버전
+			criteria.setModelVer(criteria.getCompModelVer());
+			criteria.setPid(criteria.getCompPid());
+			if (currChSts != null) {
+				XqmsVo compChSts = xqmsService.selectXqmsChannelStsView(criteria);
+				model.addAttribute("compChSts", compChSts);
+			}
+			if (currUiSts != null) {
+				XqmsVo compUiSts = xqmsService.selectXqmsUiReactionStsView(criteria);
+				model.addAttribute("compUiSts", compUiSts);
+			}
+		}
+		
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 버전별 채널변경시간 정보 상세 리스트 조회
+	 * @param model
+	 * @param criteria 검색조건
+	 * @return 버전별 채널변경시간 정보 상세 리스트
+	 */
+	@RequestMapping("/bmt/xqms/getXqmsChannelDetailList")
+	public View getXqmsChannelDetailList(Model model, XqmsCriteria criteria) {
+		model.addAttribute("xqmsChannelDetailList", xqmsService.selectXqmsChannelDetailList(criteria));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 버전별 ui반응시간 정보 상세 리스트 조회
+	 * @param model
+	 * @param criteria 검색조건
+	 * @return 버전별 채널변경시간 정보 상세 리스트
+	 */
+	@RequestMapping("/bmt/xqms/getXqmsUiReactionDetailList")
+	public View getXqmsUiReactionDetailList(Model model, XqmsCriteria criteria) {
+		model.addAttribute("xqmsUiReactionDetailList", xqmsService.selectXqmsUiReactionDetailList(criteria));
+		return new MappingJackson2JsonView();
+	}
+
+	/**
+	 * 프로젝트 측정이력조회  화면
+	 * @param model
+	 */
+	@RequestMapping("/bmt/xqms/xqmsList")
+	public void xqmsList(Model model, String seq, String pid){		
+		
+		model.addAttribute("seq",seq);
+		model.addAttribute("pid", pid);
+		// 검색조건 정의
+		model.addAttribute("startDt", new SimpleDateFormat("yyyy-MM-dd").format(DateUtils.addDays(new Date(), -7)));
+		model.addAttribute("endDt", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));	
+	}
+
+	/**
+	 * 프로젝트  bmt측정이력 리스트 조회
+	 * @param model
+	 * @param criteria 검색조건
+	 * @return
+	 */
+	@RequestMapping("/bmt/xqms/getProjectXqmsBmtList")
+	public View getProjectXqmsBmtList(Model model, XqmsCriteria criteria){
+		criteria.setStartDt(criteria.getStartDt().replaceAll("-", ""));
+		criteria.setEndDt(criteria.getEndDt().replaceAll("-", ""));
+		model.addAttribute("projectXqmsBmtList", xqmsService.selectProjectXqmsBmtList(criteria));
+		return new MappingJackson2JsonView();
+	}
+	/**
+	 * 프로젝트  리모컨 로봇 테스트 측정이력 리스트 조회
+	 * @param model
+	 * @param criteria 검색조건
+	 * @return
+	 */
+	@RequestMapping("/bmt/xqms/getProjectXqmsRemoconRobotList")
+	public View getProjectXqmsRemoconRobotList(Model model, XqmsCriteria criteria){
+		criteria.setStartDt(criteria.getStartDt().replaceAll("-", ""));
+		criteria.setEndDt(criteria.getEndDt().replaceAll("-", ""));
+		model.addAttribute("projectXqmsRemoconRobotList", xqmsService.selectProjectXqmsRemoconRobotList(criteria));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 프로젝트 LKFS 측정이력 리스트 조회
+	 * @param model
+	 * @param criteria 검색조건
+	 * @return
+	 */
+	@RequestMapping("/bmt/xqms/getProjectXqmsLkfsList")
+	public View getProjectXqmsLkfsList(Model model, XqmsCriteria criteria){
+		criteria.setStartDt(criteria.getStartDt().replaceAll("-", ""));
+		criteria.setEndDt(criteria.getEndDt().replaceAll("-", ""));
+		model.addAttribute("projectXqmsLkfsList", xqmsService.selectProjectXqmsLkfsList(criteria));
+		return new MappingJackson2JsonView();
+	}
+	
+	
+	/**
+	 * 프로젝트  channel 측정이력 리스트 조회
+	 * @param model
+	 * @param criteria
+	 * @return
+	 */
+	@RequestMapping("/bmt/xqms/getProjectXqmsChannelList")
+	public View getProjectXqmsChannelList(Model model, XqmsCriteria criteria){
+		criteria.setStartDt(criteria.getStartDt().replaceAll("-", ""));
+		criteria.setEndDt(criteria.getEndDt().replaceAll("-", ""));
+		model.addAttribute("projectXqmsChannelList", xqmsService.selectProjectXqmsChannelList(criteria));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 프로젝트 UiReation 측정이력 리스트 조회
+	 * @param model
+	 * @param criteria
+	 * @return
+	 */
+	@RequestMapping("/bmt/xqms/getProjectXqmsUiReactionList")
+	public View getProjectXqmsUiReactionList(Model model, XqmsCriteria criteria){
+		criteria.setStartDt(criteria.getStartDt().replaceAll("-", ""));
+		criteria.setEndDt(criteria.getEndDt().replaceAll("-", ""));
+		model.addAttribute("projectXqmsUiReactionList", xqmsService.selectProjectXqmsUiReationList(criteria));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 해당 pid 프로젝트 BMT 측정이력 엑셀 다운로드
+	 * @param model
+	 * @param criteria
+	 * @return
+	 */
+	@RequestMapping("/bmt/xqms/getProjectXqmsBmtExcel")
+	public ExcelDownloadView getProjectXqmsBmtExcel(Model model, XqmsCriteria criteria){
+		
+		criteria.setStartDt(criteria.getStartDt().replaceAll("-", ""));
+		criteria.setEndDt(criteria.getEndDt().replaceAll("-", ""));
+		
+		List<XqmsVo> list = xqmsService.selectProjectXqmsBmtList(criteria);
+		ExcelHeader[] headers = new ExcelHeader[]{
+				new ExcelHeader("testcase", "Test Case 이름", HorizontalAlignment.LEFT )
+				, new ExcelHeader("modelNm", "측정모델", HorizontalAlignment.CENTER)
+				, new ExcelHeader("importance", "중요도", "", "B100", HorizontalAlignment.CENTER)
+				, new ExcelHeader("tcDivision", "구분","", "B900", HorizontalAlignment.CENTER)	
+				, new ExcelHeader("bigCateNm", "대분류", HorizontalAlignment.CENTER)	
+				, new ExcelHeader("prjChasu", "차수", HorizontalAlignment.CENTER)
+				, new ExcelHeader("remocon", "리모컨", HorizontalAlignment.CENTER)
+				, new ExcelHeader("person", "담당자", HorizontalAlignment.CENTER)	
+				, new ExcelHeader("xqmsDtm", "측정일시", HorizontalAlignment.CENTER)
+				, new ExcelHeader("bmtResult", "측정결과", "", "B300", HorizontalAlignment.CENTER)				
+		};
+		
+		return new ExcelDownloadView(new ExcelResource(list, headers),"TESTCASE 측정이력.xlsx");
+	}
+	
+	/**
+	 * 해당 pid 프로젝트 리모컨 로봇 측정이력 엑셀 다운로드
+	 * @param model
+	 * @param criteria
+	 * @return
+	 */
+	@RequestMapping("/bmt/xqms/getProjectXqmsRemoconRobotExcel")
+	public ExcelDownloadView getProjectXqmsRemoconRobotExcel(Model model, XqmsCriteria criteria){
+		criteria.setStartDt(criteria.getStartDt().replaceAll("-", ""));
+		criteria.setEndDt(criteria.getEndDt().replaceAll("-", ""));
+		
+		List<XqmsVo> list = xqmsService.selectProjectXqmsRemoconRobotList(criteria);
+		ExcelHeader[] headers = new ExcelHeader[]{
+				new ExcelHeader("testcase", "Test Case 이름", HorizontalAlignment.LEFT )
+				, new ExcelHeader("modelNm", "측정모델" ,HorizontalAlignment.CENTER)
+				, new ExcelHeader("importance", "중요도", "" , "B100" ,HorizontalAlignment.CENTER)
+				, new ExcelHeader("tcDivision", "구분","", "B900", HorizontalAlignment.CENTER)
+				, new ExcelHeader("bigCateNm", "대분류" ,HorizontalAlignment.CENTER)
+				, new ExcelHeader("prjChasu", "차수" ,HorizontalAlignment.CENTER)
+				, new ExcelHeader("remocon", "리모컨" ,HorizontalAlignment.CENTER)
+				, new ExcelHeader("person", "담당자" ,HorizontalAlignment.CENTER)	
+				, new ExcelHeader("xqmsDtm", "측정일시" ,HorizontalAlignment.CENTER)
+				, new ExcelHeader("targetRepeat", "측정모델 요청")
+				, new ExcelHeader("resultRepeat", "측정모델 이동")
+				, new ExcelHeader("targetDaq", "리모컨 요청")
+				, new ExcelHeader("resultDaq", "리모컨 이동")
+				, new ExcelHeader("repeatResult", "결과", "", "B300", HorizontalAlignment.CENTER)
+		};
+		
+		return new ExcelDownloadView(new ExcelResource(list, headers),"리모컨 로봇 테스트 측정이력.xlsx");
+	}
+	/**
+	 * 해당 pid 프로젝트 리모컨 로봇 측정이력 엑셀 다운로드
+	 * @param model
+	 * @param criteria
+	 * @return
+	 */
+	@RequestMapping("/bmt/xqms/getProjectXqmsLkfsExcel")
+	public ExcelDownloadView getProjectXqmsLkfsExcel(Model model, XqmsCriteria criteria){
+		criteria.setStartDt(criteria.getStartDt().replaceAll("-", ""));
+		criteria.setEndDt(criteria.getEndDt().replaceAll("-", ""));
+		
+		List<XqmsVo> list = xqmsService.selectProjectXqmsLkfsList(criteria);
+		ExcelHeader[] headers = new ExcelHeader[]{
+				new ExcelHeader("testcase", "Test Case 이름", HorizontalAlignment.LEFT )
+				, new ExcelHeader("modelNm", "측정모델" ,HorizontalAlignment.CENTER)
+				, new ExcelHeader("importance", "중요도", "" , "B100" ,HorizontalAlignment.CENTER)
+				, new ExcelHeader("tcDivision", "구분","", "B900", HorizontalAlignment.CENTER)
+				, new ExcelHeader("bigCateNm", "대분류" ,HorizontalAlignment.CENTER)
+				, new ExcelHeader("prjChasu", "차수" ,HorizontalAlignment.CENTER)
+				, new ExcelHeader("remocon", "리모컨" ,HorizontalAlignment.CENTER)
+				, new ExcelHeader("person", "담당자" ,HorizontalAlignment.CENTER)	
+				, new ExcelHeader("xqmsDtm", "측정일시" ,HorizontalAlignment.CENTER)
+				, new ExcelHeader("startDtm", "측정시작",HorizontalAlignment.CENTER)
+				, new ExcelHeader("endDtm", "측정종료",HorizontalAlignment.CENTER)
+				, new ExcelHeader("avgMLkfs", "평균-M-LKFS")
+				, new ExcelHeader("avgSLkfs", "평균-S-LKFS")
+				, new ExcelHeader("lastILkfs", "최종-I-LKFS")
+				
+		};
+		
+		return new ExcelDownloadView(new ExcelResource(list, headers),"LKFS 측정이력.xlsx");
+	}
+	/**
+	 * 해당 pid 프로젝트 Channel 측정이력 엑셀 다운로드
+	 * @param model
+	 * @param criteria
+	 * @return
+	 */
+	@RequestMapping("/bmt/xqms/getProjectXqmsChannelExcel")
+	public ExcelDownloadView getProjectXqmsChannelExcel(Model model, XqmsCriteria criteria){
+
+		criteria.setStartDt(criteria.getStartDt().replaceAll("-", ""));
+		criteria.setEndDt(criteria.getEndDt().replaceAll("-", ""));
+		
+		List<XqmsVo> list = xqmsService.selectProjectXqmsChannelList(criteria);
+		ExcelHeader[] headers = new ExcelHeader[]{
+				new ExcelHeader("testcase", "Test Case 이름", HorizontalAlignment.LEFT )
+				, new ExcelHeader("modelNm", "측정모델" ,HorizontalAlignment.CENTER)
+				, new ExcelHeader("importance", "중요도", "" , "B100" ,HorizontalAlignment.CENTER)
+				, new ExcelHeader("tcDivision", "구분","", "B900", HorizontalAlignment.CENTER)
+				, new ExcelHeader("bigCateNm", "대분류" ,HorizontalAlignment.CENTER)
+				, new ExcelHeader("prjChasu", "차수" ,HorizontalAlignment.CENTER)
+				, new ExcelHeader("remocon", "리모컨" ,HorizontalAlignment.CENTER)
+				, new ExcelHeader("person", "담당자" ,HorizontalAlignment.CENTER)	
+				, new ExcelHeader("xqmsDtm", "측정일시" ,HorizontalAlignment.CENTER)
+				, new ExcelHeader("totTime", "총소요")
+				, new ExcelHeader("remoconReactTime", "A구간")
+				, new ExcelHeader("firstStopTime", "B구간")
+				, new ExcelHeader("secondStopTime", "C구간")
+				, new ExcelHeader("ntwTime", "네트워크")	
+				, new ExcelHeader("channelResult", "결과", "", "B300", HorizontalAlignment.CENTER)
+		};
+		
+		return new ExcelDownloadView(new ExcelResource(list, headers),"채널변경 측정이력.xlsx");
+	}
+
+	/**
+	 * 해당 pid 프로젝트 UiReation 측정이력 엑셀 다운로드
+	 * @param model
+	 * @param criteria
+	 * @return
+	 */
+	@RequestMapping("/bmt/xqms/getProjectXqmsUiReationExcel")
+	public ExcelDownloadView getProjectXqmsUiReationExcel(Model model, XqmsCriteria criteria){
+		criteria.setStartDt(criteria.getStartDt().replaceAll("-", ""));
+		criteria.setEndDt(criteria.getEndDt().replaceAll("-", ""));
+		
+		List<XqmsVo> list = xqmsService.selectProjectXqmsUiReationList(criteria);
+		ExcelHeader[] headers = new ExcelHeader[]{
+				new ExcelHeader("testcase", "Test Case 이름" ,HorizontalAlignment.LEFT)
+				, new ExcelHeader("modelNm", "측정모델" ,HorizontalAlignment.CENTER)
+				, new ExcelHeader("importance", "중요도", "" , "B100" ,HorizontalAlignment.CENTER)
+				, new ExcelHeader("tcDivision", "구분","", "B900", HorizontalAlignment.CENTER)
+				, new ExcelHeader("bigCateNm", "대분류" ,HorizontalAlignment.CENTER) 
+				, new ExcelHeader("prjChasu", "차수" ,HorizontalAlignment.CENTER)
+				, new ExcelHeader("remocon", "리모컨" ,HorizontalAlignment.CENTER)
+				, new ExcelHeader("person", "담당자" ,HorizontalAlignment.CENTER)	
+				, new ExcelHeader("xqmsDtm", "측정일시" ,HorizontalAlignment.CENTER)
+				, new ExcelHeader("matchTime", "매칭")
+				, new ExcelHeader("reactTime", "커서")
+				, new ExcelHeader("diffTime", "변화율")
+				, new ExcelHeader("coldResetResult", "결과", "", "B300", HorizontalAlignment.CENTER)
+		};
+		
+		return new ExcelDownloadView(new ExcelResource(list, headers),"UI 반응시간 측정이력.xlsx");
+	}
+
+	/**
+	 * 측정이력관리 리스트 화면
+	 * @param model
+	 */
+	@RequestMapping("/bmt/xqms/xqmsMngList")
+	public void xqmsMngList(Model model, String pid) {
+		// 검색조건 정의
+		model.addAttribute("startDt", new SimpleDateFormat("yyyy-MM-dd").format(DateUtils.addDays(new Date(), -7)));
+		model.addAttribute("endDt", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+		model.addAttribute("projectView", projectService.selectProjectView(pid));
+	}
+	
+	/**
+	 * 측정이력관리 수정 폼
+	 * @param model
+	 */
+	@Auth(url={"/bmt/xqms/xqmsMngList"})
+	@RequestMapping("/bmt/xqms/xqmsMngForm")
+	public void xqmsMngForm(Model model){
+		
+	}
+	
+	/**
+	 * 측정이력관리 Bmt 측정결과 상세
+	 * @param vo
+	 * @return
+	 */
+	@RequestMapping("/bmt/xqms/getXqmsMngBmtView")
+	public View getXqmsMngBmtView(Model model, String xqmsSeq){
+		model.addAttribute("bmtView",xqmsService.selectProjectXqmsBmtView(xqmsSeq));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 측정이력관리 측정결과 수정 처리 프로세스
+	 * @param model
+	 * @param vo
+	 * @return
+	 */
+	@Auth(url={"/bmt/xqms/xqmsMngList"})
+	@RequestMapping("/bmt/xqms/modXqmsMngPrc")
+	public View modXqmsMngPrc(Model model, XqmsVo vo){
+		int save = 0;
+		// BMT 결과 수정
+		if (vo.getXqmsType().contains("C401")){
+			save = xqmsService.updateProjectXqmsBmtResult(vo);
+		} 
+		// 채널변경 결과 수정
+		else if (vo.getXqmsType().contains("C402")) {
+			save = xqmsService.updateProjectXqmsChannelResult(vo);
+		}
+		// UIReaction 결과 수정
+		else if (vo.getXqmsType().contains("C403")) {
+			save = xqmsService.updateProjectXqmsUiReactionResult(vo);
+		}
+		// 리모컨 로봇 테스트 결과 수정
+		else if (vo.getXqmsType().contains("C405")) {
+			save = xqmsService.updateProjectXqmsRemoconRobotResult(vo);
+		}
+		// 리모컨 로봇 테스트 결과 수정
+		else if (vo.getXqmsType().contains("C404")) {
+			save = xqmsService.updateProjectXqmsLkfsResult(vo);
+		}
+		
+		
+		if (save == 1) {
+			model.addAttribute("save",save);
+		}
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 측정이력관리 Channel 측정결과 상세
+	 * @param model
+	 * @param vo
+	 * @return
+	 */
+	@RequestMapping("/bmt/xqms/getXqmsMngChannelView")
+	public View getXqmsMngChannelView(Model model, String xqmsSeq){	
+		model.addAttribute("channelView",xqmsService.selectProjectXqmsChannelView(xqmsSeq));	
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 측정이력관리 uiReaction 측정결과 상세
+	 * @param model
+	 * @param xqmsSeq
+	 * @return
+	 */
+	@RequestMapping("/bmt/xqms/getXqmsMngUiReactionView")
+	public View getXqmsMngUiReactionView(Model model, String xqmsSeq){
+		model.addAttribute("uiReactionView", xqmsService.selectProjectXqmsUiReactionView(xqmsSeq));
+		return new MappingJackson2JsonView();
+	}
+	/**
+	 * 측정이력관리 리모컨 로봇 테스트 측정결과 상세
+	 * @param model
+	 * @param xqmsSeq
+	 * @return
+	 */
+	@RequestMapping("/bmt/xqms/getXqmsMngRemoconRobotView")
+	public View getXqmsMngRemoconRobotView(Model model, String xqmsSeq){
+		model.addAttribute("remoconRobotView", xqmsService.selectProjectXqmsRemoconRobotView(xqmsSeq));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 측정이력관리 리모컨 로봇 테스트 측정결과 상세
+	 * @param model
+	 * @param xqmsSeq
+	 * @return
+	 */
+	@RequestMapping("/bmt/xqms/getXqmsMngLkfsView")
+	public View getXqmsMngLkfsView(Model model, String xqmsSeq){
+		//LKFS 차트에 그려진 데이터 받기
+		FileComponent fc = new FileComponent();
+		List<XqmsAttachVo> xav = xqmsService.selectXqmsAttachList(xqmsSeq);
+		String savePath = xav.get(0).getFilePath();
+		String saveName = xav.get(0).getOrgFileNm();
+		String lkfsChartData = fc.readFile(savePath,saveName);
+		if(!lkfsChartData.isEmpty()){
+			fc.deleteFile(savePath, saveName);
+		}
+		model.addAttribute("lkfsView", xqmsService.selectProjectXqmsLkfsView(xqmsSeq));
+		model.addAttribute("lkfsLineChartData", lkfsChartData);
+		return new MappingJackson2JsonView();
+	}
+	/**
+	 * 측정이력관리 Bmt 삭제 처리 프로세스
+	 * @param model
+	 * @param criteria
+	 * @return
+	 */
+	@Auth(url={"/bmt/xqms/xqmsMngList"})
+	@RequestMapping("/bmt/xqms/delXqmsMngBmtPrc")
+	public View delXqmsMngBmtPrc(Model model,XqmsVo vo){	
+		model.addAttribute("del",xqmsService.deleteProjectXqmsBmt(vo));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 측정이력관리 Channel 삭제 처리 프로세스
+	 * @param model
+	 * @param criteria
+	 * @return
+	 */
+	@Auth(url={"/bmt/xqms/xqmsMngList"})
+	@RequestMapping("/bmt/xqms/delXqmsMngChannelPrc")
+	public View delXqmsMngChannelPrc(Model model, XqmsVo vo){
+		model.addAttribute("del", xqmsService.deleteProjectXqmsChannel(vo));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 측정이력관리 UiReaction 삭제 처리 프로세스
+	 * @param model
+	 * @param criteria
+	 * @return
+	 */
+	@Auth(url={"/bmt/xqms/xqmsMngList"})
+	@RequestMapping("/bmt/xqms/delXqmsMngUiReactionPrc")
+	public View delXqmsMngUiReactionPrc(Model model, XqmsVo vo){
+		model.addAttribute("del", xqmsService.deleteProjectXqmsUiReatction(vo));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 측정이력관리 lkfs 삭제 처리 프로세스
+	 * @param model
+	 * @param criteria
+	 * @return
+	 */
+	@Auth(url={"/bmt/xqms/xqmsMngList"})
+	@RequestMapping("/bmt/xqms/delXqmsMngLkfsPrc")
+	public View delXqmsMngLkfsPrc(Model model, XqmsVo vo){
+		model.addAttribute("del", xqmsService.deleteProjectXqmsLkfs(vo));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 측정이력관리 리모컨 로봇 테스트 삭제 처리 프로세스
+	 * @param model
+	 * @param criteria
+	 * @return
+	 */
+	@Auth(url={"/bmt/xqms/xqmsMngList"})
+	@RequestMapping("/bmt/xqms/delXqmsMngRemoconRobotPrc")
+	public View delXqmsMngRemoconRobotPrc(Model model, XqmsVo vo){
+		model.addAttribute("del", xqmsService.deleteProjectXqmsRemoconRobot(vo));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 성능평가결과 리스트 엑셀다운로드
+	 * @param model
+	 * @param criteria 검색조건
+	 * @return 엑셀
+	 */
+	@RequestMapping("/bmt/xqms/getXqmsStsListExcel")
+	public ExcelDownloadView getXqmsChannelStsListExcel(Model model, XqmsCriteria criteria) {
+		List<ExcelResource> list = new ArrayList<ExcelResource>();
+		List<XqmsVo> chList = new ArrayList<XqmsVo>();
+		List<XqmsVo> uiList = new ArrayList<XqmsVo>();
+		
+		// 측정모델
+		XqmsVo currChList = xqmsService.selectXqmsChannelStsView(criteria);
+		XqmsVo currUiList = xqmsService.selectXqmsUiReactionStsView(criteria);
+		chList.add(currChList);
+		uiList.add(currUiList);
+		
+		// 상용버전
+		criteria.setModelVer(criteria.getCompModelVer());
+		criteria.setPid(criteria.getCompPid());
+		XqmsVo compChList = xqmsService.selectXqmsChannelStsView(criteria);
+		XqmsVo compUiList = xqmsService.selectXqmsUiReactionStsView(criteria);
+		
+		if (StringUtils.equals(criteria.getPerformYn(), "N")) {
+			if (compChList != null) {
+				chList.add(compChList);
+			}
+			if (compUiList != null) {
+				uiList.add(compUiList);
+			}
+		}
+		
+		ExcelHeader[] chHeaders = new ExcelHeader[] {
+			new ExcelHeader("projectNm", "프로젝트명", HorizontalAlignment.CENTER)
+			, new ExcelHeader("modelNm", "모델명", HorizontalAlignment.CENTER)
+			, new ExcelHeader("modelVer", "모델버전", HorizontalAlignment.CENTER)
+			, new ExcelHeader("totCnt", "측정횟수")
+			, new ExcelHeader("totMin", "최소값")
+			, new ExcelHeader("totMax", "최대값")
+			, new ExcelHeader("totAvg", "평균")
+		};
+		
+		ExcelHeader[] uiHeaders = new ExcelHeader[] {
+				new ExcelHeader("projectNm", "프로젝트명", HorizontalAlignment.CENTER)
+				, new ExcelHeader("modelNm", "모델명", HorizontalAlignment.CENTER)
+				, new ExcelHeader("modelVer", "모델버전", HorizontalAlignment.CENTER)
+				, new ExcelHeader("totCnt", "측정횟수")
+				, new ExcelHeader("matchTimeMin", "매칭시간 최소값")
+				, new ExcelHeader("matchTimeMax", "매칭시간 최대값")
+				, new ExcelHeader("matchTimeAvg", "매칭시간 평균")
+				, new ExcelHeader("reactTimeMin", "커서반응시간 최소값")
+				, new ExcelHeader("reactTimeMax", "커서반응시간 최대값")
+				, new ExcelHeader("reactTimeAvg", "커서반응시간 평균")
+				, new ExcelHeader("diffTimeMin", "변화율시간 최소값")
+				, new ExcelHeader("diffTimeMax", "변화율시간 최대값")
+				, new ExcelHeader("diffTimeAvg", "변화율시간 평균")
+		};
+		
+		if ((currChList != null && compChList != null) || (StringUtils.equals(criteria.getPerformYn(), "Y") && currChList != null)) {
+			list.add(new ExcelResource(chList, chHeaders,"채널변경시간"));
+		}
+		if ((currUiList != null && compUiList != null) || (StringUtils.equals(criteria.getPerformYn(), "Y") && currUiList != null)) {
+			list.add(new ExcelResource(uiList, uiHeaders,"UI반응시간"));
+		}
+		
+		return new ExcelDownloadView(list,"성능평가결과.xlsx");
+	}
+	
+	/**
+	 * 성능평가 채널변경시간 상세보기 엑셀다운로드
+	 * @param model
+	 * @param criteria 검색조건
+	 * @return 엑셀
+	 */
+	@RequestMapping("/bmt/xqms/getXqmsChDetailListExcel")
+	public ExcelDownloadView getXqmsChDetailListExcel(Model model, XqmsCriteria criteria) {
+		List<ExcelResource> list = new ArrayList<ExcelResource>();
+		// 측정모델
+		List<XqmsVo> currList = xqmsService.selectXqmsChannelDetailList(criteria);
+		ExcelHeader[] currHeaders = new ExcelHeader[] {
+				new ExcelHeader("remoconReactTime", "A구간")
+				, new ExcelHeader("firstStopTime", "B구간")
+				, new ExcelHeader("secondStopTime", "C구간")
+				, new ExcelHeader("totTime", "총합")
+				, new ExcelHeader("ntwTime", "네트워크")
+				, new ExcelHeader("xqmsDtm", "측정일시", HorizontalAlignment.CENTER)
+		};
+		list.add(new ExcelResource(currList, currHeaders,"측정모델 ("+criteria.getModelVer()+")"));
+		
+		// 상용버전
+		if (StringUtils.equals(criteria.getPerformYn(), "N")) {
+			criteria.setModelVer(criteria.getCompModelVer());
+			criteria.setPid(criteria.getCompPid());
+			List<XqmsVo> compList = xqmsService.selectXqmsChannelDetailList(criteria);
+			ExcelHeader[] compHeaders = new ExcelHeader[] {
+					new ExcelHeader("remoconReactTime", "A구간")
+					, new ExcelHeader("firstStopTime", "B구간")
+					, new ExcelHeader("secondStopTime", "C구간")
+					, new ExcelHeader("totTime", "총합")
+					, new ExcelHeader("ntwTime", "네트워크")
+					, new ExcelHeader("xqmsDtm", "측정일시", HorizontalAlignment.CENTER)
+			};
+			list.add(new ExcelResource(compList, compHeaders,"상용버전 ("+criteria.getModelVer()+")"));
+		}
+		
+		return new ExcelDownloadView(list, criteria.getModelNm()+" 성능평가 상세결과.xlsx");
+	}
+	
+	/**
+	 * 성능평가 UI반응시간 상세보기 엑셀다운로드
+	 * @param model
+	 * @param criteria 검색조건
+	 * @return 엑셀
+	 */
+	@RequestMapping("/bmt/xqms/getXqmsUiDetailListExcel")
+	public ExcelDownloadView getXqmsUiDetailListExcel(Model model, XqmsCriteria criteria) {
+		List<ExcelResource> list = new ArrayList<ExcelResource>();
+		// 측정모델
+		List<XqmsVo> currList = xqmsService.selectXqmsUiReactionDetailList(criteria);
+		ExcelHeader[] currHeaders = new ExcelHeader[] {
+				new ExcelHeader("matchTime", "매칭")
+				, new ExcelHeader("reactTime", "커서")
+				, new ExcelHeader("diffTime", "변화율")
+				, new ExcelHeader("xqmsDtm", "측정일시", HorizontalAlignment.CENTER)
+		};
+		list.add(new ExcelResource(currList, currHeaders,"측정모델 ("+criteria.getModelVer()+")"));
+		
+		// 상용버전
+		if (StringUtils.equals(criteria.getPerformYn(), "N")) {
+			criteria.setModelVer(criteria.getCompModelVer());
+			criteria.setPid(criteria.getCompPid());
+			List<XqmsVo> compList = xqmsService.selectXqmsUiReactionDetailList(criteria);
+			ExcelHeader[] compHeaders = new ExcelHeader[] {
+					new ExcelHeader("matchTime", "매칭")
+					, new ExcelHeader("reactTime", "커서")
+					, new ExcelHeader("diffTime", "변화율")
+					, new ExcelHeader("xqmsDtm", "측정일시", HorizontalAlignment.CENTER)
+			};
+			list.add(new ExcelResource(compList, compHeaders,"상용버전 ("+criteria.getModelVer()+")"));
+		}
+		
+		return new ExcelDownloadView(list, criteria.getModelNm()+" 성능평가 상세결과.xlsx");
+	}
+	
+	/**
+	 * 측정이력조회 > LKFS Detail 리스트 화면
+	 * @param model
+	 */
+	@Auth(url={"/bmt/xqms/xqmsList"})
+	@RequestMapping("/bmt/xqms/xqmsLkfsDetailList")
+	public void xqmsLkfsDetailList(Model model) {
+		
+	}
+	
+	/**
+	 * 측정이력조회 > xqms리포트 리스트 화면
+	 * @param model
+	 */
+	@Auth(url={"/bmt/xqms/xqmsList"})
+	@RequestMapping("/bmt/xqms/xqmsAttachList")
+	public void xqmsAttachList(Model model) {
+		
+	}
+	
+	/**
+	 * xqmsSeq에 맞는 측정이력 첨부파일 리스트조회
+	 * @param model
+	 * @param xqmsSeq
+	 * @return
+	 */
+	@RequestMapping("/bmt/xqms/getXqmsAttachList")
+	public View getXqmsAttachList(Model model, String xqmsSeq){
+		model.addAttribute("xqmsAttachList", xqmsService.selectXqmsAttachList(xqmsSeq));
+		return new MappingJackson2JsonView();
+	}
+}
+

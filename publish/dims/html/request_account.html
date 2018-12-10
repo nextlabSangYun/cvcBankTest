@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>DIMS</title>
+    <link href="../css/style.css" rel="stylesheet">    
+</head>
+<body>   
+	
+	<div class="dims_popup window">
+		<div class="dims_popup_header">
+			<div class="dims_popup_title"><img src="../images/bullet_title.png" alt=""> <span>계정생성 요청</span></div>
+			<button type="button" class="btn_popup_close" onclick="self.close();"><img src="../images/icon_popup_close.png" alt="close"></button>
+		</div>			
+		<div class="height20"></div>
+		<div class="table_title"><img src="../images/bullet_subtitle.png" alt=""> <span>기본정보 입력</span></div>
+		<form action="">			
+			<div class="table_horizon_white">
+				<table>
+					<tr>
+						<th><strong>＊</strong>아이디</th>
+						<td>
+							<input type="text" class="dims_input" name="" placeholder="영문, 숫자 조합 4~12자 이내" style="width: calc(100% - 85px);">
+							<button type="button" class="btn_item grey">중복체크</button>
+						</td>							
+						<th><strong>＊</strong>이름</th>
+						<td><input type="text" class="dims_input" name="" placeholder="이름을 입력해 주세요"></td>													
+					</tr>
+					<tr>
+						<th><strong>＊</strong>비밀번호</th>
+						<td><input type="password" class="dims_input" name="" placeholder="영문, 숫자, 특수문자 조합 6~15자 이내"></td>
+						<th><strong>＊</strong>비밀번호 확인</th>
+						<td><input type="password" class="dims_input" name="" placeholder="영문, 숫자, 특수문자 조합 6~15자 이내"></td>
+					</tr>
+					<tr>
+						<th><strong>＊</strong>이메일주소</th>
+						<td><input type="text" class="dims_input" name="" placeholder="@를 포함한 이메일 주소를 입력해 주세요"></td>							
+						<th><strong>＊</strong>휴대포번호</th>
+						<td><input type="text" class="dims_input" name="" placeholder="-를 제외한 숫자만 입력해 주세요"></td>							
+					</tr>
+					<tr>
+						<th>전화번호</th>
+						<td><input type="text" class="dims_input" name="" placeholder="-를 제외한 숫자만 입력해 주세요"></td>
+						<th>FAX번호</th>
+						<td><input type="text" class="dims_input" name="" placeholder="-를 제외한 숫자만 입력해 주세요"></td>
+					</tr>
+					<tr>
+						<th><strong>＊</strong>권한</th>
+						<td>
+							<div class="select_wrap full">
+								<select>
+									<option value="hide">사용자 권한을 선택해 주세요</option>
+									<option value="">납품사</option>
+									<option value="">물류센터 관리</option>
+									<option value="">물류센터 운영/option>
+									<option value="">HOME센터</option>
+								</select>
+							</div>
+						</td>							
+						<th><strong>＊</strong>소속</th>
+						<td>
+							<input type="text" class="dims_input" name="" disabled placeholder="검색 버튼을 눌러 주세요" style="width: calc(100% - 125px);">
+							<button type="button" class="btn_item grey">검색</button>
+							<button type="button" class="btn_item">초기화</button>
+						</td>
+					</tr>
+					<tr>
+						<th><strong>＊</strong>신청사유</th>
+						<td colspan="3"><textarea class="dims_textarea" rows="5" id="" placeholder="신청사유를 입력해 주세요"></textarea></td>														
+					</tr>
+
+				</table>
+			</div><!-- end table_wrap -->
+			<div class="height20"></div>
+			<div class="notice_wrap">
+				<ul>
+					<li>- <strong>＊</strong>표시는 필수 입력항목입니다.</li>
+					<li>- 아이디는 영문, 숫자조합 4~12자를 입력 후 중복확인을 해주시기 바랍니다.</li>
+					<li>- 비밀번호는 하나 이상의 알파벳, 숫자, 특수문자 포함 6자 이상 15자 이내로 입력해주세요.</li>
+				</ul>
+			</div>
+		
+			<div class="table_bottom_wrap">						
+				<div class="button_wrap right">					
+					<button type="submit" class="btn_tbl white">생성 요청</button>							
+					<button type="button" class="btn_tbl white">취소</button>							
+				</div>
+			</div>
+			<!-- end.table_bottom_wrap -->
+		</form>			
+	</div>
+
+    <script src="../js/lib/jquery-3.2.1.min.js"></script>
+    <script src="../js/lib/jquery-ui.min.js"></script>	
+	<script src="../js/ui.js"></script>
+	<script src="../js/lib/prefixfree.min.js"></script>		
+	<script src="../js/lib/jquery.form.min.js"></script>
+	<script src="../js/lib/calendar.js"></script>
+</body>
+</html>

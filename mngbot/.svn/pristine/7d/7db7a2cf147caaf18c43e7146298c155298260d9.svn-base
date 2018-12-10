@@ -1,0 +1,22 @@
+package kr.co.nextlab.qa.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import kr.co.nextlab.comm.controller.BaseController;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Controller
+public class QaXqmsController extends BaseController{
+	
+	/**
+	 * qaxqms 리스트 페이지
+	 * @param model
+	 * @param pid
+	 */
+	@RequestMapping("/qa/xqms/xqmsList")
+	public void xqmsList(Model model){
+	}
+}

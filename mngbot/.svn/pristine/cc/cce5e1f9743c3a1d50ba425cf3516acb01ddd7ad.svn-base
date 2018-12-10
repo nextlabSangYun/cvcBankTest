@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.nextlab.bot.mapper.MenuMapper">
+	<select id="selectAuthMenuTotalList" parameterType="menuVo" resultType="menuVo">
+		WITH v_temp AS
+		( 
+			SELECT a.menu_id
+				, a.app_id
+				, a.menu_nm
+				, a.use_yn
+				, a.menu_par_id
+				, a.menu_url
+				, a.page_type
+				, a.menu_nm AS path
+				, LEN(a.menu_id) AS lvl
+				, CONVERT(VARCHAR(100) , a.menu_id) AS sort
+			FROM  tb_menu a
+			WHERE a.menu_par_id = '00' 
+				AND a.app_id = #{appId}
+			UNION ALL
+			SELECT a.menu_id
+				, a.app_id
+				, a.menu_nm
+				, a.use_yn
+				, a.menu_par_id
+				, a.menu_url
+				, a.page_type
+				, CONVERT(VARCHAR(100), b.path + ' > ' + a.menu_nm) AS path 
+				, LEN(A.MENU_ID) AS lvl
+				, CONVERT(VARCHAR(100), b.sort + '/' + a.menu_id ) AS sort
+			FROM tb_menu a INNER JOIN v_temp b ON  a.menu_par_id = b.menu_id
+		)
+		SELECT a.menu_id
+				, a.app_id
+				, a.menu_nm
+				, a.use_yn
+				, a.menu_par_id
+				, a.menu_url
+				, a.page_type
+				, a.path
+				, a.lvl
+				, a.sort
+				, b.menu_id AS authMenuId
+		FROM v_temp a LEFT OUTER JOIN tb_auth_menu b ON (a.menu_id = b.menu_id AND b.auth_id = #{authId})
+		WHERE a.use_yn = 'Y'
+		ORDER BY a.sort
+	</select>
+	
+	<select id="selectUserGroupMenuList" parameterType="String" resultType="menuVo">
+		SELECT c.menu_id
+				, c.app_id
+				, c.menu_nm
+				, c.menu_order
+				, c.menu_par_id
+				, c.menu_url
+				, c.page_type
+				, b.auth_id
+		FROM	tb_auth_menu a
+				JOIN tb_user_group_auth b 
+					ON (a.auth_id = b.auth_id AND a.app_id = b.app_id)
+				JOIN tb_menu c 
+					ON (a.menu_id = c.menu_id AND c.use_yn = 'Y')
+		WHERE	user_group_id = #{userGroupId}
+	</select>
+	
+	<select id="selectUserAppList" parameterType="userVo" resultType="appVo">
+		SELECT	a.app_id
+				, a.app_nm
+				, a.app_url
+				, a.file_nm
+				, a.org_file_nm
+				, a.file_path
+				, ISNULL(c.app_id, '') AS favorite
+				, b.auth_id
+		FROM	tb_app a 
+				JOIN  tb_user_group_auth b ON (a.app_id = b.app_id)
+				LEFT OUTER JOIN tb_favorites c ON (a.app_id = c.app_id AND c.user_id = #{userId})
+		WHERE	a.use_yn = 'Y'
+				AND b.user_group_id = #{userGroupId}
+		ORDER BY c.app_seq, a.app_order
+	</select>
+</mapper>

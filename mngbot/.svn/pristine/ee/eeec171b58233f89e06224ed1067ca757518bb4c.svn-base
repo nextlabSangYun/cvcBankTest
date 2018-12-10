@@ -1,0 +1,485 @@
+<%@ page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://www.nextlab.co.kr/tags/nextlab" prefix="nl"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+
+<link href="/css/bootstrap.css" rel="stylesheet">
+<script type="text/javascript" src="/js/bootstrap.js"></script>
+
+<link href="/css/summernote.css" rel="stylesheet">
+<script type="text/javascript" src="/js/summernote.min.js"></script>
+
+<div class="pop_wrap win_pop" id="requestForm">
+<form name="editForm" method="post" enctype="multipart/form-data" onsubmit="return false;">
+	<input type="hidden" name="reqId" v-model="view.reqId" />
+	<div class="pop_tit">
+		<p>{{reqId !== '' ? '접수번호 : '+reqId : 'BMT 신규 요청'}}</p>
+	</div>
+	<div class="pop_cont">
+		<p class="info_tit" v-if="reqId !== ''">기본정보</p>
+		<div class="g_table02">
+			<table>
+				<caption>제목, 내용, 첨부파일 등을 입력하는 표 입니다.</caption>
+				<colgroup>
+					<col style="width:120px;">
+					<col>
+				</colgroup>
+				<tbody>
+					<tr>
+						<th>제목</th>	
+						<td v-if="(reqId === '') || (reqId !== '' && idChk && (view.progressStat == 'D201' || view.progressStat == 'D202'))">
+							<input type="text" class="full" name="subject" v-model="view.reqSubject" placeholder="최소 5글자 이상">
+						</td>
+						<td v-else>
+							{{ view.reqSubject }}
+						</td>
+					</tr>
+					<tr>
+						<th>내용</th>
+						<td class="notice_txt" v-if="(reqId === '') || (reqId !== '' && idChk && (view.progressStat == 'D201' || view.progressStat == 'D202'))">
+							<textarea id="summernote" name="content" class="full"></textarea>
+						</td>
+						<td class="notice_txt" v-else>
+							<div class="txt" v-html="view.reqCont">
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<th>첨부파일 </th>
+						<td class="file" v-if="(reqId === '') || (reqId !== '' && idChk && (view.progressStat == 'D201' || view.progressStat == 'D202'))">
+							<input type="file" class="ir" id="upLoadFile" name="uploadFile" @change="btnFileUpload">
+							<label for="upLoadFile" class="sch_file" >파일찾기</label>
+							<p class="file_txt">최대 10MB 까지 첨부 가능합니다.</p>
+							<ul class="file_list" v-show="view.fileList.length>0">
+								<li class="full" v-for="(fn,index) in view.fileList"><a style="padding-left: 5px;" @click="getFileDown(index)">{{fn.orgFileNm}}</a><button class="del"  @click="btnFileDelete(index)"> </button></li>
+							</ul>
+						</td>
+						<td v-else>
+							<ul class="file_list" v-show="view.fileList.length>0">
+								<li class="full" v-for="(fn,index) in view.fileList"><a style="padding-left: 5px;" @click="getFileDown(index)">{{fn.orgFileNm}}</a></li>
+							</ul>
+						</td>
+					</tr>
+					<tr>
+						<th>담당자</th>
+						<td class="reg" v-if="(reqId === '') || (reqId !== '' && idChk && (view.progressStat == 'D201' || view.progressStat == 'D202'))">
+							<user-select ref="userSelect" :add-fn="addManagerList"></user-select>
+							<div class="reg_list" v-show="view.managerList.length>0">
+								<ul>
+									<li v-for="(p, index) in view.managerList"><span>{{p.userNm}}({{p.userGroupNm}})</span><button class="del" @click="delManagerList(index)"></button></li>
+								</ul>
+							</div>
+						</td>
+						<td class="reg" v-else>
+							<div class="reg_list" v-show="view.managerList.length>0">
+								<ul>
+									<li v-for="(p, index) in view.managerList"><span>{{p.userNm}}({{p.userGroupNm}})</span></li>
+								</ul>
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		
+		<p class="cate_tit" v-if="reqId !== ''">코멘트</p>
+		<div class="search_area" v-if="reqId !== '' && (view.progressStat == 'D201' || view.progressStat == 'D202')">
+			<textarea class="issue_comment" v-model.trim="comment"></textarea>
+			<button v-if="buttonFlag==false" class="g_btn01" @click="regComment">등록</button>
+			<button v-else class="g_btn01" @click="modComment">수정</button>
+		</div>
+		<div class="g_table" v-if="reqId !== ''">
+			<table>
+				<colgroup>
+					<col style="width: 15%;">
+					<col>
+					<col style="width: 20%;">
+					<col style="width: 10%;">
+				</colgroup>
+				<thead>
+					<tr>
+						<th>등록일시</th>
+						<th>코멘트</th>
+						<th>작성자</th>
+						<th>관리</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr v-for="list in pagingCommentList">
+						<td>{{ list.regDtm | dateTimeFormat }}</td>
+						<td class="l_align"><span v-html="list.comment"></span></td>
+						<td>{{ list.userNm }}({{ list.userGroupNm }})</td>
+						<td class="tb_fixed_btns">
+							<button class="tb_btn04" v-if="list.regId == user.userId && (view.progressStat == 'D201' || view.progressStat == 'D202')" @click="commentEdit(list.comment, list.seq)">수정</button>
+						</td>
+					</tr>
+					<tr v-if="pagingCommentList.length==0">
+						<td colspan="4">등록된 코멘트가 없습니다.</td>
+					</tr>
+				</tbody>
+			</table>
+			<paginator ref="paginatorComment" :go-fn="getPagingCommentList" init-rows="5"></paginator>
+		</div>
+		
+	</div>
+	<div class="btn_wrap">
+		<button class="g_btn04" v-if="reqId !== '' && isMng && (view.progressStat == 'D201' || view.progressStat == 'D202')" @click="btnComplete">승인완료</button>
+		<button class="g_btn03" v-if="reqId !== '' && isMng && (view.progressStat == 'D201' || view.progressStat == 'D202')" @click="showPopupLayer('/bmt/request/requestCancel?reqId=' + requestForm.reqId); return false;">반려</button>
+		<button class="g_btn01" v-if="reqId !== '' && idChk && (view.progressStat == 'D201' || view.progressStat == 'D202')" @click="btnModify">저장</button>
+		<button class="g_btn01" v-if="reqId === ''" @click="btnSave">등록</button>
+		<button class="g_btn02" onclick="window.close(); return false">취소</button>
+	</div>
+</form>
+</div>
+<script>
+var requestForm = new Vue(
+		{
+			el : '#requestForm',
+			data : {
+				reqId : '<c:out value="${param.reqId}"/>'
+				, view: {
+					reqSubject: ''
+					, reqCont: ''
+					, progressStat: ''
+					, regId: ''
+					, fileList: []
+					, managerList: []
+					, commentList: []
+				}
+				, user: {
+					userId: '<c:out value="${user.userId}"/>'
+					, loginUserNm: '<c:out value="${user.userNm}"/>'
+					, loginUserGroupNm: '<c:out value="${user.userGroupNm}"/>'
+				}
+				, idChk: false
+				, isMng: false
+				, comment: ''
+				, buttonFlag: false
+				, pagingCommentList: []
+				, procChk: false
+				, seq: ''
+			},
+			mounted : function() {
+				this.$nextTick(function(){
+					if(!isEmpty(requestForm.reqId)){
+						this.getView(requestForm.reqId);
+					} else {
+						this.setContents();
+					}
+				});
+			},
+			updated : function() {
+				this.setContents();
+			},
+			methods : {
+				setContents: function() {
+					$('#summernote').summernote({
+						height: 200
+						, width: 300
+						, maxwidth: 300
+						, disableResizeEditor: true
+						, toolbar: [
+							['style', ['style', 'fontsize', 'color']],
+							['fontsize', ['bold', 'italic', 'underline', 'strikethrough']],
+							['para', ['paragraph', 'height', 'hr']],
+							['picture', ['table', 'picture', 'link']]
+						]
+					});
+					if (!($('#summernote').summernote('isEmpty'))) {
+						$('#summernote').summernote('code', $('#summernote').summernote('code'));
+					} else {
+						$('#summernote').summernote('code', requestForm.view.reqCont);
+					}
+				}
+				, btnFileUpload: function(){
+					fileUpload($("#upLoadFile"), {saveFilePath: "bmt/request"}, function(data){
+						var fileData = {
+								fileNm: data.saveFileNm
+								, filePath: data.saveFilePath
+								, orgFileNm: data.realFileNm
+								, fileUrl: "/file/download?savePath=" + data.saveFilePath + "&saveName=" + data.saveFileNm + "&realName=" + data.realFileNm
+								, uploadFileNm: '' 
+						}
+						var chNm = null;
+						if (fileData.orgFileNm.length > 25){
+							chNm = fileData.orgFileNm.substring(0,25);
+							fileData.uploadFileNm = chNm + ".....  ";
+						}else {
+							chNm = fileData.orgFileNm;
+							fileData.uploadFileNm = chNm + "  ";
+						}
+						
+						var fChk = requestForm.view.fileList.some(function(t) {
+							return t.orgFileNm == data.realFileNm;
+						});
+						if(!fChk){
+							requestForm.view.fileList.push(fileData);
+						}else {
+							alert("이미 추가된 파일입니다.");
+						}
+					});
+				}
+				, getFileDown: function(index) {
+					var i = index;
+					fileDown(requestForm.view.fileList[i].filePath, requestForm.view.fileList[i].fileNm, requestForm.view.fileList[i].orgFileNm);
+				}
+				, btnFileDelete: function(index){
+					if (confirm("파일을 삭제 하시겠습니까?")){
+						requestForm.view.fileList.splice(index, 1);
+					}
+				}
+				, addManagerList: function(data) {
+					var chk = this.view.managerList.some(function(p) {
+						return p.managerId == data.userId;
+					});
+					
+					if (!chk) {
+						this.view.managerList.push({
+							managerId : data.userId,
+							userNm : data.userNm,
+							userGroupNm : data.userGroupNm
+						});
+					}
+					else {
+						alert("이미 추가된 담당자입니다.");
+					}
+				}
+				, delManagerList: function(index) {
+					this.view.managerList.splice(index, 1);
+				}
+				, btnSave: function(){
+					var param = requestForm.view;
+					if (requestForm.view.reqSubject.length < 5){
+						alert("제목을 최소 5글자 이상 입력해주세요.");
+						return false;
+					}
+					
+					requestForm.view.reqCont = $('#summernote').summernote('code');
+					if (requestForm.view.reqCont.length < 1){
+						alert("내용을 작성해주세요.");
+						return false;
+					}
+					
+					if (requestForm.view.managerList.length < 1){
+						alert("담당자를 지정해주세요.");
+						return false;
+					}
+					
+					var cmsg = "등록하시겠습니까?";
+					if (confirm(cmsg)){
+						startLoading();
+						$.ajax({
+							type: "post"
+							, url: "/bmt/request/regRequest"
+							, contentType: "application/json"
+							, data : JSON.stringify(param)
+							, success: function(data){
+								if (data.save){
+									alert("저장되었습니다.");
+									opener.list.getList();
+									endLoading();
+									window.close();
+								}
+							}
+							, error: function(xhr, status, error){
+								alert($(xhr.responseText).text());
+							}
+						});
+					}
+				}
+				, btnModify: function(){
+					var param = requestForm.view;
+					if (requestForm.view.reqSubject.length < 5){
+						alert("제목을 최소 5글자 이상 입력해주세요.");
+						return false;
+					}
+					
+					requestForm.view.reqCont = $('#summernote').summernote('code');
+					if (requestForm.view.reqCont.length < 1){
+						alert("내용을 작성해주세요.");
+						return false;
+					}
+					
+					if (requestForm.view.managerList.length < 1){
+						alert("담당자를 지정해주세요.");
+						return false;
+					}
+					
+					var cmsg = "수정하시겠습니까?";
+					if (confirm(cmsg)){
+						startLoading();
+						$.ajax({
+							type: "post"
+							, url: "/bmt/request/modRequest"
+							, contentType: "application/json"
+							, data : JSON.stringify(param)
+							, success: function(data){
+								if (data.save){
+									alert("수정되었습니다.");
+									opener.list.getList();
+									endLoading();
+									window.close();
+								}
+							}
+							, error: function(xhr, status, error){
+								alert($(xhr.responseText).text());
+							}					
+						});
+					}
+				}
+				, getView: function() {
+					$.get("/bmt/request/getRequestView?reqId=" + requestForm.reqId,function(data){
+						requestForm.view = data.bmtRequest;
+						/* 로그인 ID 와 요청 등록ID 일치여부 확인 */
+						if (requestForm.user.userId == data.bmtRequest.regId){
+							requestForm.idChk = true;
+						}
+						
+						/* 로그인 ID 와 담당자 ID 일치여부 확인*/
+						for (var i=0; i < data.bmtRequest.managerList.length; i++) {
+							if (requestForm.user.userId == data.bmtRequest.managerList[i].managerId) {
+								requestForm.isMng = true;
+							}
+						}
+						
+						requestForm.getPagingCommentList();
+						requestForm.goPageComment(1);
+					});
+				}
+				, btnComplete: function() {
+					var cmsg = "승인완료 하시겠습니까?";
+					if (confirm(cmsg)){
+						startLoading();
+						$.post('/bmt/request/modReqProgrssStat', {reqId:requestForm.reqId, progressStat:'D203', regId:requestForm.view.regId, reqSubject:requestForm.view.reqSubject}, function(data){
+							if (data.save){
+								alert("승인완료 되었습니다.");
+								requestForm.view.progressStat = 'D203';
+								opener.list.getList();
+								endLoading();
+								window.close();
+							} else{
+								var message = data.messsage;
+								if(message == 'D203'){
+									alert("이미 승인완료된 요청건 입니다.");
+								}else if(message == 'D204'){
+									alert("이미 반려처리된 요청건 입니다.");
+								}
+								opener.list.getList();
+								window.location.reload();
+								endLoading();
+								
+							}
+						});
+					}
+				}
+				, btnCancel: function() {
+					var cmsg = "반려처리 하시겠습니까?";
+					if (confirm(cmsg)){
+						startLoading();
+						$.post('/bmt/request/modReqProgrssStat', {reqId:requestForm.reqId, progressStat:'D204', regId:requestForm.view.regId, reqSubject:requestForm.view.reqSubject}, function(data){
+							if (data.save){
+								alert("반려처리 되었습니다.");
+								requestForm.view.progressStat = 'D204';
+								opener.list.getList();
+								endLoading();
+								window.close();
+							} else{
+								var message = data.messsage;
+								if(message == 'D203'){
+									alert("이미 승인완료된 요청건 입니다.");
+								}else if(message == 'D204'){
+									alert("이미 반려처리가 되었습니다.");
+								}
+								opener.list.getList();
+								window.location.reload();
+								endLoading();
+							}
+						});
+					}
+				}
+				, regComment: function() {
+					var param = {
+						reqId:requestForm.reqId
+						, comment: requestForm.comment
+					}
+					
+					if (param.comment == "") {
+						alert("코멘트를 입력하세요.");
+						$("#comment").focus();
+						return;
+					}
+					
+					if (this.procChk) return;
+					this.procChk = true;
+					
+					$.post('/bmt/request/regReqComment', param, function(data){
+						if (data.reqCommentList.length > 0) {
+							requestForm.view.commentList = data.reqCommentList;
+							requestForm.getPagingCommentList();
+							requestForm.goPageComment(1);
+							opener.list.getList();
+						} else if (data.message) {
+							alert(data.message);
+						}
+						requestForm.procChk = false;
+						requestForm.comment = "";
+					});
+					
+				}
+				, modComment: function(){
+					var param = {
+						reqId:requestForm.reqId
+						, comment: this.comment
+						, seq: this.seq
+					}
+					
+					if (param.comment == "") {
+						alert("코멘트를 입력하세요.");
+						$("#comment").focus();
+						return;
+					}
+					
+					if (this.procChk) return;
+					this.procChk = true;
+					
+					$.post('/bmt/request/modReqComment', param, function(data){
+						if (data.reqCommentList.length > 0) {
+							requestForm.view.commentList = data.reqCommentList;
+							requestForm.getPagingCommentList();
+						} else if (data.message) {
+							alert(data.message);
+						}
+						requestForm.procChk = false;
+						requestForm.comment = "";
+						requestForm.seq = "";
+						requestForm.buttonFlag = false;
+					});
+				}
+				, commentEdit: function(comment, commentSeq){
+					if (this.buttonFlag == false) {
+						this.buttonFlag = true;
+						requestForm.comment = comment.replace(/(<br>|<br\/>|<br \/>)/g, '\r\n');
+						requestForm.seq = commentSeq;
+					} else {
+						this.buttonFlag = false;
+						requestForm.comment = '';
+						requestForm.seq = '';
+					}
+				}
+				, getPagingCommentList: function() {
+					var tempList = [];
+					tempList =  this.$refs.paginatorComment.pagingList(requestForm.view.commentList);
+					
+					tempList.forEach(function(o,i){
+						tempList[i].comment = o.comment.replace(/(?:\n)/g, '<br>');
+						tempList[i].comment.split('\n').join('<br>');
+					});
+					
+					this.pagingCommentList = tempList;
+				}
+				, goPageComment: function(page) {
+					this.$refs.paginatorComment.goPage(page);
+				}
+			}
+		});
+</script>
+

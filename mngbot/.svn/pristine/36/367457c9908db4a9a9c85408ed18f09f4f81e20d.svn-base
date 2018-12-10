@@ -1,0 +1,42 @@
+@charset 'utf-8';
+
+
+.top_fixed_btns {position:absolute;top:8px;right:50%;margin-right:-548px;}
+.top_fixed_btns div {position:relative;float:left;margin-left:15px;}
+.top_fixed_btns .btn_add {position:relative;text-indent:0;background:none;left:0;top:0;}
+.top_fixed_btns .btn_setting {display:inline-block;width:52px;height:52px;}
+.top_fixed_btns .tooltip {display:none;z-index:1;position:absolute;left:50%;bottom:-40px;min-width:100px;margin-left:-50px;line-height:30px;border-radius:13px;color:#fff;background:#6570b0;text-align:center;}
+.top_fixed_btns .tooltip:before {content:'';display:inline-block;position:absolute;left:50%;top:-6px;width:7px;height:6px;margin-left:-3px;background:url('../images/bmt/arr_tooltip.png') no-repeat 0 50%;}
+.top_fixed_btns div:hover .tooltip {display:block;}
+
+.sel_rpt_wrap {width:100%;height:193px;overflow:hidden;margin-bottom:60px;background:#fff;}
+.sel_rpt_wrap ul {overflow-x:auto;width:100%;padding:0 20px;box-sizing:border-box;}
+.sel_rpt_wrap li {display:table-cell;white-space:nowrap;min-width:100px;padding:20px 21px 8px;}
+.ico_rpt {position:relative;text-align:center;}
+.ico_rpt button {display:inline-block;width:100px;height:100px;margin-bottom:12px;border-radius:50px;font-weight:bold;font-size:23px;color:#fff;}
+.ico_rpt .name {overflow:hidden;height:36px;width:143px;margin:0 auto;word-break:break-all;line-height:18px;color:#2a2a2a;box-sizing:border-box;white-space:normal;text-align:center;}
+.ico_rpt .ico_fav {display:inline-block;position:absolute;right:40px;top:20px;width:22px;height:22px;background:url('../images/common/ico_fav.png') no-repeat 0 0;cursor:pointer;}
+.ico_rpt.fav .ico_fav {background-image:url('../images/common/ico_fav_on.png');} 
+
+.rpt_sch_area {position:relative;margin-bottom:20px;padding:10px 132px 10px 20px;background:#fff;}
+.rpt_sch_area .g_btn01 {position:absolute;right:20px;top:10px;}
+.rpt_sch_area .ico_sch {display:inline-block;padding-left:25px;background:url('../images/stats/ico_btn_sch.png') no-repeat 0 50%;}
+.report_list {border-top:2px solid #444;}
+.report_list li {position:relative;padding:12px 20px 12px 32px;background:#fff;border-bottom:1px solid #ddd;}
+.report_list li:after {content:'';display:block;clear:both;}
+.report_list .ico_rpt {float:left;width:105px;margin:0 25px 0 0;}
+.report_list .ico_rpt button {margin:0;}
+.report_list .ico_rpt .ico_fav {right:0;top:0;}
+.report_list .txt_area {float:left;width:calc(100%  - 250px);padding-top:18px;}
+.report_list .txt_area .tit {margin-bottom:10px;font-size:16px;}
+.report_list .txt_area .tit a {color:#333;}
+.report_list .txt_area .desc {font-size:14px;line-height:21px;}
+.report_list .btn_list {position:absolute;right:20px;top:50%;width:90px;margin-top:-34px;}
+.report_list .btn_list button {margin:2px 0;}
+
+.sel_cr_area:after {content:'';display:block;clear:both;}
+.sel_cr_area button {display:inline-block;width:20px;height:20px;float:left;margin:0 1px;}
+.sel_cr_area button.select {border:2px solid #222;box-sizing:border-box;}
+
+.data_none {margin:50px 0;text-align:center;}
+.data_none  p {padding-top:170px;font-size:18px;color:#666;background:url('../images/bmt/ico_data_none.png') no-repeat 50% 0;}

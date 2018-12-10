@@ -1,0 +1,404 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.nextlab.hded.mapper.HdedProjectMapper">
+	<select id="selectMyProjectList" parameterType="heProjectVo" resultType="heProjectVo">
+		SELECT a.pid
+			   , a.project_nm
+			   , a.project_stat
+			   , a.project_result_cd
+			   , a.project_st_dt
+			   , a.project_end_dt
+			   , a.bigo
+			   , a.reg_id
+			   , (SELECT e.user_nm FROM tb_user e where e.user_id = a.reg_id) AS reg_nm
+			   , a.reg_dtm
+			   , a.mod_id
+			   , (SELECT f.user_nm FROM tb_user f where f.user_id = a.mod_id) AS mod_nm
+			   , a.mod_dtm
+			   , b.sys_seq
+			   , b.system_id
+			   , b.system_stat
+			   , b.system_result_cd
+			   , b.chasu
+			   , c.chasu_st_dtm
+			   , c.chasu_ed_dtm
+			   , d.system_nm
+			   , CASE WHEN c.chasu_ed_dtm = a.project_end_dt THEN 'Y'
+			   		  ELSE 'N'
+				 END AS chasu_stat
+		FROM   tb_he_project a
+		JOIN   tb_project_system b
+		ON     a.pid = b.pid
+		JOIN   tb_system_chasu_hst c
+		ON     a.pid     = c.pid
+		AND    b.sys_seq = c.sys_seq
+		AND    b.chasu   = c.chasu
+		JOIN   tb_he_system d
+		ON     b.system_id = d.system_id
+		WHERE a.use_yn = 'Y'
+		<if test=" !mngYn ">
+			AND EXISTS (SELECT 1 FROM tb_project_member e WHERE e.pid = a.pid AND e.parti_id = #{partiId})
+		</if>
+		<if test=" progressYn ">
+			AND a.project_stat IN ('C301','C302','C303')
+		</if>
+		ORDER BY a.reg_dtm DESC
+	</select>
+	
+	<select id="selectMyProjectChasuList" parameterType="projectVo" resultType="projectVo">
+		SELECT a.pid
+			   , a.project_nm
+			   , a.project_stat
+			   , a.project_result_cd
+			   , a.project_st_dt
+			   , a.project_end_dt
+			   , a.bigo
+			   , a.reg_id
+			   , a.reg_dtm
+			   , a.mod_id
+			   , a.mod_dtm
+			   , b.sys_seq
+			   , b.system_id
+			   , b.system_stat
+			   , b.system_result_cd
+			   , c.chasu
+			   , c.chasu_st_dtm
+			   , c.chasu_ed_dtm
+			   , d.system_nm
+		FROM   tb_he_project a
+		JOIN   tb_project_system b
+		ON     a.pid = b.pid
+		JOIN   tb_system_chasu_hst c
+		ON     a.pid     = c.pid
+		AND    b.sys_seq = c.sys_seq
+		JOIN   tb_he_system d
+		ON     b.system_id = d.system_id
+		WHERE a.use_yn = 'Y'
+		<if test=" !mngYn ">
+			AND EXISTS (SELECT 1 FROM tb_project_member e WHERE e.pid = a.pid AND e.parti_id = #{partiId})
+		</if>
+		<if test=" progressYn ">
+			AND a.project_stat in ('C301','C302','C303')
+		</if>
+		ORDER BY a.reg_dtm DESC
+	</select>
+	
+	<select id="selectProjectList" parameterType="heProjectCriteria" resultType="heProjectVo">
+		SELECT a.pid
+			   , a.project_nm
+			   , a.project_stat
+			   , a.project_result_cd
+			   , a.project_st_dt
+			   , a.project_end_dt
+			   , a.bigo
+			   , a.reg_id
+			   , (SELECT e.user_nm FROM tb_user e where e.user_id = a.reg_id) AS reg_nm
+			   , a.reg_dtm
+			   , a.mod_id
+			   , (SELECT f.user_nm FROM tb_user f where f.user_id = a.mod_id) AS mod_nm
+			   , a.mod_dtm
+			   , b.sys_seq
+			   , b.system_id
+			   , b.system_stat
+			   , b.system_result_cd
+			   , b.chasu
+			   , c.chasu_st_dtm
+			   , c.chasu_ed_dtm
+			   , d.system_nm
+			   , CASE WHEN c.chasu_ed_dtm = a.project_end_dt THEN 'Y'
+			   		  ELSE 'N'
+				 END AS chasu_stat
+		FROM   tb_he_project a
+		JOIN   tb_project_system b
+		ON     a.pid = b.pid
+		JOIN   tb_system_chasu_hst c
+		ON     a.pid     = c.pid
+		AND    b.sys_seq = c.sys_seq
+		AND    b.chasu   = c.chasu
+		JOIN   tb_he_system d
+		ON     b.system_id = d.system_id
+		WHERE a.use_yn = 'Y'
+		AND <![CDATA[ a.project_st_dt <= #{endDt} AND a.project_end_dt >= #{startDt} ]]>
+		<if test=" chkIng ">
+			AND a.project_stat IN ('C301','C302','C303')
+		</if>
+		<if test="systemNm != null and systemNm != ''">
+			AND d.system_nm = #{systemNm}
+		</if>
+		<if test="projectNm != null and projectNm != ''">
+			AND a.project_nm LIKE '%' + #{projectNm} + '%'
+		</if>
+		ORDER BY a.reg_dtm DESC
+	</select>
+	<insert id="insertHeProject" parameterType="heProjectVo">
+		INSERT INTO tb_he_project
+			(pid
+			, project_nm
+			, project_stat
+			, project_result_cd
+			, project_st_dt
+			, project_end_dt
+			, bigo
+			, reg_id
+			, reg_dtm
+			, mod_id
+			, mod_dtm)
+		VALUES
+			(#{pid}
+			, #{projectNm}
+			, #{projectStat}
+			, #{projectResultCd}
+			, CONVERT(VARCHAR(10), #{projectStDt}, 23)+ ' 00:00:00'
+			, CONVERT(VARCHAR(10), #{projectEndDt}, 23)+ ' 23:59:59'
+			, #{bigo}
+			, #{regId}
+			, GETDATE()
+			, #{modId}
+			, GETDATE())
+	</insert>
+	<insert id="insertHeProjectMember" parameterType="heProjectMemberVo">
+		INSERT INTO tb_project_member
+			(pid, parti_id, reg_id, reg_dtm)
+		VALUES
+			(#{pid}, #{partiId}, #{regId}, GETDATE())
+	</insert>
+	<insert id="insertHeProjectSystem" parameterType="HeProjectSystemVo">
+		INSERT INTO tb_project_system
+			(pid
+			, sys_seq
+			, system_id
+			, system_stat
+			, system_result_cd
+			, reg_id
+			, reg_dtm
+			, mod_id
+			, mod_dtm
+			, chasu)
+		VALUES
+			(#{pid}
+			, (SELECT ISNULL(MAX(a.sys_seq), 0) as sys_seq FROM tb_project_system a WHERE a.pid = #{pid} AND a.system_id = #{systemId})+1
+			, #{systemId}
+			, #{systemStat}
+			, #{systemResultCd}
+			, #{regId}
+			, GETDATE()
+			, #{modId}
+			, GETDATE()
+			, #{chasu})
+		<selectKey resultType="Integer" keyProperty="sysSeq" order="AFTER">
+			SELECT a.sys_seq 
+			FROM tb_project_system a
+			WHERE a.pid = #{pid}
+				AND a.system_id = #{systemId}
+		</selectKey>
+	</insert>
+	<select id="selectProjectSystemSeq" parameterType="heProjectSystemVo" resultType="Integer">
+		SELECT a.sys_seq 
+		FROM tb_project_system a
+		WHERE a.pid = #{pid}
+			AND a.system_id = #{systemId}
+	</select>
+	<insert id="insertHeSystemChasuHst" parameterType="heSystemChasuHstVo">
+		INSERT INTO tb_system_chasu_hst
+			(pid, sys_seq, chasu, chasu_st_dtm, chasu_ed_dtm, reg_id, reg_dtm, mod_id, mod_dtm)
+		VALUES
+			(#{pid}, #{sysSeq}, #{chasu}, CONVERT(VARCHAR(10), #{chasuStDtm}, 23) + ' 00:00:00', CONVERT(VARCHAR(10), #{chasuEdDtm}, 23) + ' 23:59:59', #{regId}, GETDATE(), #{modId}, GETDATE())
+	</insert>
+	<select id="selectHeProjectView" parameterType="String" resultType="heProjectVo">
+		SELECT a.pid
+			, a.project_nm
+			, a.project_stat
+			, a.project_result_cd
+			, a.project_st_dt
+			, a.project_end_dt 
+			, a.bigo
+			, a.reg_id
+			, (SELECT user_nm FROM tb_USER WHERE user_id = a.reg_id) as reg_nm
+			, a.reg_dtm
+			, a.mod_Id
+			, (SELECT user_nm FROM tb_USER WHERE user_id = a.mod_Id) as mod_nm
+			, a.mod_dtm 
+			, b.system_id
+			, b.sys_seq
+			, (SELECT system_nm FROM TB_HE_SYSTEM WHERE system_id = b.system_id) as systemNm
+			, b.chasu
+			, c.chasu_ed_dtm
+		FROM TB_HE_PROJECT a
+		JOIN TB_PROJECT_SYSTEM b ON (a.pid = b.pid)
+		JOIN TB_SYSTEM_CHASU_HST c ON (b.pid = c.pid AND b.sys_seq = c.sys_seq AND b.chasu = c.chasu)
+		WHERE a.pid = #{pid} AND a.use_yn = 'Y'
+		ORDER BY c.chasu DESC
+	</select>
+	<select id="selectHeProjectManagerList" parameterType="String" resultType="heProjectMemberVo">
+		SELECT B.USER_GROUP_ID
+			, STUFF((
+				SELECT ', '+ A.user_nm
+				FROM tb_user A
+				INNER JOIN tb_project_member C ON (c.parti_id = A.user_id)
+				WHERE A.USER_GROUP_ID = b.USER_GROUP_ID AND C.pid = #{pid}
+				FOR XML PATH('')
+			),1,1,'') AS user_nm
+			, (SELECT user_group_nm FROM tb_user_group WHERE user_group_id = b.user_group_id) user_group_nm
+		FROM(SELECT a.pid
+			, a.parti_id
+			, b.user_nm
+			, b.USER_GROUP_ID
+		FROM tb_project_member a
+		JOIN tb_user b ON (b.user_id = a.parti_id)
+		WHERE a.pid = #{pid})B
+		GROUP BY B.USER_GROUP_ID
+	</select>
+	<select id="selectHeProjectEditManagerList" parameterType="String" resultType="heProjectMemberVo">
+		SELECT a.pid
+			, a.parti_id
+			, b.user_nm
+			, (SELECT user_group_nm FROM tb_user_group WHERE user_group_id = b.user_group_id) user_group_nm
+		FROM tb_project_member a
+		JOIN tb_user b ON (b.user_id = a.parti_id)
+		WHERE a.pid = #{pid}
+	</select>
+	<update id="updateHeProject" parameterType="heProjectVo">
+		UPDATE tb_he_project SET
+			project_nm = #{projectNm}
+			, project_st_dt = #{projectStDt}
+			, project_end_dt = #{projectEndDt}
+			, bigo = #{bigo}
+			, mod_id = #{modId}
+			, mod_dtm = GETDATE()
+		WHERE pid = #{pid}	
+	</update>
+	<update id="updateSystemChasuHst" parameterType="heProjectVo">
+		UPDATE tb_system_chasu_hst SET
+			chasu_st_dtm = #{projectStDt}
+			, chasu_ed_dtm = #{projectEndDt}
+			, mod_id = #{modId}
+			, mod_dtm = GETDATE()
+		WHERE pid = #{pid} AND sys_seq = #{sysSeq} 
+	</update>
+	<delete id="deleteProjectMember" parameterType="String">
+		DELETE tb_project_member
+		WHERE pid = #{pid}
+	</delete>
+	<update id="updateCompleteHeProject" parameterType="heProjectVo">
+		UPDATE tb_he_project SET
+			project_stat = #{projectStat}
+			, project_result_cd = #{projectResultCd}
+			, mod_id = #{modId}
+			, mod_dtm = GETDATE()
+		WHERE pid = #{pid}
+	</update>
+	<update id="updateCompleteProjectSystem" parameterType="heProjectVo">
+		UPDATE tb_project_system SET
+			system_stat = #{projectStat}
+			, system_result_cd = #{projectResultCd}
+			, mod_id = #{modId}
+			, mod_dtm = GETDATE()
+		WHERE pid = #{pid}
+	</update>
+	<update id="updateNextHeSystemChasuHst" parameterType="heSystemChasuHstVo">
+		UPDATE tb_system_chasu_hst SET
+			chasu_ed_dtm = DATEADD(s,-1,CONVERT(DATETIME,convert(INT, GETDATE()-1)))
+			, mod_id  = #{modId}
+			, mod_dtm = GETDATE()
+		WHERE pid = #{pid} AND sys_seq = #{sysSeq}
+	</update>
+	<insert id="insertNextHeSystemChasuHst" parameterType="heSystemChasuHstVo">
+		INSERT INTO tb_system_chasu_hst
+			(pid, sys_seq, chasu, chasu_st_dtm, chasu_ed_dtm, reg_id, reg_dtm, mod_id, mod_dtm)
+		VALUES
+			(#{pid}, #{sysSeq}, #{chasu}, CONVERT(DATETIME,CONVERT(INT,GETDATE()-1)), CONVERT(VARCHAR(10), #{chasuEdDtm}, 23) + ' 23:59:59', #{regId}, GETDATE(), #{modId}, GETDATE())
+	</insert>
+	<update id="updateNextProjectSystem" parameterType="heProjectSystemVo">
+		UPDATE tb_project_system SET
+			chasu = #{chasu}
+		WHERE pid = #{pid} AND sys_seq=#{sysSeq}
+	</update>
+	
+	<update id="updateHeProjectUseYn" parameterType="heProjectVo">
+		UPDATE tb_he_project SET
+			use_yn = 'N'
+			, project_stat = 'C304'
+			, mod_id = #{modId}
+			, mod_dtm = GETDATE()
+		WHERE pid = #{pid}
+	</update>
+	
+	<select id="selectHeProjectChasuHstList" parameterType="String" resultType="heSystemChasuHstVo">
+		SELECT
+			c.pid
+			, c.sys_seq
+			, c.chasu
+			, c.chasu_st_dtm
+			, c.chasu_ed_dtm
+			, c.reg_id
+			, c.reg_dtm
+			, c.mod_id
+			, c.mod_dtm
+		FROM tb_he_project a
+		JOIN tb_project_system b
+		ON b.pid = a.pid
+		JOIN tb_system_chasu_hst c
+		ON c.pid = b.pid
+			AND c.sys_seq = b.sys_seq
+		WHERE a.pid = #{pid}
+		ORDER BY c.chasu DESC
+	</select>
+	
+	<select id="selectTcPassRate" parameterType="String" resultType="heProjectVo">
+		WITH v_temp AS (
+			SELECT
+				A.chasu
+				, COUNT(CASE WHEN d.tc_result_cd = 'B301' THEN 1
+							 ELSE null 
+						END) AS tc_pass_cnt
+				, COUNT(CASE WHEN d.tc_result_cd = 'B302' THEN 1
+							 ELSE null
+						END) AS tc_fail_cnt
+			FROM  (
+				SELECT
+					c.project_tc_seq
+					, d.chasu
+					, MAX(d.tc_result_seq) AS tc_result_seq
+				FROM tb_he_project a
+				JOIN tb_project_system b
+				ON b.pid = a.pid
+				JOIN tb_project_tc c
+				ON c.pid = b.pid
+					AND c.sys_seq = b.sys_seq
+				JOIN tb_tc_result d
+				ON d.project_tc_seq = c.project_tc_seq
+				WHERE a.pid = #{pid}
+				GROUP BY c.project_tc_seq, d.chasu
+			) AS A
+			JOIN tb_tc_result d
+			ON d.tc_result_seq = A.tc_result_seq
+			GROUP BY A.chasu
+		)
+		SELECT
+			v.chasu
+			, v.tc_pass_cnt
+			, v.tc_fail_cnt
+			, z.tc_total_cnt
+			, FLOOR(CASE WHEN ISNULL(CAST(z.tc_total_cnt AS FLOAT),0) = 0 THEN 0 ELSE CAST(v.tc_pass_cnt AS FLOAT) / CAST(z.tc_total_cnt AS FLOAT) END *100) tc_pass_percent
+		FROM v_temp v
+		JOIN (SELECT
+					COUNT(*) AS tc_total_cnt
+				FROM tb_he_project a
+				JOIN tb_project_system b
+				ON b.pid = a.pid
+				JOIN tb_project_tc c
+				ON c.pid = b.pid
+					AND c.sys_seq = b.sys_seq
+				WHERE a.pid = #{pid}
+			) z
+		ON 1 = 1
+		ORDER BY v.chasu
+	</select>
+	
+	<select id="selectSystemNmList" parameterType="String" resultType="heSystemVo">
+		SELECT
+			a.system_nm
+		FROM tb_he_system a
+		WHERE system_nm LIKE '%' + #{systemNm} + '%'
+	</select>
+</mapper>

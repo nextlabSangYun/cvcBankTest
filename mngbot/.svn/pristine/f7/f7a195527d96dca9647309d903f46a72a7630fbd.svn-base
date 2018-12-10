@@ -1,0 +1,529 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.nextlab.qa.mapper.QaProjectMapper">
+	
+	<select id="selectMyProjectChasuList" parameterType="qaProjectVo" resultType="qaProjectVo">
+		SELECT
+			a.pid
+			, a.project_nm
+			, a.project_st_dt
+			, a.project_end_dt
+			, a.chasu
+			, a.tc_prefix
+			, a.prediction_qa_mm
+			, a.prediction_bp_mm
+			, a.project_qa_mm
+			, a.project_bp_mm
+			, a.project_stat_cd
+			, a.project_result_cd
+			, a.use_yn
+			, a.bigo
+			, a.reg_id
+			, a.reg_dtm
+			, a.mod_id
+			, a.mod_dtm
+			, b.chasu AS hst_chasu
+			, b.chasu_st_dtm
+			, b.chasu_ed_dtm
+		FROM tb_qa_project a
+		JOIN tb_qa_project_chasu_hst b
+		ON b.pid = a.pid
+		WHERE a.use_yn = 'Y'
+		<if test=" !mngYn ">
+			AND EXISTS (SELECT 1 FROM tb_qa_project_parti e WHERE e.pid = a.pid AND e.parti_id = #{partiId})
+		</if>
+		<if test=" progressYn ">
+			AND a.project_stat_cd in ('C301','C302','C303')
+		</if>
+		ORDER BY a.reg_dtm DESC
+	</select>
+	
+	<select id="selectProjectStatusList" parameterType="qaProjectVo" resultType="qaProjectVo">
+		WITH v_temp AS (
+				SELECT
+					a.pid
+					, count(c.seq) test_fail_cnt
+					, count(d.seq) test_flaw_cnt
+				FROM tb_qa_project a
+				LEFT JOIN tb_qa_tc_info b
+				ON (b.pid = a.pid
+					AND (b.use_yn IS NULL OR b.use_yn = 'Y'))
+				LEFT JOIN tb_qa_xqms c
+				ON (c.tc_id = b.tc_id
+					AND c.tc_result_cd = 'B302'
+					AND c.chasu = a.chasu)
+				LEFT JOIN tb_qa_xqms_flaw d
+				ON (d.seq = c.seq
+					AND d.jira_link is not null)
+				WHERE a.project_stat_cd IN ('C301','C302','C303')
+				<if test=" !mngYn ">
+				AND EXISTS (	SELECT 1 FROM tb_qa_project_parti g
+								WHERE g.pid = a.pid
+								AND g.parti_id = #{partiId}
+							)
+				</if>
+				GROUP BY a.pid
+		)
+		SELECT
+			v.pid
+			, z.test_cnt
+			, z.test_ing_cnt
+			, v.test_fail_cnt
+			, v.test_flaw_cnt
+			, p.project_nm
+			, p.project_st_dt
+			, p.project_end_dt
+			, p.chasu
+			, CASE WHEN i.chasu_ed_dtm = CONVERT(VARCHAR, p.project_end_dt, 23)+ ' 23:59:59' THEN 'Y'
+				   ELSE 'N'
+			   END AS chasu_stat
+			, FLOOR(CASE WHEN ISNULL(CAST(z.test_cnt AS FLOAT),0) = 0 THEN 0 
+						 ELSE CAST(z.test_ing_cnt AS FLOAT) / CAST(z.test_cnt AS FLOAT) 
+					END *100) AS test_percent
+			, FLOOR(CASE WHEN ISNULL(CAST(v.test_fail_cnt AS FLOAT),0) = 0 THEN 0 
+						 ELSE CAST(v.test_flaw_cnt AS FLOAT) / CAST(v.test_fail_cnt AS FLOAT)
+					END *100) AS flaw_percent
+		FROM v_temp AS v
+		JOIN (	SELECT
+			  		e.pid
+					, count(f.tc_id) AS test_cnt
+					, count(f.last_result_cd) AS test_ing_cnt
+				FROM tb_qa_project e
+				LEFT JOIN tb_qa_tc_info f
+				ON (f.pid = e.pid
+					AND (f.use_yn IS NULL OR f.use_yn = 'Y'))
+				WHERE e.project_stat_cd IN ('C301','C302','C303')
+				<if test=" !mngYn ">
+				AND EXISTS (	SELECT 1 FROM tb_qa_project_parti h
+								WHERE h.pid = e.pid
+								AND h.parti_id = #{partiId}
+							)
+				</if>
+				GROUP BY e.pid
+			) z
+		ON z.pid = v.pid
+		JOIN tb_qa_project p
+		ON p.pid = v.pid
+		JOIN tb_qa_project_chasu_hst i
+		ON (i.pid = p.pid
+			AND i.chasu = p.chasu)
+	</select>
+	
+	<select id="selectMyProjectList" parameterType="qaProjectVo" resultType="qaProjectVo">
+		SELECT
+			a.pid
+			, a.project_nm
+			, a.project_st_dt
+			, a.project_end_dt
+			, a.chasu
+			, a.tc_prefix
+			, a.prediction_qa_mm
+			, a.prediction_bp_mm
+			, a.project_qa_mm
+			, a.project_bp_mm
+			, a.project_stat_cd
+			, a.project_result_cd
+			, a.use_yn
+			, a.bigo
+			, a.reg_id
+			, a.reg_dtm
+			, a.mod_id
+			, a.mod_dtm
+			, b.chasu AS hst_chasu
+			, b.chasu_st_dtm
+			, b.chasu_ed_dtm
+			, CASE WHEN b.chasu_ed_dtm = CONVERT(VARCHAR, a.project_end_dt, 23)+ ' 23:59:59' THEN 'Y'
+				   ELSE 'N'
+			   END AS chasu_stat
+		FROM tb_qa_project a
+		JOIN tb_qa_project_chasu_hst b
+		ON b.pid = a.pid
+		WHERE a.use_yn = 'Y'
+		<if test=" !mngYn ">
+			AND EXISTS (SELECT 1 FROM tb_qa_project_parti e WHERE e.pid = a.pid AND e.parti_id = #{partiId})
+		</if>
+		<if test=" progressYn ">
+			AND a.project_stat_cd in ('C301','C302','C303')
+		</if>
+		ORDER BY a.reg_dtm DESC
+	</select>
+	
+	<select id="selectMyProjectOverviewList" parameterType="qaProjectVo" resultType="qaProjectVo">
+		SELECT
+			a.pid
+			, a.project_nm
+			, a.project_st_dt
+			, a.project_end_dt
+			, a.chasu
+			, a.tc_prefix
+			, a.prediction_qa_mm
+			, a.prediction_bp_mm
+			, a.project_qa_mm
+			, a.project_bp_mm
+			, a.project_stat_cd
+			, a.project_result_cd
+			, a.use_yn
+			, a.bigo
+			, a.reg_id
+			, a.reg_dtm
+			, a.mod_id
+			, a.mod_dtm
+			, b.chasu_st_dtm
+			, b.chasu_ed_dtm
+			, STUFF(( SELECT ';'+ (e.model_nm + '('+ d.model_ver +')')
+					  FROM tb_qa_project_model d
+					  JOIN tb_model e 
+					  ON (e.model_id = d.model_id)
+					  WHERE d.pid = a.pid
+				FOR XML PATH('')),1,1,'') AS project_model_info
+			, STUFF(( SELECT '/' + k.user_group_nm + '^' + k.user_nm
+					  FROM ( SELECT h.user_group_id
+									, STUFF(( SELECT ', '+ i.user_nm
+											  FROM tb_user i
+											  JOIN tb_qa_project_parti j ON (j.parti_id = i.user_id)
+											  WHERE i.user_group_id = h.user_group_id 
+											  AND j.pid = a.pid
+										FOR XML PATH('')),1,1,'') AS user_nm
+									, (SELECT user_group_nm FROM tb_user_group WHERE user_group_id = h.user_group_id) user_group_nm
+							FROM ( SELECT f.pid
+										, f.parti_id
+										, g.user_nm
+										, g.user_group_id
+									FROM tb_qa_project_parti f
+									JOIN tb_user g
+									ON (g.user_id = f.parti_id)
+									WHERE f.pid =a.pid ) h
+							GROUP BY h.user_group_id ) k
+				FOR XML PATH('')),1,1,'') AS project_parti_info
+			, CASE WHEN b.chasu_ed_dtm = CONVERT(VARCHAR, a.project_end_dt, 23)+ ' 23:59:59' THEN 'Y'
+				   ELSE 'N'
+			  END AS chasu_stat
+		FROM tb_qa_project a
+		JOIN tb_qa_project_chasu_hst b
+		ON b.pid = a.pid
+			AND b.chasu = a.chasu
+		WHERE a.use_yn = 'Y'
+		AND ((a.project_stat_cd = 'C304' AND (<![CDATA[DATEDIFF(mm, a.project_st_dt, GETDATE()) <= 1]]>)) OR (a.project_stat_cd != 'C304'))
+		<if test=" !mngYn ">
+			AND EXISTS (SELECT 1 FROM tb_qa_project_parti c WHERE c.pid = a.pid AND c.parti_id = #{partiid})
+		</if>
+		ORDER BY a.reg_dtm DESC
+	</select>
+	
+	<select id="selectProjectList" parameterType="qaProjectCriteria" resultType="qaProjectVo">
+		SELECT 
+			a.pid
+			, a.project_nm
+			, a.project_st_dt
+			, a.project_end_dt
+			, a.chasu
+			, a.tc_prefix
+			, a.prediction_qa_mm
+			, a.prediction_bp_mm
+			, a.project_qa_mm
+			, a.project_bp_mm
+			, a.project_stat_cd
+			, a.project_result_cd
+			, a.use_yn
+			, a.bigo
+			, a.reg_id
+			, a.reg_dtm
+			, a.mod_id
+			, a.mod_dtm
+			, CASE WHEN b.chasu_ed_dtm = CONVERT(VARCHAR, a.project_end_dt, 23)+ ' 23:59:59' THEN 'Y'
+				   ELSE 'N'
+			  END AS chasu_stat
+		FROM tb_qa_project a
+		JOIN tb_qa_project_chasu_hst b
+		ON b.pid = a.pid
+			AND b.chasu = a.chasu
+		WHERE a.use_yn = 'Y'
+		AND <![CDATA[ a.project_st_dt <= #{endDt} AND a.project_end_dt >= #{startDt} ]]>
+		<if test=" chkIng ">
+			AND a.project_stat_cd IN ('C301','C302','C303')
+		</if>
+		<if test="projectNm != null and projectNm != ''">
+			AND a.project_nm LIKE '%' + #{projectNm} + '%'
+		</if>
+		ORDER BY a.reg_dtm DESC
+	</select>
+	
+	<select id="selectCheckTcPrefix" parameterType="String" resultType="Integer">
+		SELECT COUNT(*) 
+		FROM tb_qa_project a
+		WHERE a.tc_prefix = #{tcPrefix}
+	</select>
+	
+	<insert id="insertProject" parameterType="qaProjectVo">
+		INSERT INTO tb_qa_project (
+			pid
+			, project_nm
+			, project_st_dt
+			, project_end_dt
+			, chasu
+			, tc_prefix
+			, prediction_qa_mm
+			, prediction_bp_mm
+			, project_stat_cd
+			, use_yn
+			, bigo
+			, reg_id
+			, reg_dtm
+			, mod_id
+			, mod_dtm
+		) VALUES (
+			#{pid}
+			, #{projectNm}
+			, #{projectStDt}
+			, #{projectEndDt}
+			, #{chasu}
+			, #{tcPrefix}
+			, #{predictionQaMm}
+			, #{predictionBpMm}
+			, #{projectStatCd}
+			, 'Y'
+			, #{bigo}
+			, #{regId}
+			, GETDATE()
+			, #{modId}
+			, GETDATE()
+		)
+	</insert>
+	
+	<insert id="insertQaProjectModel" parameterType="qaProjectModelVo">
+		INSERT INTO tb_qa_project_model (
+			pid
+			, model_id
+			, model_ver
+			, reg_id
+			, reg_dtm
+			, mod_id
+			, mod_dtm
+		) VALUES (
+			#{pid}
+			, #{modelId}
+			, #{modelVer}
+			, #{regId}
+			, GETDATE()
+			, #{modId}
+			, GETDATE()
+		)
+		<selectKey resultType="Integer" keyProperty="modelSeq" order="AFTER">
+			SELECT a.model_seq
+			FROM tb_qa_project_model a
+			WHERE a.pid = #{pid}
+			AND a.model_id = #{modelId}
+			AND a.model_ver = #{modelVer}
+		</selectKey>
+	</insert>
+	
+	<insert id="insertQaModelVerHst" parameterType="qaModelVerHstVo">
+		INSERT INTO tb_qa_model_ver_hst (
+			model_seq
+			, model_ver
+			, reg_id
+			, reg_dtm
+		) VALUES (
+			#{modelSeq}
+			, #{modelVer}
+			, #{regId}
+			, GETDATE()
+		)
+	</insert>
+	
+	<insert id="insertQaProjectParti" parameterType="qaProjectPartiVo">
+		INSERT INTO tb_qa_project_parti (
+			pid
+			, parti_id
+			, reg_id
+			, reg_dtm
+		) VALUES (
+			#{pid}
+			, #{partiId}
+			, #{regId}
+			, GETDATE()
+		)
+	</insert>
+	
+	<insert id="insertQaProjectChasuHst" parameterType="qaProjectChasuHstVo">
+		insert into tb_qa_project_chasu_hst (
+			pid
+			, chasu
+			, chasu_st_dtm
+			, chasu_ed_dtm
+			, reg_id
+			, reg_dtm
+			, mod_id
+			, mod_dtm
+		) SELECT
+			pid
+			, chasu
+			, CONVERT(VARCHAR, #{chasuStDtm}, 23)+ ' 00:00:00'
+			, CONVERT(VARCHAR, project_end_dt, 23)+ ' 23:59:59'
+			, #{regId}
+			, GETDATE()
+			, #{regId}
+			, GETDATE()
+		FROM tb_qa_project 
+		WHERE pid = #{pid}
+	</insert>
+	
+	<select id="selectProjectView" parameterType="String" resultType="qaProjectVo">
+		SELECT 
+			a.pid
+			, a.project_nm
+			, a.project_st_dt
+			, a.project_end_dt
+			, a.chasu
+			, a.tc_prefix
+			, a.prediction_qa_mm
+			, a.prediction_bp_mm
+			, a.project_qa_mm
+			, a.project_bp_mm
+			, a.project_stat_cd
+			, a.project_result_cd
+			, a.use_yn
+			, a.bigo
+			, a.reg_id
+			, a.reg_dtm
+			, a.mod_id
+			, a.mod_dtm
+			, CASE WHEN b.chasu_ed_dtm = CONVERT(VARCHAR, a.project_end_dt, 23)+ ' 23:59:59' THEN 'Y'
+				   ELSE 'N'
+			  END AS chasu_stat
+		FROM tb_qa_project a
+		JOIN tb_qa_project_chasu_hst b
+		ON b.pid = a.pid
+			AND b.chasu = a.chasu
+		WHERE a.pid = #{pid}
+	</select>
+	
+	<select id="selectQaProjectModelList" parameterType="String" resultType="qaProjectModelVo">
+		SELECT
+			a.model_seq
+			, a.pid
+			, a.model_id
+			, a.model_ver
+			, a.reg_id
+			, a.reg_dtm
+			, a.mod_id
+			, a.mod_dtm
+			, b.model_nm
+		FROM tb_qa_project_model a
+		JOIN tb_model b 
+		ON (b.model_id = a.model_id)
+		WHERE a.pid = #{pid}
+	</select>
+	
+	<select id="selectProjectModelHstList" parameterType="Integer" resultType="qaModelVerHstVo">
+		SELECT
+			b.seq
+			, b.model_seq
+			, b.model_ver
+			, b.reg_id
+			, b.reg_dtm
+			, a.model_id
+			, c.model_nm
+		FROM tb_qa_project_model a
+		JOIN tb_qa_model_ver_hst b
+		ON b.model_seq = a.model_seq
+		JOIN tb_model c
+		ON c.model_id = a.model_id
+		WHERE a.model_seq = #{modelSeq}
+	</select>
+	
+	<select id="selectProjectPartiList" parameterType="String" resultType="qaProjectPartiVo">
+		SELECT B.USER_GROUP_ID
+			, STUFF((
+				SELECT ', '+ A.user_nm
+				FROM tb_user A
+				INNER JOIN tb_qa_project_parti C ON (c.parti_id = A.user_id)
+				WHERE A.USER_GROUP_ID = b.USER_GROUP_ID AND C.pid = B.pid
+				FOR XML PATH('')
+			),1,1,'') AS user_nm
+			, (SELECT user_group_nm FROM tb_user_group WHERE user_group_id = b.user_group_id) user_group_nm
+		FROM ( SELECT a.pid
+					, a.parti_id
+					, b.user_nm
+					, b.USER_GROUP_ID
+				FROM tb_qa_project_parti a
+				JOIN tb_user b ON (b.user_id = a.parti_id)
+				WHERE a.pid = #{pid} ) B
+		GROUP BY B.pid, B.USER_GROUP_ID
+	</select>
+	
+	<update id="updateNextQaProjectChasuHst" parameterType="qaProjectChasuHstVo">
+		UPDATE tb_qa_project_chasu_hst 
+		SET chasu_ed_dtm = DATEADD(s,-1,CONVERT(DATETIME,convert(INT, GETDATE()-1)))
+			, mod_id  = #{modId}
+			, mod_dtm = GETDATE()
+		WHERE pid = #{pid} AND chasu = #{chasu}
+	</update>
+	
+	<update id="updateNextProjectChasu" parameterType="qaProjectVo">
+		UPDATE tb_qa_project 
+		SET chasu = #{chasu}
+			, mod_id  = #{modId}
+			, mod_dtm = GETDATE()
+		WHERE pid = #{pid}
+	</update>
+	
+	<update id="updateProjectUseYn" parameterType="qaProjectVo">
+		UPDATE tb_qa_project
+		SET use_yn = 'N'
+			, project_stat_cd = 'C304'
+			, mod_id = #{modId}
+			, mod_dtm = GETDATE()
+		WHERE pid = #{pid}
+	</update>
+	
+	<update id="updateProjectStat" parameterType="projectVo">
+		UPDATE tb_qa_project
+		SET project_stat_cd = #{projectStatCd}
+			, project_result_cd = #{projectResultCd}
+			, mod_id = #{modId}
+			, mod_dtm = GETDATE()
+			<if test="projectQaMm != null and projectQaMm != ''">
+				, project_qa_mm = #{projectQaMm}
+			</if>
+			<if test="projectBpMm != null and projectBpMm != ''">
+				, project_bp_mm = #{projectBpMm}
+			</if>
+		WHERE pid = #{pid}
+	</update>
+	
+	<select id="selectProjectEditPartiList" parameterType="String" resultType="qaProjectPartiVo">
+		SELECT a.pid
+			, a.parti_id
+			, b.user_nm
+			, b.user_group_id
+			, (SELECT user_group_nm FROM tb_user_group WHERE user_group_id = b.user_group_id) user_group_nm
+		FROM tb_qa_project_parti a
+		JOIN tb_user b ON (b.user_id = a.parti_id)
+		WHERE a.pid = #{pid}
+	</select>
+	
+	<update id="updateProject" parameterType="qaProjectVo">
+		UPDATE tb_qa_project
+		SET project_nm = #{projectNm}
+			, project_st_dt = #{projectStDt}
+			, project_end_dt = #{projectEndDt}
+			, prediction_qa_mm = #{predictionQaMm}
+			, prediction_bp_mm = #{predictionBpMm}
+			, bigo = #{bigo}
+			, mod_id = #{modId}
+			, mod_dtm = GETDATE()
+		WHERE pid = #{pid}
+	</update>
+	
+	<delete id="deleteProjectParti" parameterType="String">
+		DELETE FROM tb_qa_project_parti
+		WHERE pid = #{pid}
+	</delete>
+	
+	<update id="updateProjectModelVerPrc" parameterType="qaProjectModelVo">
+		UPDATE tb_qa_project_model
+		SET model_ver = #{modelVer}
+		WHERE model_seq = #{modelSeq}
+	</update>
+</mapper>

@@ -1,0 +1,340 @@
+<%@ page contentType="text/html" pageEncoding="UTF-8" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://www.nextlab.co.kr/tags/nextlab" prefix="nl"%>
+<div class="pop_wrap" style="width:700px;">
+	<div class="pop_tit">
+		<p v-if="pid">프로젝트 정보수정</p>
+		<p v-else>새 프로젝트</p>
+	</div>
+	<div class="pop_cont">
+		<div class="g_table02">
+			<table>
+				<caption>프로젝트 이름. 기간, checklist 등의 정보를 입력하는 표 입니다.</caption>
+				<colgroup>
+					<col style="width:120px;">
+					<col>
+				</colgroup>
+				<tbody>
+					<tr>
+						<th>프로젝트 이름<strong>*</strong></th>
+						<td>
+							<input type="text" class="full" id="" maxlength="50" placeholder="프로젝트명을 입력하세요." v-model.trim="projectView.projectNm">
+						</td>
+					</tr>
+					<tr>
+						<th>프로젝트 태그<strong>*</strong></th>
+						<td v-if="pid">
+							{{projectView.tcPrefix}}
+						</td>
+						<td v-else>
+							<input class="filter" type="text" id="" maxlength="10" placeholder="프로젝트태그를 입력하세요. (영문, 숫자 최대 10자)" v-model.trim="projectView.tcPrefix">
+							<button class="btn_default" @click="btnOverlapCheck"><span>중복확인</span></button>
+						</td>
+					</tr>
+					<tr class="period">
+						<th>기간<strong>*</strong></th>
+						<td>
+							<input type="text" class="input_date" id="projectStDt" name="projectStDt" readonly v-model="projectView.projectStDt">
+							<span class="bar">~</span>
+							<input type="text" class="input_date" id="projectEndDt" name="projectEndDt" readonly v-model="projectView.projectEndDt">
+						</td>
+					</tr>
+					<tr>
+						<th>예상 M/M<strong>*</strong></th>
+						<td>
+							<span class="sub_list">QA : </span>
+							<input type="text" placeholder="예상 M/M를 입력하세요." maxlength="30" v-model="projectView.predictionQaMm">
+							<span class="sub_list">BP : </span>
+							<input type="text" placeholder="예상 M/M를 입력하세요." maxlength="30" v-model="projectView.predictionBpMm">
+						</td>
+					</tr>
+					<tr>
+						<th>측정모델 등록<strong>*</strong></th>
+						<td class="reg">
+							<model-select ref="modelSelect" :input-model-version="true" :add-fn="addModelList"></model-select>
+							<div class="reg_list" v-show="projectView.modelSaveList.length>0 || projectView.modelList.length>0">
+								<ul>
+									<li v-for="m in projectView.modelSaveList" class="gr"><span>{{m.modelNm}}({{m.modelVer}})</span></li>
+									<li v-for="(m, index) in projectView.modelList"><span>{{m.modelNm}}({{m.modelVer}})</span><button class="del" @click="delModelList(index)"></button></li>
+								</ul>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<th>참여인력 등록<strong>*</strong></th>
+						<td class="reg">
+							<user-select ref="userSelect" :add-fn="addPartiList"></user-select>
+							<div class="reg_list" v-show="projectView.partiList.length>0">
+								<ul>
+									<li v-for="(p, index) in projectView.partiList"><span>{{p.userNm}}({{p.userGroupNm}})</span><button class="del" @click="delPartiList(index)"></button></li>
+								</ul>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<th>비고</th>
+						<td>
+							<input type="text" class="full" placeholder="선택입력항목" maxlength="300" v-model="projectView.bigo">
+							<br/>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<div class="btn_wrap">
+		<button v-if="pid" class="btn_proc" @click="modProject">수정</button>
+		<button v-else class="btn_proc" @click="btnSave">등록</button>
+		<button class="btn_cancel" @click="hidePopupLayer">닫기</button>
+	</div>
+</div>
+<script>
+	var frm = new Vue({
+		el: '.pop_wrap'
+		, data: {
+			pid: '<c:out value="${param.pid}"/>'
+			, projectView: {
+				projectNm: ''
+				, projectStDt: ''
+				, projectEndDt: ''
+				, tcPrefix: ''
+				, predictionQaMm: ''
+				, predictionBpMm: ''
+				, bigo: ''
+				, modelSaveList: []
+				, modelList: []
+				, partiList: []
+			}
+			, isTcPrefixCheck: false
+			, procChk: false
+		}
+		, updated: function() {
+			setPopup(2);
+		}
+		, mounted: function() {
+			$(".input_date").on("change", function() {
+				frm['projectView'][this.name] = $(this).val();
+			});
+			
+			if (!isEmpty(this.pid)){
+				this.getProjectView(this.pid);
+			}
+			setPopup(2);
+		}
+		, methods: {
+			btnSave: function() {
+				var param = this.projectView;
+				if (!this.chkModel(param, 'reg')) {
+					return;
+				}
+				if (this.procChk){
+					return;
+				}
+				$.ajax({
+					type: "post"
+					, url : "/qa/project/regProjectPrc"
+					, contentType: "application/json"
+					, data : JSON.stringify(param)
+					, beforeSend: function() { 
+						frm.procChk = true;
+						parent.startLoading();
+					}
+					, success: function(data) {
+						if (data.save) {
+							alert("새 프로젝트가 등록 되었습니다.");
+							parent.window.location.reload();
+							hidePopupLayer();
+						} else if (data.message) {
+							alert(data.message);
+						}
+					}
+					, error: function(xhr, status, error) {
+						alert($(xhr.responseText).text());
+					}
+					, complete : function() {
+						frm.procChk = false;
+						parent.endLoading();
+					}
+				});
+			}
+			, btnOverlapCheck : function() {
+				var tcPrefix = this.projectView.tcPrefix;
+				if (isEmpty(tcPrefix)) {
+					this.projectView.tcPrefix = tcPrefix;
+					alert("프로젝트 태그를 입력하세요.");
+					return;
+				}
+				var re = /[^a-zA-Z0-9\-\_]/gi;
+				var chkTcPrefix = tcPrefix.replace(re,"");
+				if (isEmpty(chkTcPrefix)) {
+					this.projectView.tcPrefix = tcPrefix;
+					alert("올바른 태그를 입력해 주세요.");
+					return;
+				}
+				$.get("/qa/issue/getCheckTcPrefix?tcPrefix="+ tcPrefix, function(data){
+					if (data.isCheck) {
+						frm.isTcPrefixCheck = false;
+						alert('이미 등록된 태그가 있습니다.');
+						frm.projectView.tcPrefix = '';
+					} else {
+						frm.isTcPrefixCheck = true;
+						frm.projectView.tcPrefix = tcPrefix;
+						alert('사용 가능한 태그입니다.');
+					}
+				});
+			}
+			, addModelList: function(data) {
+				// 저장된값 확인
+				var chk = this.projectView.modelSaveList.some(function(m) {
+					return (m.modelId + m.modelVer) == (data.modelId + data.modelVer);
+				});
+				// 세미콜론확인
+				if(data.modelVer.match(";")){
+					alert("모델 버전에는 세미콜론(;)을 입력하실 수 없습니다.");
+					return data.modelVer = "";
+				}
+				// 새로추가된값 확인
+				if (!chk) {
+					chk = this.projectView.modelList.some(function(m) {
+						return (m.modelId + m.modelVer) == (data.modelId + data.modelVer);
+					});
+				}
+				if (!chk)
+					this.projectView.modelList.push(data);
+				else {
+					alert("이미 추가된 측정모델입니다.");
+				}
+			}
+			, delModelList: function(index) {
+				this.projectView.modelList.splice(index, 1);
+			}
+			, addPartiList: function(data) {
+				var chk = this.projectView.partiList.some(function(p) {
+					return p.partiId == data.userId;
+				});
+				
+				if (!chk) {
+					data.partiId = data.userId;
+					this.projectView.partiList.push(data);
+				}
+				else {
+					alert("이미 추가된 참여인력입니다.");
+				}
+			}
+			, delPartiList: function(index) {
+				this.projectView.partiList.splice(index, 1);
+			}
+			, chkModel: function(param, type) {
+				if (param.projectNm == "") {
+					alert("프로젝트 이름을 입력하세요.");
+					return false;
+				}
+				var tcPrefix = param.tcPrefix;
+				var re = /[^a-zA-Z0-9\-\_]/gi;
+				tcPrefix = tcPrefix.replace(re,"");
+				if (tcPrefix == "") {
+					this.projectView.tcPrefix = tcPrefix;
+					this.isTcPrefixCheck = false;
+					alert("프로젝트 태그을 입력하세요.");
+					return false;
+				}
+				if (type=='reg' && !this.isTcPrefixCheck) {
+					alert("프로젝트 태그 중복확인을 해주세요.");
+					return false;
+				}
+				if (param.projectStDt == "") {
+					alert("프로젝트 시작일자를 입력하세요.");
+					return false;
+				}
+				if (param.projectEndDt == "") {
+					alert("프로젝트 종료일자를 입력하세요.");
+					return false;
+				}
+				if (param.projectStDt > param.projectEndDt) {
+					alert("시작일자와 종료일자를 확인해주세요.");
+					return false;
+				}
+				if (param.predictionQaMm == "") {
+					alert("QA 예상 M/M를 입력하세요.");
+					return false;
+				}
+				if (!$.isNumeric(param.predictionQaMm)) {
+					alert("QA 예상 M/M을 숫자만 입력하세요.");
+					return false;
+				}
+				if (param.predictionBpMm == "") {
+					alert("BP 예상 M/M를 입력하세요.");
+					return false;
+				}
+				if (!$.isNumeric(param.predictionBpMm)) {
+					alert("BP 예상 M/M을 숫자만 입력하세요.");
+					return false;
+				}
+				if (type=="reg" && param.modelList.length == 0) {
+					alert("측정모델을 등록하세요.");
+					return false;
+				}
+				if (param.partiList.length == 0) {
+					alert("참여인력을 등록하세요.");
+					return false;
+				}
+				return true;
+			}
+			, getProjectView: function(pid) {
+				$.get("/qa/project/getProjectView?pid=" + pid, function(data){
+					frm.projectView = data.projectView;
+					frm.projectView.partiList = data.projectPartiList;
+					frm.projectView.partiSaveList = data.projectPartiList.slice();
+					frm.projectView.modelList = [];
+					frm.projectView.modelSaveList = data.projectModelList;
+				});
+			}
+			, modProject: function() {
+				var param = this.projectView;
+				param.addPartiArray = [];
+				param.partiList.forEach(function(p) {
+					var chk = param.partiSaveList.some(function(ps) {
+						return p.partiId == ps.partiId;
+					});
+					if (!chk) param.addPartiArray.push(p.partiId);
+				});
+				
+				if (!this.chkModel(param, 'mod')) return;
+				if (this.procChk) return;
+				
+				$.ajax({
+					type: "post"
+					, url : "/qa/project/modProjectPrc"
+					, contentType: "application/json"
+					, data : JSON.stringify(param)
+					, beforeSend: function() { 
+						frm.procChk = true;
+						parent.startLoading();
+					}
+					, success: function(data) {
+						if (data.save) {
+							var mes = "";
+							if(frm.changeFile)
+							{
+								var fileExcelParsingUrl='<nl:property key="file.excel-parsing-url" />';
+								var turl = fileExcelParsingUrl+frm.projectView.filePath+"/"+frm.projectView.fileNm+"/"+ data.pid+"/"+frm.uid;
+								$.get(turl);
+							}
+							alert("프로젝트가 수정 되었습니다."+mes);
+							parent.location.reload();
+						} else if (data.message) {
+							alert(data.message);
+						}
+					}
+					, error: function(xhr, status, error) {
+						alert($(xhr.responseText).text());
+					}
+					, complete : function() {
+						frm.procChk = false;
+						parent.endLoading();
+					}
+				});
+			}
+		}
+	});
+</script>

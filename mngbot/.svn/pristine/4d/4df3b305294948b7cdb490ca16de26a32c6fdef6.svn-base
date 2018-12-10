@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.nextlab.qa.mapper.QaBoardMapper">
+	<select id="selectBoardList" parameterType="String" resultType="qaBoardVo">
+		SELECT
+			a.seq
+			, a.pid
+			, a.subject
+			, a.content
+			, a.reg_id
+			, a.reg_dtm
+			, b.user_nm
+			, (SELECT user_group_nm FROM tb_user_group WHERE user_group_id = b.user_group_id) AS user_group_nm
+			, (SELECT count(1) FROM tb_qa_board_file WHERE seq = a.seq) isYn 
+		FROM tb_qa_board a
+		INNER JOIN tb_user b ON (b.user_id = a.reg_id)
+		WHERE a.pid = #{pid}
+		ORDER BY a.reg_dtm DESC
+	</select>
+	
+	<select id="selectBoardView" parameterType="Integer" resultType="qaBoardVo">
+		SELECT
+			a.pid
+			, a.seq
+			, a.subject
+			, a.content
+			, a.reg_id
+			, a.reg_dtm
+			, a.mod_id
+			, a.mod_dtm
+			, b.user_nm
+			, (SELECT user_group_nm FROM tb_user_group c WHERE b.user_group_id = c.user_group_id) user_group_nm
+		FROM tb_qa_board a
+		JOIN tb_user b ON (a.reg_id = b.user_id)
+		WHERE a.seq = #{seq}
+	</select>
+	
+	<select id="selectBoardFileList" parameterType="Integer" resultType="qaBoardFileVo">
+		SELECT
+			a.seq
+			, a.file_seq
+			, a.file_nm
+			, a.file_path
+			, a.org_file_nm
+		FROM tb_qa_board_file a
+		WHERE a.seq = #{seq}
+	</select>
+	
+	<insert id="insertBoard" parameterType="qaBoardVo" >
+		INSERT INTO tb_qa_board (
+			pid
+			, subject
+			, content
+			, reg_id
+			, reg_dtm
+			, mod_id
+			, mod_dtm
+		) VALUES (
+			#{pid}
+			, #{subject}
+			, #{content}
+			, #{regId}
+			, GETDATE()
+			, #{regId}
+			, GETDATE()
+		)
+		<selectKey resultType="Integer" keyProperty="seq" order="AFTER">
+			SELECT TOP 1 a.seq
+			FROM tb_qa_board a
+			WHERE a.pid = #{pid}
+			AND a.reg_id = #{regId}
+			AND a.subject = #{subject}
+			ORDER BY a.reg_dtm DESC
+		</selectKey>
+	</insert>
+	
+	<insert id="insertBoardFile" parameterType="qaBoardFileVo">
+		INSERT INTO tb_qa_board_file (
+			seq
+			, file_seq
+			, file_nm
+			, file_path
+			, org_file_nm
+		) VALUES(
+			#{seq}
+			, #{fileSeq}
+			, #{fileNm}
+			, #{filePath}
+			, #{orgFileNm}
+		)
+	</insert>
+	
+	<delete id="deleteBoardFile" parameterType="Integer">
+		DELETE
+		FROM tb_qa_board_file
+		WHERE seq = #{seq}
+	</delete>
+	
+	<update id="updateBoard" parameterType="qaBoardVo">
+		UPDATE tb_qa_board
+		SET subject = #{subject}
+			, content = #{content}
+			, mod_id = #{modId}
+			, mod_dtm = GETDATE()
+		WHERE seq = #{seq}
+	</update>
+	
+	<delete id="deleteBoard" parameterType="Integer">
+		DELETE
+		FROM tb_qa_board
+		WHERE seq = #{seq}
+	</delete>
+</mapper>

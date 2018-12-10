@@ -1,0 +1,22 @@
+/**
+ * @title	: QA Xqms service
+ * @package	: kr.co.nextlab.qa.service
+ * @file	: QaXqmsService.java
+ * @author	: sangyun.kim
+ * @date	: 2018. 07. 24.
+ * @desc	: 
+ */
+package kr.co.nextlab.qa.service;
+
+import kr.co.nextlab.qa.model.QaXqmsCriteria;
+import kr.co.nextlab.qa.model.QaXqmsVo;
+
+public interface QaXqmsService {
+	
+	/**
+	 * 사용자 이름으로 조회한 마지막 xqms 리포트를 리턴
+	 * @param qaXqmsCriteria
+	 * @return
+	 */
+	public QaXqmsVo selectLastReport(QaXqmsCriteria qaXqmsCriteria);
+}

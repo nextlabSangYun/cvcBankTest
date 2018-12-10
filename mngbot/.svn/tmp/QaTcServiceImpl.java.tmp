@@ -1,0 +1,279 @@
+/**
+ * @title	: QA test case service 구현
+ * @package	: kr.co.nextlab.qa.service.impl
+ * @file	: QaTcServiceImpl.java
+ * @author	: winolonam
+ * @date	: 2018. 07. 10.
+ * @desc	: 
+ */
+package kr.co.nextlab.qa.service.impl;
+
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ejb.access.EjbAccessException;
+import org.springframework.stereotype.Service;
+
+import kr.co.nextlab.comm.service.SequenceService;
+import kr.co.nextlab.qa.mapper.QaTcMapper;
+<<<<<<< .mine
+import kr.co.nextlab.qa.model.QaProjectModelVo;
+||||||| .r1348
+=======
+import kr.co.nextlab.qa.model.FlawCriteria;
+>>>>>>> .r1356
+import kr.co.nextlab.qa.model.QaTcCategoryVo;
+import kr.co.nextlab.qa.model.QaTcCriteria;
+import kr.co.nextlab.qa.model.QaTcInfotVo;
+<<<<<<< .mine
+import kr.co.nextlab.qa.model.QaXqmsFileVo;
+import kr.co.nextlab.qa.model.QaXqmsVo;
+||||||| .r1348
+=======
+import kr.co.nextlab.qa.model.QaXqmsFlawVo;
+>>>>>>> .r1356
+import kr.co.nextlab.qa.service.QaTcService;
+
+@Service
+public class QaTcServiceImpl implements QaTcService {
+	
+	@Autowired
+	private QaTcMapper qaTcMapper;
+	
+	@Autowired
+	private SequenceService sequenceService;
+
+	/**
+	 * 테스트 현황 조회
+	 * @param pid
+	 * @return
+	 */
+	@Override
+	public QaTcInfotVo selectTcStatList(String pid) {
+		return qaTcMapper.selectTcStatList(pid);
+	}
+
+	/**
+	 * 결함 현황 조회
+	 * @param pid
+	 * @return
+	 */
+	@Override
+	public QaTcInfotVo selectFlawStatList(String pid) {
+		return qaTcMapper.selectFlawStatList(pid);
+	}
+	
+	/**
+	 * 결함 관리 리스트 조회
+	 * @param flawCriteria
+	 * @return
+	 */
+	@Override
+	public List<QaTcInfotVo> selectFlawList(FlawCriteria flawCriteria) {
+		return qaTcMapper.selectFlawList(flawCriteria);
+	}
+	
+	/**
+	 * 결함 정보 조회
+	 * @param tcId
+	 * @return
+	 */
+	@Override
+	public QaTcInfotVo selectFlawView(int seq) {
+		return qaTcMapper.selectFlawView(seq);
+	}
+	
+	/**
+	 * 결함 정보 입력
+	 * @param qaXqmsFlawVo
+	 * @return
+	 */
+	@Override
+	public boolean mergeFlaw(QaXqmsFlawVo qaXqmsFlawVo) {
+		return qaTcMapper.mergeFlaw(qaXqmsFlawVo) > 0;
+	}
+
+	/**
+	 * 카테고리 리스트 조회
+	 * @param qaTcCategoryVo
+	 * @return
+	 */
+	@Override
+	public List<QaTcCategoryVo> selectTcCategoryList(QaTcCategoryVo qaTcCategoryVo) {
+		return qaTcMapper.selectTcCategoryList(qaTcCategoryVo);
+	}
+
+	/**
+	 * 카테고리 등록
+	 * @param qaTcCategoryVo
+	 * @return
+	 */
+	@Override
+	public boolean insertTcCategory(QaTcCategoryVo qaTcCategoryVo) {
+		qaTcCategoryVo.setTcCateId(sequenceService.getQaCategoryId());
+		int cnt = qaTcMapper.insertTcCategory(qaTcCategoryVo);
+		if (cnt != 1) {
+			throw new EjbAccessException("리포트 등록이 실패하였습니다.");
+		}
+		return true;
+	}
+
+	/**
+	 * 카테고리 수정
+	 * @param qaTcCategoryVo
+	 * @return
+	 */
+	@Override
+	public boolean updateModTcCategory(QaTcCategoryVo qaTcCategoryVo) {
+		int cnt = qaTcMapper.updateModTcCategory(qaTcCategoryVo);
+		if (cnt != 1) {
+			throw new EjbAccessException("카테고리 수정이 실패하였습니다.");
+		}
+		return true;
+	}
+
+	/**
+	 * 카테고리 삭제
+	 * @param qaTcCategoryVo
+	 * @return
+	 */
+	@Override
+	public boolean updateDelTcCategory(QaTcCategoryVo qaTcCategoryVo) {
+		qaTcCategoryVo.setUseYn("N");
+		int cnt = qaTcMapper.updateDelTcCategory(qaTcCategoryVo);
+		if (cnt != 1) {
+			throw new EjbAccessException("카테고리 삭제를 실패하였습니다.");
+		}
+		return true;
+	}
+	
+	/**
+	 * TC 리스트
+	 * @param criteria
+	 * @return
+	 */
+	@Override
+	public List<QaTcInfotVo> selectTcList(QaTcCriteria criteria){
+		return qaTcMapper.selectTcList(criteria);
+	}
+	
+	/**
+	 * tc삭제하기
+	 * @param param
+	 * @return
+	 */
+	public boolean deleteTcPrc(String[] param){
+		if (param.length > 0) {
+			for(int i=0; i<param.length; i++){
+				if (StringUtils.isNotEmpty(param[i])) {
+					qaTcMapper.updateTcUseYnPrc(param[i]);
+				}
+			}
+		}
+		return true;
+	}
+	
+	/**
+	 * TC 추가
+	 * @param qaTcInfotVo
+	 * @return
+	 */
+	@Override
+	public boolean insertTcList(List<QaTcInfotVo> qaTcInfotVo){
+		int cnt = 0;
+		String regId = qaTcInfotVo.get(0).getRegId();
+		for(QaTcInfotVo tcInfo: qaTcInfotVo){
+			tcInfo.setRegId(regId);
+			tcInfo.setModId(regId);
+			cnt += qaTcMapper.insertTc(tcInfo);
+		}
+		if (cnt != qaTcInfotVo.size()){
+			throw new EjbAccessException("TC 등록이 실패하였습니다.");
+		}
+		return true;
+	}
+	
+	/**
+	 * 테스트 케이스 조회(단일)
+	 * @param criteria
+	 * @return
+	 */
+	@Override
+	public QaTcInfotVo selectTc(QaTcCriteria criteria){
+		return qaTcMapper.selectTc(criteria);
+	}
+	
+	
+	/**
+	 * 모델리스트
+	 * @param pid
+	 * @return
+	 */
+	@Override
+	public List<QaProjectModelVo> selectModelList(String pid){
+		return qaTcMapper.selectModelList(pid);
+	}
+	
+	/**
+	 * 리포트 등록
+	 * @param qaXqmsVo
+	 * @return
+	 */
+	public boolean insertRegReport(QaXqmsVo qaXqmsVo){
+		//체크 변수
+		int xqmsChk = 0;
+		int fileChk = 0;
+		int fileSeqNum = 0;
+		int tcChk = 0;
+		xqmsChk = qaTcMapper.insertRegReport(qaXqmsVo);
+		
+		for(QaXqmsFileVo fileVo : qaXqmsVo.getFileList()){
+			fileSeqNum ++;
+			fileVo.setFileSourceCd("C801");
+			fileVo.setSeq(qaXqmsVo.getSeq());
+			fileVo.setFileSeq(fileSeqNum);
+			fileChk = qaTcMapper.insertXqmsFile(fileVo);
+		}
+		
+		QaTcInfotVo qaTcInfotVo = new QaTcInfotVo();
+		qaTcInfotVo.setTcId(qaXqmsVo.getTcId());
+		qaTcInfotVo.setLastResultCd(qaXqmsVo.getTcResultCd());
+		
+		tcChk = qaTcMapper.updateLastResult(qaTcInfotVo);
+		
+		return true;
+	}
+
+	/**
+	 * 리포트 일괄등록
+	 * @param qaXqmsVo
+	 * @return
+	 */
+	public boolean insertRegReportBatch(QaXqmsVo qaXqmsVo){
+		//등록값 체크용 변수
+		int tcChk = 0;
+		int xqmsChk = 0;
+		
+		for(QaTcInfotVo tcVo : qaXqmsVo.getTcArray()){
+			for(QaXqmsVo vo : qaXqmsVo.getXqmsArray()){
+				vo.setTcId(tcVo.getTcId());
+				vo.setRemocon(qaXqmsVo.getRemocon());
+				vo.setTcTypeCd("B402");
+				vo.setBotSno("manual");
+				vo.setXqmsTypeCd("C401");
+				vo.setTcResultCd(qaXqmsVo.getTcResultCd());
+				vo.setXqmsPerson(qaXqmsVo.getXqmsPerson());
+				vo.setModId(qaXqmsVo.getModId());
+				vo.setChasu(qaXqmsVo.getChasu());
+				xqmsChk += qaTcMapper.insertRegReport(vo);
+				
+				QaTcInfotVo qaTcInfotVo = new QaTcInfotVo();
+				qaTcInfotVo.setTcId(vo.getTcId());
+				qaTcInfotVo.setLastResultCd(vo.getTcResultCd());
+				tcChk += qaTcMapper.updateLastResult(qaTcInfotVo);
+			}
+		}
+		return true;
+	}
+}

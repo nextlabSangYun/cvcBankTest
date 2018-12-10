@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>CVCBank</title>
+	<link rel="shortcut icon" href="../../images/favicon.ico" type="image/x-icon">
+	<link rel="stylesheet" href="../../css/common.css">
+	<link rel="stylesheet" href="../../css/bmt.css">
+	<script src="../../js/jquery-3.2.1.min.js"></script>
+	<script src="../../js/jquery-ui.min.js"></script>
+	<script src="../../js/jquery.form.min.js"></script>
+	<script src="../../js/vue.min.js"></script>
+	<script src="../../js/lodash.min.js"></script>
+	<script src="../../js/calendar.js"></script>
+	<script src="../../js/common.js"></script>
+</head>
+<body>
+<div class="wrap">
+	<!-- 내용 -->
+	<div class="content">
+		<div class="sub_layout has_snb">
+			<div class="tit_wrap">
+				<p class="cate_tit">투표 설정</p>
+				<div class="btn_wrap">
+					<button class="g_btn03">저장</button>
+				</div>
+			</div>
+			<div class="g_table04">
+				<table>
+					<caption></caption>
+					<colgroup>
+						<col style="width: 170px;">
+						<col>
+					</colgroup>
+					<tbody>
+						<tr>
+							<th>등록일시</th>
+							<td>2018-05-24 16:42</td>
+						</tr>
+						<tr>
+							<th>투표제목<strong>*</strong></th>
+							<td class="reg insert_con">
+								<input class="full" type="text">
+							</td>
+						</tr>
+						<tr>
+							<th>투표내용<strong>*</strong></th>
+							<td class="reg insert_con">
+								<textarea class="full" cols="30" rows="5"></textarea>
+							</td>
+						</tr>
+						<tr>
+							<th>투표대상<strong>*</strong></th>
+							<td class="reg insert_con">
+								<span>
+									<select>
+										<option value="">-- 그룹선택 --</option>
+										<option>여러가지1</option>
+										<option>여러가지2</option>
+									</select>
+									<select>
+										<option value="">-- 구성원선택 --</option>
+										<option>여러가지1</option>
+										<option>여러가지2</option>
+									</select>
+									<button class="g_btn01">추가</button>
+								</span>
+								<div class="reg_list">
+									<ul>
+										<li>
+											<span>넥스트랩(시스템어드민)</span>
+											<button class="del"></button>
+										</li>
+										<li>
+											<span>넥스트랩(시스템어드민)</span>
+											<button class="del"></button>
+										</li>
+									</ul>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<th>진행상황<strong>*</strong></th>
+							<td class="insert_con">
+								<select>
+									<option value="">진행중</option>
+									<option>완료</option>
+								</select>
+							</td>
+						</tr>
+						<tr>
+							<th>최종결과<strong>*</strong></th>
+							<td class="insert_con">
+								<select>
+									<option value="">-- 전체 --</option>
+									<option>여러가지1</option>
+									<option>여러가지2</option>
+								</select>
+							</td>
+						</tr>
+						<tr>
+							<th>총평<strong>*</strong></th>
+							<td class="reg insert_con">
+								<textarea class="full" cols="30" rows="5"></textarea>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="tit_wrap mgtop40">
+				<p class="cate_tit">이슈 목록</p>
+				<div class="btn_wrap">
+					<button class="g_btn01">이슈 추가</button>
+				</div>
+			</div>
+			<div class="issue_list">
+				<div class="list_title">
+					<p>#. 1</p>
+					<button></button>
+				</div>
+				<div class="table_wrap">
+					<div class="g_table04">
+						<table>
+							<caption></caption>
+							<colgroup>
+								<col style="width: 170px;">
+								<col>
+							</colgroup>
+							<tbody>
+								<tr>
+									<th>이슈제목</th>
+									<td>인터넷 장애</td>
+								</tr>
+								<tr>
+									<th>측정모델</th>
+									<td class="insert_con">
+										<button class="tb_btn02_home">BHX-UH200(1.1.1)</button>
+										<button class="tb_btn02_home">BHX-UH200(12345)</button>
+										<button class="tb_btn02_home">BHX-UH200(12345)</button>
+									</td>
+								</tr>
+								<tr>
+									<th>중요도</th>
+									<td>Major</td>
+								</tr>
+								<tr>
+									<th>대분류</th>
+									<td>서비스</td>
+								</tr>
+								<tr>
+									<th>첨부파일</th>
+									<td class="insert_con">
+										<ul class="inc_file">
+											<li><a href="#">test_result.png (356kb)</a></li>
+											<li><a href="#">test_result2.png (356kb)</a></li>
+											<li><a href="#">test_sample_video.mp4 (356kb)</a></li>
+											<!-- <li><a href="#">test_sample.mp4 (356kb)</a></li> -->
+										</ul>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="vote_result">
+						<p class="th_title">투표현황</p>
+						<div class="back_circle">
+							<div>
+								<p class="vote_num pass">5</p>
+								<p>Pass</p>
+							</div>
+							<div>
+								<p class="vote_num fail">2</p>
+								<p>Fail</p>
+							</div>
+							<div>
+								<p class="vote_num">3</p>
+								<p>미응답</p>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="g_table">
+					<table>
+						<caption></caption>
+						<colgroup>
+							<col style="width: 5%;">
+							<col style="width: 17%;">
+							<col style="width: 8%;">
+							<col>
+							<col style="width: 15%;">
+						</colgroup>
+						<thead>
+							<th>No.</th>
+							<th>투표자</th>
+							<th>투표결과</th>
+							<th>총평</th>
+							<th>투표일시</th>
+						</thead>
+						<tbody>
+							<tr>
+								<td>1</td>
+								<td>홍길동 (테스트그룹_관리자)</td>
+								<td class="pass">Pass</td>
+								<td class="l_align">별다른 문제가 없어보이는데 뭐가 문제인거죠? 저는 문제가 뭔지 잘 모르겠습니다만... 아무튼 여기가 두줄이 된다면 이렇게 보일거예요. 나는 지금 코멘트의 두줄을 만들기 위해 아무말이나 적는 중이랍니다.</td>
+								<td>2018-05-24 16:42</td>
+							</tr>
+							<tr>
+								<td>2</td>
+								<td>임꺽정 (그룹1)</td>
+								<td class="fail">Fail</td>
+								<td class="l_align">첨부파일 확인결과 이건 Fail.</td>
+								<td>2018-05-24 16:42</td>
+							</tr>
+							<tr>
+								<td>3</td>
+								<td>장보고 (시스템어드민)</td>
+								<td class="pass">Pass</td>
+								<td class="l_align">나는 이 테스트에 찬성일세</td>
+								<td>2018-05-24 16:42</td>
+							</tr>
+							<tr>
+								<td>4</td>
+								<td>을지문덕 (투표한사람)</td>
+								<td class="pass">Pass</td>
+								<td class="l_align">저는 테스트 결과가 썩 나쁘지 않다고 생각된다능.....</td>
+								<td>2018-05-24 16:42</td>
+							</tr>
+							<tr>
+								<td>5</td>
+								<td>권율 (나야나)</td>
+								<td class="fail">Fail</td>
+								<td class="l_align">안돼. 돌아가 (단호)</td>
+								<td>2018-05-24 16:42</td>
+							</tr>
+							<tr>
+								<td>6</td>
+								<td>이순신 (거북선_대장)</td>
+								<td class="pass">Pass</td>
+								<td class="l_align">나의 투표 결과를 다른 사람들에게 알리지말라</td>
+								<td>2018-05-24 16:42</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="issue_list">
+				<div class="list_title">
+					<p>#. 2</p>
+					<button></button>
+				</div>
+				<div class="table_wrap">
+					<div class="g_table04">
+						<table>
+							<caption></caption>
+							<colgroup>
+								<col style="width: 170px;">
+								<col>
+							</colgroup>
+							<tbody>
+								<tr>
+									<th>이슈제목</th>
+									<td>인터넷 장애</td>
+								</tr>
+								<tr>
+									<th>측정모델</th>
+									<td class="insert_con">
+										<button class="tb_btn02_home">BHX-UH200(1.1.1)</button>
+										<button class="tb_btn02_home">BHX-UH200(12345)</button>
+										<button class="tb_btn02_home">BHX-UH200(123456789)</button>
+										<button class="tb_btn02_home">BHX-UH200(123456789)</button>
+										<button class="tb_btn02_home">BHX-UH200(12345)</button>
+									</td>
+								</tr>
+								<tr>
+									<th>중요도</th>
+									<td>Major</td>
+								</tr>
+								<tr>
+									<th>대분류</th>
+									<td>서비스</td>
+								</tr>
+								<tr>
+									<th>첨부파일</th>
+									<td class="insert_con">
+										<ul class="inc_file">
+											<li><a href="#">test_result.png (356kb)</a></li>
+											<li><a href="#">test_result2.png (356kb)</a></li>
+											<li><a href="#">test_sample_video.mp4 (356kb)</a></li>
+											<li><a href="#">test_sample.mp4 (356kb)</a></li>
+										</ul>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="vote_result">
+						<p class="th_title">투표현황</p>
+						<div class="back_circle">
+							<div>
+								<p class="vote_num pass">5</p>
+								<p>Pass</p>
+							</div>
+							<div>
+								<p class="vote_num fail">2</p>
+								<p>Fail</p>
+							</div>
+							<div>
+								<p class="vote_num">3</p>
+								<p>미응답</p>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="g_table">
+					<table>
+						<caption></caption>
+						<colgroup>
+							<col style="width: 5%;">
+							<col style="width: 17%;">
+							<col style="width: 8%;">
+							<col>
+							<col style="width: 15%;">
+						</colgroup>
+						<thead>
+							<th>No.</th>
+							<th>투표자</th>
+							<th>투표결과</th>
+							<th>총평</th>
+							<th>투표일시</th>
+						</thead>
+						<tbody>
+							<tr>
+								<td>1</td>
+								<td>홍길동 (테스트그룹_관리자)</td>
+								<td class="pass">Pass</td>
+								<td class="l_align">별다른 문제가 없어보이는데 뭐가 문제인거죠? 저는 문제가 뭔지 잘 모르겠습니다만... 아무튼 여기가 두줄이 된다면 이렇게 보일거예요. 나는 지금 코멘트의 두줄을 만들기 위해 아무말이나 적는 중이랍니다.</td>
+								<td>2018-05-24 16:42</td>
+							</tr>
+							<tr>
+								<td>2</td>
+								<td>임꺽정 (그룹1)</td>
+								<td class="fail">Fail</td>
+								<td class="l_align">첨부파일 확인결과 이건 Fail.</td>
+								<td>2018-05-24 16:42</td>
+							</tr>
+							<tr>
+								<td>3</td>
+								<td>장보고 (시스템어드민)</td>
+								<td class="pass">Pass</td>
+								<td class="l_align">나는 이 테스트에 찬성일세</td>
+								<td>2018-05-24 16:42</td>
+							</tr>
+							<tr>
+								<td>4</td>
+								<td>을지문덕 (투표한사람)</td>
+								<td class="pass">Pass</td>
+								<td class="l_align">저는 테스트 결과가 썩 나쁘지 않다고 생각된다능.....</td>
+								<td>2018-05-24 16:42</td>
+							</tr>
+							<tr>
+								<td>5</td>
+								<td>권율 (나야나)</td>
+								<td class="fail">Fail</td>
+								<td class="l_align">안돼. 돌아가 (단호)</td>
+								<td>2018-05-24 16:42</td>
+							</tr>
+							<tr>
+								<td>6</td>
+								<td>이순신 (거북선_대장)</td>
+								<td class="pass">Pass</td>
+								<td class="l_align">나의 투표 결과를 다른 사람들에게 알리지말라</td>
+								<td>2018-05-24 16:42</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="tit_wrap mgtop40">
+				<p class="cate_tit">이슈 별 투표현황</p>
+			</div>
+			<div class="issue_list">
+				<div class="list_title">
+					<p>#. 1</p>
+				</div>
+				<div class="table_wrap">
+					<div class="g_table04">
+						<table>
+							<caption></caption>
+							<colgroup>
+								<col style="width: 170px;">
+								<col>
+							</colgroup>
+							<tbody>
+								<tr>
+									<th>이슈제목</th>
+									<td>인터넷 장애</td>
+								</tr>
+								<tr>
+									<th>측정모델</th>
+									<td class="insert_con">
+										<button class="tb_btn02_home">BHX-UH200(1.1.1)</button>
+										<button class="tb_btn02_home">BHX-UH200(12345)</button>
+										<button class="tb_btn02_home">BHX-UH200(123456789)</button>
+									</td>
+								</tr>
+								<tr>
+									<th>중요도</th>
+									<td>Major</td>
+								</tr>
+								<tr>
+									<th>대분류</th>
+									<td>서비스</td>
+								</tr>
+								<tr>
+									<th>투표현황</th>
+									<td>
+										<div class="back_circle">
+											<div>
+												<p class="vote_num pass">5</p>
+												<p>Pass</p>
+											</div>
+											<div>
+												<p class="vote_num fail">2</p>
+												<p>Fail</p>
+											</div>
+											<div>
+												<p class="vote_num">3</p>
+												<p>미응답</p>
+											</div>
+										</div>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="chart">
+						<img src="../../images/bmt/vote_result.png" alt="">
+					</div>
+				</div>
+			</div>
+			<div class="issue_list">
+				<div class="list_title">
+					<p>#. 2</p>
+				</div>
+				<div class="table_wrap">
+					<div class="g_table04">
+						<table>
+							<caption></caption>
+							<colgroup>
+								<col style="width: 170px;">
+								<col>
+							</colgroup>
+							<tbody>
+								<tr>
+									<th>이슈제목</th>
+									<td>인터넷 장애</td>
+								</tr>
+								<tr>
+									<th>측정모델</th>
+									<td class="insert_con">
+										<button class="tb_btn02_home">BHX-UH200(1.1.1)</button>
+										<button class="tb_btn02_home">BHX-UH200(12345)</button>
+										<button class="tb_btn02_home">BHX-UH200(123456789)</button>
+										<button class="tb_btn02_home">BHX-UH200(123456789)</button>
+										<button class="tb_btn02_home">BHX-UH200(12345)</button>
+									</td>
+								</tr>
+								<tr>
+									<th>중요도</th>
+									<td>Major</td>
+								</tr>
+								<tr>
+									<th>대분류</th>
+									<td>서비스</td>
+								</tr>
+								<tr>
+									<th>투표현황</th>
+									<td>
+										<div class="back_circle">
+											<div>
+												<p class="vote_num pass">5</p>
+												<p>Pass</p>
+											</div>
+											<div>
+												<p class="vote_num fail">2</p>
+												<p>Fail</p>
+											</div>
+											<div>
+												<p class="vote_num">3</p>
+												<p>미응답</p>
+											</div>
+										</div>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="chart">
+						<img src="../../images/bmt/vote_result.png" alt="">
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+</html>

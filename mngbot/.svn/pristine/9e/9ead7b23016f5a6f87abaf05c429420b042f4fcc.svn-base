@@ -1,0 +1,29 @@
+<%@ page contentType="text/html" pageEncoding="UTF-8" %>
+<%@ taglib uri="http://www.nextlab.co.kr/tags/nextlab" prefix="nl"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<script>
+	var message = '<c:out value="${message}" />';
+	var win = '<c:out value="${win}" />';
+	if (message != "") {
+		alert(message);
+	}
+	if (win == "modal") {
+		parent.hidePopupLayer();
+	} else if (win == "popup") {
+		window.close();
+	}
+	location.href = "/bot/main";
+</script>
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<title><nl:property key="site.bot.name" /></title>
+		<meta charset="UTF-8">
+		<meta name="robots" content="noindex, nofollow">
+		<link rel="shortcut icon" href="/images/favicon.ico"/>
+		<link type="text/css" rel="stylesheet" href="/css/common.css">
+	</head>
+	<body>
+		<tiles:insertAttribute name="body" />
+	</body>
+</html>

@@ -1,0 +1,265 @@
+/**
+ * @title	: 메일 컨포넌트
+ * @package	: kr.co.nextlab.component
+ * @file	: MailComponent.java
+ * @author	: jnlee
+ * @date	: 2017. 11. 5.
+ * @desc	: 
+ */
+package kr.co.nextlab.component;
+
+import java.io.File;
+
+import javax.activation.FileDataSource;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeUtility;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
+
+import kr.co.nextlab.bot.model.UserVo;
+import kr.co.nextlab.bot.service.UserService;
+import kr.co.nextlab.util.JsonUtil;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Data
+@Component
+public class MailComponent {
+
+	@Autowired
+	private UserService userService;
+	
+	@Setter(AccessLevel.PRIVATE)
+	@Autowired
+	private JavaMailSender mailSender;
+	
+	@Setter(AccessLevel.PRIVATE)
+	@Value("${site.url}")
+	private String siteUrl;
+	
+	@Setter(AccessLevel.PRIVATE)
+	@Value("${site.port}")
+	private String sitePort;
+	
+	@Setter(AccessLevel.PRIVATE)
+	@Value("${mail.username}")
+	private String from;
+	
+	private String templete;
+	private String to;
+	private String subject;
+	private String jsonParam;
+	private File file;
+	private String fileName;
+	
+	/**
+	 * 메일전송
+	 * @return 메일전송결과
+	 */
+	public boolean sendMail() {
+		boolean result = false;
+		
+		try {
+			MimeMessage message = mailSender.createMimeMessage();
+			RestTemplate restTemplate = new RestTemplate();
+			restTemplate.getMessageConverters().add(new StringHttpMessageConverter());
+			ResponseEntity<String> response  = null;
+			
+			if (StringUtils.isEmpty(jsonParam))
+				response  = restTemplate.getForEntity(siteUrl + ":" + sitePort + templete, String.class);
+			else {
+				
+				HttpHeaders headers = new HttpHeaders();
+				headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+				HttpEntity<String> entity = new HttpEntity<String>(jsonParam, headers);
+				response = restTemplate.exchange(siteUrl + ":" + sitePort + templete, HttpMethod.POST, entity, String.class);
+			}
+			
+			MimeMessageHelper messageHelper = null;
+			if (file!=null && file.exists()) {
+				messageHelper = new MimeMessageHelper(message, true, "UTF-8");
+				messageHelper.addAttachment(MimeUtility.encodeText(fileName, "UTF-8", "B"), new FileDataSource(file));
+			} else {
+				messageHelper = new MimeMessageHelper(message, false, "UTF-8");
+			}
+			messageHelper.setTo(to);
+			messageHelper.setSubject(subject);
+			messageHelper.setText(response.getBody(), true);
+			messageHelper.setFrom(from);
+			mailSender.send(message);
+			result = true;
+		} catch (Exception e) {
+			log.error("mail send fail", e);
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * 메일전송 (컨트롤러호출)
+	 * @param templete 메일폼경로
+	 * @param to 받는사람
+	 * @param subject 제목
+	 * @param jsonParam json형식 파라메터
+	 * @param file 첨부파일
+	 * @return 메일전송결과
+	 */
+	public boolean sendMail(String templete, String to, String subject, String jsonParam, File file, String fileName) {
+		this.setTemplete(templete);
+		this.setTo(to);
+		this.setSubject(subject);
+		this.setJsonParam(jsonParam);
+		this.setFile(file);
+		this.setFileName(fileName);
+		return this.sendMail();
+	}
+	
+	/**
+	 * 메일전송 (컨트롤러호출)
+	 * @param templete 메일폼경로
+	 * @param to 받는사람
+	 * @param subject 제목
+	 * @param jsonParam json형식 파라메터
+	 * @return 메일전송결과
+	 */
+	public boolean sendMail(String templete, String to, String subject, String jsonParam) {
+		return this.sendMail(templete, to, subject, jsonParam, null, "");
+	}
+	
+	/**
+	 * 메일전송 (컨트롤러호출)
+	 * @param templete 메일폼경로
+	 * @param userId 받는사람 사용자아이디
+	 * @param subject 제목
+	 * @param jsonParam json형식 파라메터
+	 * @param file 첨부파일
+	 * @return 메일전송결과
+	 */
+	public boolean sendMailUser(String templete, String userId, String subject, String jsonParam, File file, String fileName) {
+		UserVo userVo = userService.selectUserView(userId);
+		if (!StringUtils.isEmpty(userVo.getEmail())) {
+			if (templete.indexOf("?") != -1) templete += "&userNm=" + userVo.getUserNm();
+			else templete += "?userNm=" + userVo.getUserNm();
+			this.setTemplete(templete);
+			this.setTo(userVo.getEmail());
+			this.setSubject(subject);
+			this.setJsonParam(jsonParam);
+			this.setFile(file);
+			this.setFileName(fileName);
+			return this.sendMail();
+		}
+		return false;
+	}
+	
+	/**
+	 * 메일전송 (컨트롤러호출)
+	 * @param templete 메일폼경로
+	 * @param userId 받는사람 사용자아이디
+	 * @param subject 제목
+	 * @param jsonParam json형식 파라메터
+	 * @return 메일전송결과
+	 */
+	public boolean sendMailUser(String templete, String userId, String subject, String jsonParam) {
+		return this.sendMailUser(templete, userId, subject, jsonParam, null, "");
+	}
+	
+	/**
+	 * 메일전송 (컨트롤러호출)
+	 * @param templete 메일폼경로
+	 * @param userIdArray [] 받는사람 사용자아이디
+	 * @param subject 제목
+	 * @param jsonParam json형식 파라메터
+	 * @param file 첨부파일
+	 * @return 메일전송결과
+	 */
+	public int sendMailUser(String templete, String [] userIdArray, String subject, String jsonParam, File file, String fileName) {
+		UserVo userVo = null;
+		int cnt = 0;
+		String tmp = "";
+		for (String userId: userIdArray) {
+			userVo = userService.selectUserView(userId);
+			if (!StringUtils.isEmpty(userVo.getEmail())) {
+				tmp = templete;
+				if (tmp.indexOf("?") != -1) tmp += "&userNm=" + userVo.getUserNm();
+				else tmp += "?userNm=" + userVo.getUserNm();
+				jsonParam += JsonUtil.getJsonStrFromObject(userVo);
+				this.setTemplete(tmp);
+				this.setTo(userVo.getEmail());
+				this.setSubject(subject);
+				this.setJsonParam(jsonParam);
+				this.setFile(file);
+				this.setFileName(fileName);
+				if (this.sendMail()) cnt++;
+			}
+		}
+		return cnt;
+	}
+	
+	/**
+	 * 메일전송 (컨트롤러호출)
+	 * @param templete 메일폼경로
+	 * @param userIdArray [] 받는사람 사용자아이디
+	 * @param subject 제목
+	 * @param jsonParam json형식 파라메터
+	 * @return 메일전송결과
+	 */
+	public int sendMailUser(String templete, String [] userIdArray, String subject, String jsonParam) {
+		return this.sendMailUser(templete, userIdArray, subject, jsonParam, null, "");
+	}
+	
+	/**
+	 * 메일전송-메일주소 (컨트롤러호출)
+	 * @param templete 메일폼경로
+	 * @param addrArray [] 받는사람 메일주소
+	 * @param subject 제목
+	 * @param jsonParam json형식 파라메터
+	 * @param file 첨부파일
+	 * @return 메일전송결과
+	 */
+	public int sendMailAddr(String templete, String [] addrArray, String subject, String jsonParam, File file, String fileName) {
+		UserVo userVo = null;
+		int cnt = 0;
+		String tmp = "";
+		for (String addr: addrArray) {
+			if (!StringUtils.isEmpty(addr)) {
+				tmp = templete;
+				jsonParam += JsonUtil.getJsonStrFromObject(userVo);
+				this.setTemplete(tmp);
+				this.setTo(addr);
+				this.setSubject(subject);
+				this.setJsonParam(jsonParam);
+				this.setFile(file);
+				this.setFileName(fileName);
+				if (this.sendMail()) cnt++;
+			}
+		}
+		return cnt;
+	}
+	
+	/**
+	 * 메일전송-메일주소 (컨트롤러호출)
+	 * @param templete 메일폼경로
+	 * @param addrArray [] 받는사람 메일주소
+	 * @param subject 제목
+	 * @param jsonParam json형식 파라메터
+	 * @return 메일전송결과
+	 */
+	public int sendMailAddr(String templete, String [] addrArray, String subject, String jsonParam) {
+		return this.sendMailAddr(templete, addrArray, subject, jsonParam, null, "");
+	}
+}

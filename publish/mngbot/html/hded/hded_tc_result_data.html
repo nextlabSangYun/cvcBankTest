@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>CVCBank</title>
+	<link rel="shortcut icon" href="../../images/favicon.ico" type="image/x-icon">
+	<link rel="stylesheet" href="../../css/common.css">
+	<link rel="stylesheet" href="../../css/hded.css">
+	<script src="../../js/jquery-3.2.1.min.js"></script>
+	<script src="../../js/jquery-ui.min.js"></script>
+	<script src="../../js/jquery.form.min.js"></script>
+	<script src="../../js/vue.min.js"></script>
+	<script src="../../js/lodash.min.js"></script>
+	<script src="../../js/calendar.js"></script>
+	<script src="../../js/common.js"></script>
+</head>
+<body>
+	<div class="pop_wrap" style="width:460px;">
+		<div class="pop_tit">
+			<p>결과자료 조회</p>
+		</div>
+		<div class="pop_cont">
+			<p class="info_tit">결과자료</p>
+			<div class="test_result">
+				<p>1. SCS , EAG 응답 값 동일, Hit Count 정상 확인, DB 입력 정보 중 Start, END Time 적재가 정상적이지 못함 (수정 완료)</p>
+				<p>2. 미디어위치정보 "" , CDN 코드 "", STB_Usage_Code = 2인 경우 : </p>
+				<p>콘텐츠 ID : {94D2B744-3649-11E8-A6C2-A5DA71120002}</p>
+				<p>파일 경로 : /ontv/10850/T348349_1_180402.ts</p>
+				<p>EAG-SVC 응답 값 , SCS 응답 값 일치 확인</p>
+				<p>"url": "ftp://celruntv:tpffjsxlql@192.168.3.46:21/ontv/10850/T348349_1_180402.ts.pac"</p>
+			</div>
+			<p class="info_tit">첨부파일 다운로드</p>
+			<div class="g_table">
+				<table>
+					<colgroup>
+						<col style="width:50px">
+						<col>
+					</colgroup>
+					<thead>
+						<tr>
+							<th>No.</th>
+							<th>첨부파일명</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>1</td>
+							<td>
+								<a href="#" class="link">BMT+체크리스트-HD_STB+CS_QA-180219.xlsx</a>
+							</td>
+						</tr>
+						<tr>
+							<td>2</td>
+							<td>
+								<a href="#" class="link">첨부#2. (E-CDN)EAG_검증리스트_180413_테스트템플릿_보안해제_20180419 (1).xlsx</a>
+							</td>
+						</tr>
+						<tr>
+							<td>3</td>
+							<td>
+								<a href="#" class="link">BL9_cmykCast_1024x1024.png</a>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<div class="btn_wrap">
+			<button class="btn_cancel" onclick="hidePopupLayer(); return false">닫기</button>
+		</div>
+	</div>
+</body>
+</html>

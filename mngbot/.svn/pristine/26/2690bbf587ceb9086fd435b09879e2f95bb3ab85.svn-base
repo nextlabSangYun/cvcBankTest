@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.nextlab.bot.mapper.UserMapper">
+	<select id="selectUserView" parameterType="String" resultType="userVo">
+		SELECT user_id
+			, user_nm
+			, user_group_id
+			, pwd
+			, use_yn
+			, reg_dtm
+			, reg_id
+			, file_nm
+			, org_file_nm
+			, file_path
+			, phone
+			, email
+			, id
+			, conn_fail_cnt
+		FROM tb_user
+		WHERE user_id = #{userId}
+	</select>
+	
+	<select id="selectUserList" parameterType="userCriteria" resultType="userVo">
+		SELECT a.user_id
+			, a.user_nm
+			, (SELECT user_group_nm FROM tb_user_group b WHERE b.user_group_id = a.user_group_id) user_group_nm
+			, a.pwd
+			, a.use_yn
+			, a.reg_dtm
+			, a.reg_id
+			, a.file_nm
+			, a.org_file_nm
+			, a.file_path
+			, a.phone
+			, a.email
+			, a.id
+		FROM tb_user a
+		WHERE 1=1
+		<if test=" useYn != null and useYn != '' ">
+			AND a.use_yn = #{useYn}
+		</if>
+		<if test=" userGroupId != null and userGroupId != '' ">
+			AND a.user_group_id = #{userGroupId}
+		</if>
+		<if test=" !mngYn ">
+			AND a.user_group_id != 'G01'
+		</if>
+		ORDER BY a.reg_dtm desc
+	</select>
+	
+	<insert id="insertUserInfo" parameterType="userVo">
+		INSERT INTO tb_user 
+				(
+					user_id
+					, user_nm
+					, user_group_id
+					, pwd
+					, use_yn
+					, reg_dtm
+					, reg_id
+					, phone
+					, email
+					, id
+				)
+		VALUES 
+				(
+					#{userId}
+					, #{userNm}
+					, #{userGroupId}
+					, #{pwd}
+					, #{useYn}
+					, GETDATE()
+					, #{regId}
+					, #{phone}
+					, #{email}
+					, #{id}
+				)
+	</insert>
+	
+	<update id="updateUserInfo" parameterType="userVo">
+		UPDATE tb_user
+		SET 
+			user_group_id = #{userGroupId}
+			, use_yn = #{useYn}
+			, phone = #{phone}
+			, email = #{email}
+			, file_nm = #{fileNm}
+			, org_file_nm = #{orgFileNm}
+			, file_path = #{filePath}
+			<if test=" pwd != null and pwd != '' ">
+				, pwd = #{pwd}
+			</if>
+		WHERE user_id = #{userId}
+	</update>
+	
+	<select id="selectUserInfoForId" parameterType="String" resultType="userVo">
+		SELECT a.user_id
+			, a.user_nm
+			, a.user_group_id
+			, (SELECT user_group_nm FROM tb_user_group WHERE user_group_id = a.user_group_id) AS user_group_nm
+			, a.use_yn
+			, a.reg_dtm
+			, a.reg_id
+			, a.file_nm
+			, a.org_file_nm
+			, a.file_path
+			, a.phone
+			, a.email
+			, a.id
+			, a.pwd
+			, a.conn_fail_cnt
+		FROM tb_user a
+		WHERE id = #{id}
+	</select>
+	
+	<select id="selectUserUseList" resultType="userVo">
+		SELECT user_id
+			, user_nm
+			, user_group_id
+		FROM tb_user
+		WHERE use_yn = 'Y'
+	</select>
+	
+	<insert id="insertUserConnHstList" parameterType="userConnHstVo">
+		INSERT INTO tb_user_conn_hst 
+				(user_id
+				, seq
+				, conn_ip, conn_id, conn_dtm)
+		VALUES 
+				(#{userId}
+				, (SELECT ISNULL(CONVERT(INT,MAX(seq)+1), 1) FROM tb_user_conn_hst WHERE user_id = #{userId})
+				, #{connIp}, #{connId}, GETDATE())
+	</insert>
+	
+	<insert id="insertFavoritesApp" parameterType="favoritesVo">
+		INSERT INTO tb_favorites
+				(user_id
+				, app_id)
+		VALUES 
+				(#{userId}
+				, #{appId})
+	</insert>
+	
+	<delete id="deleteFavoritesApp" parameterType="favoritesVo">
+		DELETE FROM tb_favorites
+		WHERE user_id = #{userId}
+		AND app_id = #{appId}
+	</delete>
+
+	<select id="selectWidgetList" resultType="widgetVo" parameterType="String">
+		SELECT a.widget_id
+			, a.widget_nm
+			, a.reg_dtm
+			, a.app_id
+			, a.file_nm
+			, a.file_path
+			, a.org_file_nm
+			, (SELECT app_nm FROM tb_app b WHERE a.app_id = b.app_id) app_nm
+			, b.widget_id as chk
+		FROM TB_WIDGET a
+		LEFT OUTER JOIN tb_user_widget b ON (a.widget_id = b.widget_id AND b.user_id = #{userId})
+		ORDER BY a.widget_id
+	</select>
+	
+	<insert id="insertUserWidgetInit" parameterType="userVo">
+		INSERT INTO tb_user_widget (user_id , widget_id)
+		VALUES (#{userId} , #{widgetId})
+	</insert>
+	
+	<select id="selectUserWidgetList" parameterType="String" resultType="widgetVo">
+		SELECT a.seq
+			, a.user_id
+			, a.widget_id
+			, b.widget_nm
+			, (SELECT app_nm FROM tb_app c WHERE b.app_id = c.app_id) app_nm
+		FROM tb_user_widget a
+		JOIN tb_widget b ON (a.widget_id = b.widget_id)
+		WHERE a.user_id = #{userId}
+		ORDER BY a.widget_id
+	</select>
+	
+	<insert id="insertUserWidget" parameterType="widgetVo">
+		INSERT INTO tb_user_widget (user_id , widget_id)
+		VALUES (#{userId} , #{widgetId})
+	</insert>
+	
+	<delete id="deleteUserWidget" parameterType="widgetVo">
+		DELETE FROM tb_user_widget
+		WHERE user_id = #{userId}
+		AND widget_id = #{widgetId}
+	</delete>
+	
+	<delete id="deleteAllUserWidget" parameterType="String">
+		DELETE FROM tb_user_widget
+		WHERE user_id = #{userId}
+	</delete>
+		
+	<insert id="insertWallPaper" parameterType="wallpaperVo">
+		INSERT INTO tb_wallpaper
+			(wallpaper_id
+			, default_yn
+			, wallpaper_file_nm
+			, org_file_nm
+			, file_path
+			, user_id
+			, reg_dtm
+		) VALUES (
+			#{wallpaperId}
+			, 'Y'
+			, #{wallpaperFileNm}
+			, #{orgFileNm}
+			, #{filePath}
+			, #{userId}
+			, GETDATE()
+		)
+	</insert>
+	
+	<update id="updateWallPaper" parameterType="wallpaperVo">
+		UPDATE tb_wallpaper
+		SET
+			wallpaper_file_nm = #{wallpaperFileNm}
+			, org_file_nm = #{orgFileNm}
+			, file_path = #{filePath}
+		WHERE user_id = #{userId}
+	</update>
+	
+	<select id="selectWallpaperView" parameterType="String" resultType="wallpaperVo">
+		SELECT wallpaper_id
+			, default_yn
+			, wallpaper_file_nm
+			, org_file_nm
+			, file_path
+			, user_id
+		FROM tb_wallpaper
+		WHERE user_id = #{userId}
+	</select>
+	
+	<select id="selectFavoritesAppId" parameterType="favoritesVo" resultType="String">
+		SELECT app_id
+		FROM tb_favorites
+		WHERE user_id = #{userId}
+		AND app_id = #{appId}
+	</select>	
+	
+	<update id="updateUserTempPwd" parameterType="userVo">
+		UPDATE tb_user
+		SET
+			pwd = #{pwd}
+		WHERE user_id = #{userId}
+	</update>
+	
+	<update id="updateConnFailCnt" parameterType="userVo">
+		UPDATE	tb_user SET
+				conn_fail_cnt = #{connFailCnt}
+		WHERE	user_id = #{userId}
+	</update>
+</mapper>

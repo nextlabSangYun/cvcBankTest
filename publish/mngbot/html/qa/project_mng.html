@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>CVCBank</title>
+	<link rel="shortcut icon" href="../../images/favicon.ico" type="image/x-icon">
+	<link rel="stylesheet" href="../../css/common.css">
+	<link rel="stylesheet" href="../../css/qa.css">
+	<script src="../../js/jquery-3.2.1.min.js"></script>
+	<script src="../../js/jquery-ui.min.js"></script>
+	<script src="../../js/jquery.form.min.js"></script>
+	<script src="../../js/vue.min.js"></script>
+	<script src="../../js/lodash.min.js"></script>
+	<script src="../../js/calendar.js"></script>
+	<script src="../../js/common.js"></script>
+</head>
+<body>
+<div class="wrap">
+	<!-- 내용 -->
+	<div class="content">
+		<div class="sub_layout has_snb">
+			<div class="cont_wrap">
+				<div class="setting_list">
+					<ul>
+						<li>
+							<a href="#"><span class="ico"><img src="../../images/bmt/ico_bmt_set_0002030701.png"></span><span class="name">프로젝트 정보수정</span></a>
+						</li>
+						<li>
+							<a href="#"><span class="ico"><img src="../../images/bmt/ico_bmt_set_0002030702.png"></span><span class="name">측정환경 설정</span></a>
+						</li>
+						<li>
+							<a href="#"><span class="ico"><img src="../../images/bmt/ico_bmt_set_0002030703.png"></span><span class="name">측정이력 관리</span></a>
+						</li>
+						<li>
+							<a href="#"><span class="ico"><img src="../../images/bmt/ico_bmt_set_0002030704.png"></span><span class="name">분류관리</span></a>
+						</li>
+					</ul>
+				</div>
+				<div class="now_state">
+					<ul>
+						<li>
+							<span>현재</span>
+							<p class="only_btn"><strong>15</strong>회차</p>
+							<button class="btn_default">다음회차시작</button>
+						</li>
+						<li>
+							<span>프로젝트</span>
+							<p><strong class="point_cr">진행중</strong></p>
+							<div class="state_desc">
+								<input type="text" placeholder="QA M/M 입력">
+								<input type="text" placeholder="BP M/M 입력">
+							</div>
+							<div class="state_desc">
+								<select>
+									<option value="">- 전체 -</option>
+									<option>미평가</option>
+									<option>적합</option>
+									<option>부분부적합</option>
+									<option>부적합</option>
+								</select>
+								<button class="btn_default">프로젝트 완료 처리</button>
+							</div>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+</html>

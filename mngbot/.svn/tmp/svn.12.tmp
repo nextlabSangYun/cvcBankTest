@@ -1,0 +1,280 @@
+/**
+ * @title	: H/E 테스트 케이스 서비스 impl
+ * @package	: kr.co.nextlab.hded.service.impl
+ * @file	: HdedTcServiceImpl.java
+ * @author	: winolonam
+ * @date	: 2018. 4. 26.
+ * @desc	: 
+ */
+package kr.co.nextlab.hded.service.impl;
+
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ejb.access.EjbAccessException;
+import org.springframework.stereotype.Service;
+
+import kr.co.nextlab.comm.model.FileVo;
+import kr.co.nextlab.comm.service.SequenceService;
+import kr.co.nextlab.component.FileComponent;
+import kr.co.nextlab.excel.CommonExcelParser;
+import kr.co.nextlab.excel.model.HeTcExcelUpload;
+import kr.co.nextlab.hded.mapper.HdedTcMapper;
+import kr.co.nextlab.hded.model.HeSystemVo;
+import kr.co.nextlab.hded.model.HeTcCategoryVo;
+import kr.co.nextlab.hded.model.HeTcTmplCriteria;
+import kr.co.nextlab.hded.model.HeTcTmplVo;
+import kr.co.nextlab.hded.service.HdedTcService;
+
+@Service
+public class HdedTcServiceImpl implements HdedTcService{
+	
+	@Autowired
+	private FileComponent fileComponent;
+	
+	@Autowired
+	private HdedTcMapper hdedTcMapper;
+	
+	@Autowired
+	private SequenceService sequenceService;
+	
+	HeSystemVo hsv = new HeSystemVo();
+	
+	HeTcCategoryVo htcv = new HeTcCategoryVo();
+
+	@Override
+	public FileVo insertLargeTcList(FileVo fileVo) {
+		
+		fileVo = this.heTcExcelParsing(fileVo);
+		
+		if (StringUtils.isNotEmpty(fileVo.getMessage())) {
+			// TODO excel data insert
+		}
+		
+		return fileVo;
+	}
+	
+	/**
+	 * 버킷리스트 조회
+	 * @param criteria
+	 * @return
+	 */
+	@Override
+	public List<HeTcTmplVo> selectBucketList(HeTcTmplCriteria criteria){
+		criteria.setTcStat("D302");
+		return hdedTcMapper.selectBucketList(criteria);
+	}
+	
+	
+	/**
+	 * 버킷리스트에서 TC 등록
+	 * @param heTcTmplVo
+	 * @return
+	 */
+	@Override
+	public boolean insertBucketTsetCase(HeTcTmplVo heTcTmplVo){
+		
+		//등록값 체크용 변수
+		int cnt = 0;
+		int sysChk = 0;
+		int lcateChk = 0;
+		int mcateChk = 0;
+		int scateChk = 0;
+		
+		//카테고리 저장 변수
+		HeTcCategoryVo ltcv = new HeTcCategoryVo();
+		HeTcCategoryVo mtcv = new HeTcCategoryVo();
+		HeTcCategoryVo stcv = new HeTcCategoryVo();
+		
+		//시스템명 체크 (없을경우 새로등록 있을경우 systemId 호출) 및 시스템 아이디등록
+		HeSystemVo hSysVo = new HeSystemVo();
+		hsv = hdedTcMapper.selectSysNmChk(heTcTmplVo.getSystemNm());
+		if(hsv != null){
+			//시스템명이 있음 시스템 ID만 추가
+			heTcTmplVo.setSystemId(hsv.getSystemId());
+		}else{
+			//시스템명이 없음 새로 추가
+			hSysVo.setSystemId(sequenceService.getHdSystemId());
+			hSysVo.setSystemNm(heTcTmplVo.getSystemNm());
+			hSysVo.setUseYn("Y");
+			hSysVo.setRegId(heTcTmplVo.getRegId());
+			sysChk = hdedTcMapper.insertSystem(hSysVo);
+			// 등록결과 확인
+			if (sysChk <= 0){
+				throw new EjbAccessException("시스템명 등록이 실패하였습니다.");
+			}
+			heTcTmplVo.setSystemId(hSysVo.getSystemId());
+		}
+		
+		//카테고리명 체크(없을 경우 새로 등록 있을경우 categoryId 호출) 및 카테고리아이디 등록
+		String lcateNm = heTcTmplVo.getLcateNm();
+		String mcateNm = heTcTmplVo.getMcateNm();
+		String scateNm = heTcTmplVo.getScateNm();
+		//대분류명 체크
+		ltcv.setTcCateNm(lcateNm);
+		ltcv.setSystemId(heTcTmplVo.getSystemId());
+		ltcv.setTcCateParId("000000000000000");
+		htcv = hdedTcMapper.selectCategoryChk(ltcv);
+		if(htcv != null){
+			//대분류명있음 대분류명 ID 추가
+			heTcTmplVo.setLcateId(htcv.getTcCateId());
+		}
+		else{
+			//대분류명 없음 새로 추가
+			ltcv.setTcCateId(sequenceService.getHdCategoryId());
+			ltcv.setRegId(heTcTmplVo.getRegId());
+			ltcv.setUseYn("Y");
+			lcateChk = hdedTcMapper.insertHeTcCategory(ltcv);
+			if (lcateChk <= 0){
+				throw new EjbAccessException("시스템명 등록이 실패하였습니다.");
+			}
+			heTcTmplVo.setLcateId(ltcv.getTcCateId());
+			
+		}
+		//중분류명 체크
+		mtcv.setTcCateNm(mcateNm);
+		mtcv.setSystemId(heTcTmplVo.getSystemId());
+		mtcv.setTcCateParId(heTcTmplVo.getLcateId());
+		htcv = hdedTcMapper.selectCategoryChk(mtcv);
+		if(htcv != null){
+			//중분류명 있음 중분류명 추가
+			heTcTmplVo.setMcateId(htcv.getTcCateId());
+		}else{
+			//중분류명 없음 새로 추가
+			mtcv.setTcCateId(sequenceService.getHdCategoryId());
+			mtcv.setRegId(heTcTmplVo.getRegId());
+			mtcv.setUseYn("Y");
+			mcateChk = hdedTcMapper.insertHeTcCategory(mtcv);
+			if (mcateChk <= 0){
+				throw new EjbAccessException("시스템명 등록이 실패하였습니다.");
+			}
+			heTcTmplVo.setMcateId(mtcv.getTcCateId());
+		}
+		//소분류명 체크
+		stcv.setTcCateNm(scateNm);
+		stcv.setSystemId(heTcTmplVo.getSystemId());
+		stcv.setTcCateParId(heTcTmplVo.getMcateId());
+		htcv = hdedTcMapper.selectCategoryChk(stcv);
+		if(htcv != null){
+			//소분류명 있음 중분류명 추가
+			heTcTmplVo.setTcCateId(htcv.getTcCateId());
+		}else{
+			//소분류명 없음 새로 추가
+			stcv.setTcCateId(sequenceService.getHdCategoryId());
+			stcv.setRegId(heTcTmplVo.getRegId());
+			stcv.setUseYn("Y");
+			scateChk = hdedTcMapper.insertHeTcCategory(stcv);
+			if (scateChk <= 0){
+				throw new EjbAccessException("시스템명 등록이 실패하였습니다.");
+			}
+			heTcTmplVo.setTcCateId(stcv.getTcCateId());
+		}
+		
+		//TC 아이디 생성
+		heTcTmplVo.setTcId(sequenceService.getHdTcId());
+		
+		//기본값 생성(테스트 케이스 변경분류= 'D401(최초등록)', 테스트케이스 그룹아이디=생성된 tcId, 테스트케이스 상태 = 'D302(최종상태)')
+		heTcTmplVo.setTcChangeCd("D401");
+		heTcTmplVo.setTcGroupId(heTcTmplVo.getTcId());
+		heTcTmplVo.setTcStat("D302");
+		
+		//TC 등록
+		cnt = hdedTcMapper.insertBuckTc(heTcTmplVo);
+		
+		// 등록결과 확인
+		if (cnt <= 0){
+			throw new EjbAccessException("TestCase 등록이 실패하였습니다.");
+		}
+					
+		return true;
+	}
+	
+	/**
+	 * 버킷TC 상세조회
+	 * @param tcId
+	 * @return
+	 */
+	@Override
+	public HeTcTmplVo selectTcView(String tcId){
+		return hdedTcMapper.selectTcView(tcId);
+	}
+	
+	private FileVo heTcExcelParsing(FileVo fileVo) {
+		if (fileVo != null) {
+			List<HeTcExcelUpload> heTcExcelUploadList = null;
+			
+			fileVo.setFileFullPath(fileComponent.getFileFullPath(fileVo));
+			CommonExcelParser<HeTcExcelUpload> commonExcelParser = new CommonExcelParser<HeTcExcelUpload>(HeTcExcelUpload.class, 0, 1, 10000);
+			commonExcelParser.setFileVo(fileVo);
+			
+			/**
+			 * 엑셀 유효성 체크
+			 */
+			if(commonExcelParser.isFileVoValidExcelFile()){
+				heTcExcelUploadList = commonExcelParser.validResultList(HeTcExcelUpload.class, commonExcelParser.getFileVoDataList());
+				fileVo.setHeTcExcelUploadList(heTcExcelUploadList);
+				for (HeTcExcelUpload heTcExcelUpload : heTcExcelUploadList) {
+					if (StringUtils.isNotEmpty(heTcExcelUpload.getResultMsg())) {
+						fileVo.setMessage(heTcExcelUpload.getResultMsg());
+						break;
+					}
+				}
+			}
+		}
+		return fileVo;
+	}
+	
+	/**
+	 * 버킷TC 수정하기
+	 * @param heTcTmplVo
+	 * @return
+	 */
+	@Override
+	public boolean updateBucketTestCase(HeTcTmplVo heTcTmplVo){
+		//기존tcId 상태 update(테스트케이스상태 코드분류 -> 이전상태:D303)
+		//update 확인 변수
+		int updateChk = 0;
+		heTcTmplVo.setTcStat("D303");
+		updateChk = hdedTcMapper.updateExistTc(heTcTmplVo);
+		
+		//변경된이력 새로 tc새로등록(기존 tcId를 tcGroupId로 입력 , 테스트케이스 상태 최종상태:D302)
+		//pid 값을 체크하여 pid가 null면 임의변경(D402), null아니면  프로젝트사용변경(D403, 테스트케이스 변경 분류값 : 프로젝트명 )
+		heTcTmplVo.setTcId(sequenceService.getHdTcId());
+		heTcTmplVo.setTcStat("D302");
+		heTcTmplVo.setTcChangeCd("D402");
+		//insert 확인 변수
+		int insertChk = 0;
+		insertChk = hdedTcMapper.insertBuckTc(heTcTmplVo);
+		if (updateChk <= 0 || insertChk <= 0){
+			throw new EjbAccessException("TestCase 수정이 실패하였습니다.");
+		}
+		return true;
+	}
+	/**
+	 * 테스트 케이스 변경 이력 최근 30건
+	 */
+	@Override
+	public List<HeTcTmplVo> selectTcChangeHistList() {
+		return hdedTcMapper.selectTcChangeHistList();
+	}
+
+	/**
+	 * 해당 그룹 아이디에 속하는 이력 리스트 조회
+	 * @return
+	 */
+	@Override
+	public List<HeTcTmplVo> selectTcChangeHistByGroupIdList(String groupId) {
+		return hdedTcMapper.selectTcChangeHistByGroupIdList(groupId);
+	}
+
+	/**
+	 * 선택데이터 와 현재데이터 비교 리스트
+	 * @param tcId
+	 * @return
+	 */
+	@Override
+	public List<HeTcTmplVo> selectTcChangeHistDetail(String tcId) {
+		return hdedTcMapper.selectTcChangeHistDetail(tcId);
+	}
+}

@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>Management Bot</title>
+	<link rel="stylesheet" href="../css/common.css">
+	<link rel="stylesheet" href="../css/bmt.css">
+	<script src="../js/jquery-3.2.1.min.js"></script>
+	<script src="../js/jquery-ui.min.js"></script>
+	<script src="../js/jquery.form.min.js"></script>
+	<script src="../js/vue.min.js"></script>
+	<script src="../js/lodash.min.js"></script>
+	<script src="../js/calendar.js"></script>
+	<script src="../js/common.js"></script>
+</head>
+<body>
+	<div class="pop_wrap" style="width:1080px;">
+		<div class="pop_tit">
+			<p>결과 상세보기</p>
+		</div>
+		<div class="pop_cont">
+			<div class="g_table02">
+				<table>
+					<caption>분류, 중요도, Test Case 이름을 확인 할 수 있는 표 입니다.</caption>
+					<colgroup>
+						<col style="width:120px;">
+						<col>
+						<col style="width:120px;">
+						<col style="width:300px;">
+					</colgroup>
+					<tbody>
+						<tr>
+							<th>분류</th>
+							<td>홈 > 마이 Btv > VOD 다시보기</td>
+							<th>중요도</th>
+							<td>Major</td>
+						</tr>
+						<tr>
+							<th>Test Case 이름</th>
+							<td colspan="3">회차에서 OK 버튼을 누르면 (회차 선택), 해당 회차의 구매 팝업 표시<br> - 시리즈(소장용 또는 365일 시청) 구매 옵션은 해당되는 콘텐츠에 한해 표시함
+							</td>
+						</tr>
+						<tr>
+							<th>비고</th>
+							<td colspan="3">테스트 하실 때 ㅇㅇㅇ VOD 로 테스트 진행하세요~</td>
+						</tr>
+						<tr>
+							<th>첨부 파일</th>
+							<td colspan="3">
+								<a href="#" class="link">DCIM20171020_112012.jpg</a>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<p class="area_tit">측정이력</p>
+			<!-- 18.01.09 탭으로 수정 -->
+			<div class="tab_wrap">
+				<ul class="g_tab">
+					<li><a href="#">BMT</a></li>
+					<li><a href="#">채널변경시간</a></li>
+					<li><a href="#">UI반응시간</a></li>
+				</ul>
+				<div class="tab_con_wrap">
+					<div class="tab_con">
+						<div class="g_table">
+							<table>
+								<caption>측정일시, 측정모델 등 확인 하는 표 입니다.</caption>
+								<colgroup>
+									<col style="width:16%;">
+									<col style="width:14%;">
+									<col style="width:8%;">
+									<col style="width:8%;">
+									<col style="width:10%;">
+									<col style="width:14%;">
+									<col>
+									<col style="width:10%;">
+								</colgroup>
+								<thead>
+									<tr>
+										<th>측정 모델</th>
+										<th>Mac</th>
+										<th>차수</th>
+										<th>리모컨</th>
+										<th>담당자</th>
+										<th>측정일시</th>
+										<th>측정 결과</th>
+										<th>XQMS 리포트</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>BHX-UH200(5.4.2)</td>
+										<td>15:78:10:f1:y5:36</td>
+										<td>1차</td>
+										<td>IR</td>
+										<td>김현우</td>
+										<td>2017/04/28/09:33</td>
+										<td><span class="state04">PASS</span></td>
+										<td><button class="btn_show"></button></td>
+									</tr>
+									<tr>
+										<td>BHX-UH200(5.4.2)</td>
+										<td>15:78:10:f1:y5:36</td>
+										<td>1차</td>
+										<td>IR</td>
+										<td>김현우</td>
+										<td>2017/04/28/09:33</td>
+										<td><span class="state04">PASS</span></td>
+										<td><button class="btn_show"></button></td>
+									</tr>
+									<tr>
+										<td>BHX-UH200(5.4.2)</td>
+										<td>15:78:10:f1:y5:36</td>
+										<td>1차</td>
+										<td>IR</td>
+										<td>김현우</td>
+										<td>2017/04/28/09:33</td>
+										<td><span class="state04">PASS</span></td>
+										<td><button class="btn_show"></button></td>
+									</tr>
+									<tr>
+										<td>BHX-UH200(5.4.2)</td>
+										<td>15:78:10:f1:y5:36</td>
+										<td>1차</td>
+										<td>IR</td>
+										<td>김현우</td>
+										<td>2017/04/28/09:33</td>
+										<td><span class="state04">PASS</span></td>
+										<td><button class="btn_show"></button></td>
+									</tr>
+									<tr>
+										<td>BHX-UH200(5.4.2)</td>
+										<td>15:78:10:f1:y5:36</td>
+										<td>1차</td>
+										<td>IR</td>
+										<td>김현우</td>
+										<td>2017/04/28/09:33</td>
+										<td><span class="state04">PASS</span></td>
+										<td><button class="btn_show"></button></td>
+									</tr>
+								</tbody>
+							</table>
+							<div class="pagination">
+								<ol>
+									<li class="btn_first"><button>처음</button></li>
+									<li class="btn_prev"><button>이전</button></li>
+									<li class="num on"><button>1</button></li>
+									<li class="num"><button>2</button></li>
+									<li class="num"><button>3</button></li>
+									<li class="num"><button>4</button></li>
+									<li class="num"><button>5</button></li>
+									<li class="btn_next"><button>다음</button></li>
+									<li class="btn_last"><button>마지막</button></li>
+								</ol>
+							</div>
+						</div>
+					</div>
+					<div class="tab_con">
+						<div class="g_table">
+							<table>
+								<caption>측정일시, 측정모델 등 확인 하는 표 입니다.</caption>
+								<colgroup>
+									<col style="width:14%;">
+									<col style="width:12%;">
+									<col style="width:7%;">
+									<col style="width:7%;">
+									<col style="width:9%;">
+									<col style="width:13%;">
+									<col>
+									<col>
+									<col>
+									<col>
+									<col>
+									<col style="width:9%;">
+								</colgroup>
+								<thead>
+									<tr>
+										<th rowspan="2">측정 모델</th>
+										<th rowspan="2">Mac</th>
+										<th rowspan="2">차수</th>
+										<th rowspan="2">리모컨</th>
+										<th rowspan="2">담당자</th>
+										<th rowspan="2">측정일시</th>
+										<th colspan="5">측정 결과</th>
+										<th rowspan="2">XQMS 리포트</th>
+									</tr>
+									<tr>
+										
+										<th>A구간</th>
+										<th>B구간</th>
+										<th>C구간</th>
+										<th>총소요</th>
+										<th>네트워크</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>BHX-UH200(5.4.2)</td>
+										<td>15:78:10:f1:y5:36</td>
+										<td>1차</td>
+										<td>IR</td>
+										<td>김현우</td>
+										<td>2017/04/28/09:33</td>
+										<td>358</td>
+										<td>247</td>
+										<td>918</td>
+										<td>1523</td>
+										<td>30</td>
+										<td><button class="btn_show"></button></td>
+									</tr>
+									<tr>
+										<td>BHX-UH200(5.4.2)</td>
+										<td>15:78:10:f1:y5:36</td>
+										<td>1차</td>
+										<td>IR</td>
+										<td>김현우</td>
+										<td>2017/04/28/09:33</td>
+										<td>358</td>
+										<td>247</td>
+										<td>918</td>
+										<td>1523</td>
+										<td>30</td>
+										<td><button class="btn_show"></button></td>
+									</tr>
+									<tr>
+										<td>BHX-UH200(5.4.2)</td>
+										<td>15:78:10:f1:y5:36</td>
+										<td>1차</td>
+										<td>IR</td>
+										<td>김현우</td>
+										<td>2017/04/28/09:33</td>
+										<td>358</td>
+										<td>247</td>
+										<td>918</td>
+										<td>1523</td>
+										<td>30</td>
+										<td><button class="btn_show"></button></td>
+									</tr>
+									<tr>
+										<td>BHX-UH200(5.4.2)</td>
+										<td>15:78:10:f1:y5:36</td>
+										<td>1차</td>
+										<td>IR</td>
+										<td>김현우</td>
+										<td>2017/04/28/09:33</td>
+										<td>358</td>
+										<td>247</td>
+										<td>918</td>
+										<td>1523</td>
+										<td>30</td>
+										<td><button class="btn_show"></button></td>
+									</tr>
+									<tr>
+										<td>BHX-UH200(5.4.2)</td>
+										<td>15:78:10:f1:y5:36</td>
+										<td>1차</td>
+										<td>IR</td>
+										<td>김현우</td>
+										<td>2017/04/28/09:33</td>
+										<td>358</td>
+										<td>247</td>
+										<td>918</td>
+										<td>1523</td>
+										<td>30</td>
+										<td><button class="btn_show"></button></td>
+									</tr>
+								</tbody>
+							</table>
+							<div class="pagination">
+								<ol>
+									<li class="btn_first"><button>처음</button></li>
+									<li class="btn_prev"><button>이전</button></li>
+									<li class="num on"><button>1</button></li>
+									<li class="num"><button>2</button></li>
+									<li class="num"><button>3</button></li>
+									<li class="num"><button>4</button></li>
+									<li class="num"><button>5</button></li>
+									<li class="btn_next"><button>다음</button></li>
+									<li class="btn_last"><button>마지막</button></li>
+								</ol>
+							</div>
+						</div>
+					</div>
+					<div class="tab_con">
+						<div class="g_table">
+							<table>
+								<caption>측정일시, 측정모델 등 확인 하는 표 입니다.</caption>
+								<colgroup>
+									<col style="width:15%;">
+									<col style="width:13%;">
+									<col style="width:7%;">
+									<col style="width:7%;">
+									<col style="width:9%;">
+									<col style="width:14%;">
+									<col>
+									<col>
+									<col>
+									<col style="width:9%;">
+								</colgroup>
+								<thead>
+									<tr>
+										<th rowspan="2">측정 모델</th>
+										<th rowspan="2">Mac</th>
+										<th rowspan="2">차수</th>
+										<th rowspan="2">리모컨</th>
+										<th rowspan="2">담당자</th>
+										<th rowspan="2">측정일시</th>
+										<th colspan="3">측정 결과</th>
+										<th rowspan="2">XQMS 리포트</th>
+									</tr>
+									<tr>
+										
+										<th>매칭</th>
+										<th>커서</th>
+										<th>변화율</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>BHX-UH200(5.4.2)</td>
+										<td>15:78:10:f1:y5:36</td>
+										<td>1차</td>
+										<td>IR</td>
+										<td>김현우</td>
+										<td>2017/04/28/09:33</td>
+										<td>358</td>
+										<td>247</td>
+										<td>918</td>
+										<td><button class="btn_show"></button></td>
+									</tr>
+									<tr>
+										<td>BHX-UH200(5.4.2)</td>
+										<td>15:78:10:f1:y5:36</td>
+										<td>1차</td>
+										<td>IR</td>
+										<td>김현우</td>
+										<td>2017/04/28/09:33</td>
+										<td>358</td>
+										<td>247</td>
+										<td>918</td>
+										<td><button class="btn_show"></button></td>
+									</tr>
+									<tr>
+										<td>BHX-UH200(5.4.2)</td>
+										<td>15:78:10:f1:y5:36</td>
+										<td>1차</td>
+										<td>IR</td>
+										<td>김현우</td>
+										<td>2017/04/28/09:33</td>
+										<td>358</td>
+										<td>247</td>
+										<td>918</td>
+										<td><button class="btn_show"></button></td>
+									</tr>
+									<tr>
+										<td>BHX-UH200(5.4.2)</td>
+										<td>15:78:10:f1:y5:36</td>
+										<td>1차</td>
+										<td>IR</td>
+										<td>김현우</td>
+										<td>2017/04/28/09:33</td>
+										<td>358</td>
+										<td>247</td>
+										<td>918</td>
+										<td><button class="btn_show"></button></td>
+									</tr>
+									<tr>
+										<td>BHX-UH200(5.4.2)</td>
+										<td>15:78:10:f1:y5:36</td>
+										<td>1차</td>
+										<td>IR</td>
+										<td>김현우</td>
+										<td>2017/04/28/09:33</td>
+										<td>358</td>
+										<td>247</td>
+										<td>918</td>
+										<td><button class="btn_show"></button></td>
+									</tr>
+								</tbody>
+							</table>
+							<div class="pagination">
+								<ol>
+									<li class="btn_first"><button>처음</button></li>
+									<li class="btn_prev"><button>이전</button></li>
+									<li class="num on"><button>1</button></li>
+									<li class="num"><button>2</button></li>
+									<li class="num"><button>3</button></li>
+									<li class="num"><button>4</button></li>
+									<li class="num"><button>5</button></li>
+									<li class="btn_next"><button>다음</button></li>
+									<li class="btn_last"><button>마지막</button></li>
+								</ol>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+		</div>
+		<div class="btn_wrap">
+			<button class="g_btn02" onclick="hidePopupLayer(); return false">닫기</button>
+		</div>
+	</div>
+	<script>
+		setPopup(2);
+	</script>
+</body>
+</html>

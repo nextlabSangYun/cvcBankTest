@@ -1,0 +1,78 @@
+/**
+ * @title	: H/E 테스트 케이스 서비스 impl
+ * @package	: kr.co.nextlab.hded.service.impl
+ * @file	: HdedTcServiceImpl.java
+ * @author	: winolonam
+ * @date	: 2018. 4. 26.
+ * @desc	: 
+ */
+package kr.co.nextlab.hded.service.impl;
+
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import kr.co.nextlab.comm.model.FileVo;
+import kr.co.nextlab.component.FileComponent;
+import kr.co.nextlab.excel.CommonExcelParser;
+import kr.co.nextlab.excel.model.HeTcExcelUpload;
+import kr.co.nextlab.hded.service.HdedTcService;
+
+@Service
+public class HdedTcServiceImpl implements HdedTcService{
+	
+	@Autowired
+	private HdedBucketMapper hdedBucketMapper;
+	
+	@Autowired
+	private FileComponent fileComponent;
+
+	@Override
+	public FileVo insertLargeTcList(FileVo fileVo) {
+		
+		fileVo = this.heTcExcelParsing(fileVo);
+		
+		if (StringUtils.isNotEmpty(fileVo.getMessage())) {
+			// TODO excel data insert
+		}
+		
+		return fileVo;
+	}
+	
+	/**
+	 * 버킷리스트 조회
+	 * @param criteria
+	 * @return
+	 */
+	@Override
+	public List<HeTcTmplVo> selectBucketList(HdedCriteria criteria){
+		return hdedBucketMapper.selectBucketList(criteria);
+	}
+	
+	private FileVo heTcExcelParsing(FileVo fileVo) {
+		if (fileVo != null) {
+			List<HeTcExcelUpload> heTcExcelUploadList = null;
+			
+			fileVo.setFileFullPath(fileComponent.getFileFullPath(fileVo));
+			CommonExcelParser<HeTcExcelUpload> commonExcelParser = new CommonExcelParser<HeTcExcelUpload>(HeTcExcelUpload.class, 0, 1, 10000);
+			commonExcelParser.setFileVo(fileVo);
+			
+			/**
+			 * 엑셀 유효성 체크
+			 */
+			if(commonExcelParser.isFileVoValidExcelFile()){
+				heTcExcelUploadList = commonExcelParser.validResultList(HeTcExcelUpload.class, commonExcelParser.getFileVoDataList());
+				fileVo.setHeTcExcelUploadList(heTcExcelUploadList);
+				for (HeTcExcelUpload heTcExcelUpload : heTcExcelUploadList) {
+					if (StringUtils.isNotEmpty(heTcExcelUpload.getResultMsg())) {
+						fileVo.setMessage(heTcExcelUpload.getResultMsg());
+						break;
+					}
+				}
+			}
+		}
+		return fileVo;
+	}
+}

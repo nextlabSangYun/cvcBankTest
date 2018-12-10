@@ -1,0 +1,815 @@
+<!doctype html>
+<html lang="ko">
+	<head>
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+		<title>작업내역</title>
+
+		<style type="text/css">
+		body{font:11px/1.5 'Malgun Gothic', Verdana, Dotum, sans-serif;margin:0;padding:10px 10px 30px 10px;letter-spacing:0}
+		h1 span{color:#E40509;}
+		h2{font-size:11px}
+		table{border-collapse:collapse;border-spacing:0}
+		caption{visibility:hidden;width:0;height:0;font-size:0}
+		table th{background:#eee;border:1px solid #d1d1d1;padding:3px 0}
+		table td{border:1px solid #d1d1d1;padding-left:10px;padding:3px 0 3px 10px}
+		table th.right, table td.right{text-align:right;padding-right:10px;padding-left:0}
+		table td.center{text-align:center;padding-left:0}
+		table td a{color:#193d79;}
+		.index{background:#fff6dd}
+		.edit{font-weight:bold;}
+		.undone{color:#b90b0b;background-color:#feeeee !important;font-weight:bold}
+		.done{color:#5f8b33;background-color:#eaf5e1 !important;font-weight:bold}
+		.pass{color:#5f8b33;background-color:#eaf5e1 !important;font-weight:bold}
+		.red{color:#e40000;}
+		.red a{color:#e40000;}
+		.gre{color:#006F37}
+		.gre a{color:#006F37;}
+			/* table info */
+			.tbl-info{width:600px; margin-bottom:20px;	border-top:1px solid #ccc;	border-left:1px solid #ccc;}
+			.tbl-info th{background:#e9e9e9; border-bottom:1px solid #ccc;padding:3px 0}
+			.tbl-info td{border-bottom:1px solid #ccc;padding-left:10px;padding:3px 0 3px 10px}
+			.tbl-info tr:hover td{background:none;}
+
+
+			/* tab nav */
+			.tab_nav{margin:10px 0; border-bottom:1px solid #ddd;position:relative; text-align:left;}
+			.tab_nav ul{display:inline-block; margin:0 0 0 3px  !important; padding:0 !important;}
+			.tab_nav ul li{display: inline-block;margin-left:-3px;}
+			.ie7 .tab_nav ul, .lte7 .tab_nav ul li{display:inline;zoom:1;}
+			.tab_nav ul li a{display: inline-block;margin-bottom: -1px; padding: 8px 12px; border: 1px solid #ddd;border-radius: 3px 3px 0 0; border-bottom: 0; font-size: 14px; color: #666; text-decoration: none;}
+			.tab_nav ul li.current a{border:1px solid #bbb; border-bottom:1px solid #ddd; border-radius: 3px 3px 0 0; color: #fff; font-weight: bold; background: #bbb;}
+			.tab_nav .tab_nav_last{position:absolute;top:0;right:0;}
+			.tab_nav .count{position: relative; top: -1px; margin: 0 0 0 5px; padding: 1px 5px 2px 5px; font-size: 10px; font-weight: bold; color: #666; background: #E5E5E5; border-radius: 10px; font:11px verdana, sans-serif; line-height:1.25;}
+
+			.ie6 .tab_nav ul{}
+			.ie6 .tab_nav ul li{float:left;}
+			.ie6 .tab_nav .tab_nav_last ul{float:right;}
+
+			.tab_contents_wrap{width:100%; margin-top:10px;background:#fff;border-top:none;}
+			.hide{display:none;}
+			.source_download{margin:10px 0;list-style-type:disc;margin-left:10px;padding-left:10px;}
+
+		</style>
+	</head>
+	<body>
+		<h1>WORKLIST</h1>
+		
+		<div id="tab_1_contents" class="tab_contents_wrap">
+			<table id="work" style="width:100%" summary="퍼블리싱 리스트 및 작업 완료 현황">
+				<caption>작업 리스트</caption>
+				<colgroup>
+					<col width="8%" />
+					<col width="10%" />
+					<col width="10%" />
+					<col width="10%" />
+					<col width="10%" />
+					<col width="6%" />
+					<col width="*" />
+					<col width="8%" />
+					<col width="15%" />
+				</colgroup>
+				<thead>
+					<tr>
+						<th scope="col" >App</th>
+						<th scope="col" >화면명</th>
+						<th scope="col" >1Depth</th>
+						<th scope="col" >2Depth</th>
+						<th scope="col" >3Depth</th>
+						<th scope="col" >Pop-up</th>
+						<th scope="col">경로</th>
+						<th scope="col">진행상태</th>
+						<th scope="col">비고</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td class="center" rowspan="2">참고</td>
+						<td>레이아웃</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td class="red"><a href="bot/layout.html" target="_blank">bot/layout.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center">레이아웃 별도 관리/로딩 영역 추가/파비콘 등록</td>
+					</tr>
+					<tr>
+						<td>스타일</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td class="red"><a href="bot/style.html" target="_blank">bot/style.html</a></td>
+						<td class="center"></td>
+						<td class="center">기본 스타일</td>
+					</tr>
+					<tr>
+						<td class="center" rowspan="38">Management Bot</td>
+						<td rowspan="3">로그인</td>
+						<td>로그인</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td class="red"><a href="bot/login.html" target="_blank">bot/login.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>임시 비밀번호 받기</td>
+						<td></td>
+						<td></td>
+						<td>pop-up</td>
+						<td class="red"><a href="bot/temporary_password.html" target="_blank">bot/temporary_password.html</a></td>
+						<td class="center"></td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>임시 비밀번호 메일</td>
+						<td></td>
+						<td></td>
+						<td>메일양식</td>
+						<td class="red"><a href="bot/email_pwd.html" target="_blank">bot/email_pwd.html</a></td>
+						<td class="center"></td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td rowspan="6">에러메시지</td>
+						<td>에러메시지 400</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td class="red"><a href="bot/error.html" target="_blank">bot/error.html</a></td>
+						<td class="center"></td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>에러메시지 500</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td class="red"><a href="bot/error_500.html" target="_blank">bot/error_500.html</a></td>
+						<td class="center"></td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>에러메시지 400</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td class="red"><a href="bot/error_400.html" target="_blank">bot/error_400.html</a></td>
+						<td class="center"></td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>에러메시지 401</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td class="red"><a href="bot/error_401.html" target="_blank">bot/error_401.html</a></td>
+						<td class="center"></td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>에러메시지 403</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td class="red"><a href="bot/error_403.html" target="_blank">bot/error_403.html</a></td>
+						<td class="center"></td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>에러메시지 405</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td class="red"><a href="bot/error_405.html" target="_blank">bot/error_405.html</a></td>
+						<td class="center"></td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>메인</td>
+						<td rowspan="7">메인</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td class="red"><a href="bot/index.html" target="_blank">bot/index.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>개인정보수정</td>
+						<td></td>
+						<td></td>
+						<td>pop-up</td>
+						<td class="red"><a href="bot/pop_my_info.html" target="_blank">bot/pop_my_info.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>배경화면 설정</td>
+						<td></td>
+						<td></td>
+						<td>pop-up</td>
+						<td class="red"><a href="bot/pop_bg_chg.html" target="_blank">bot/pop_bg_chg.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>위젯 추가하기</td>
+						<td></td>
+						<td></td>
+						<td>pop-up</td>
+						<td class="red"><a href="bot/add_widget.html" target="_blank">bot/add_widget.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>공지사항 리스트</td>
+						<td></td>
+						<td></td>
+						<td>pop-up</td>
+						<td class="red"><a href="bot/pop_notice_list.html" target="_blank">bot/pop_notice_list.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>받은 메세지 리스트</td>
+						<td></td>
+						<td></td>
+						<td>pop-up</td>
+						<td class="red"><a href="bot/pop_msg_list.html" target="_blank">bot/pop_msg_list.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>공지사항 및 메세지 상세</td>
+						<td></td>
+						<td></td>
+						<td>pop-up</td>
+						<td class="red"><a href="bot/pop_notice.html" target="_blank">bot/pop_notice.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>시스템 설정 Main</td>
+						<td rowspan="22">시스템 설정</td>
+						<td> Main</td>
+						<td></td>
+						<td></td>
+						<td class="red"><a href="bot/system_setting_main.html" target="_blank">bot/system_setting_main.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>사용자 관리</td>
+						<td rowspan="3">사용자 관리</td>
+						<td></td>
+						<td></td>
+						<td class="red"><a href="bot/user_manage.html" target="_blank">bot/user_manage.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>사용자 등록</td>
+						<td>사용자등록</td>
+						<td>pop-up</td>
+						<td class="red"><a href="bot/user_registration.html" target="_blank">bot/user_registration.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>사용자 정보수정</td>
+						<td>사용자정보수정</td>
+						<td>pop-up</td>
+						<td class="red"><a href="bot/user_info_edit.html" target="_blank">bot/user_info_edit.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>사용자 그룹관리</td>
+						<td rowspan="3">사용자 그룹관리</td>
+						<td></td>
+						<td></td>
+						<td class="red"><a href="bot/group_manage.html" target="_blank">bot/group_manage.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>사용자 그룹등록</td>
+						<td>사용자 그룹등록</td>
+						<td>pop-up</td>
+						<td class="red"><a href="bot/group_registration.html" target="_blank">bot/group_registration.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>사용자 그룹 정보수정</td>
+						<td>사용자 그룹 정보수정</td>
+						<td>pop-up</td>
+						<td class="red"><a href="bot/group_info_edit.html" target="_blank">bot/group_info_edit.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>Bot 관리</td>
+						<td rowspan="4">Bot 관리</td>
+						<td></td>
+						<td></td>
+						<td class="red"><a href="bot/bot_manage.html" target="_blank">bot/bot_manage.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>bot 그룹등록</td>
+						<td>bot 그룹등록</td>
+						<td>pop-up</td>
+						<td class="red"><a href="bot/bot_registration.html" target="_blank">bot/bot_registration.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>bot 정보수정</td>
+						<td>bot 정보수정</td>
+						<td>pop-up</td>
+						<td class="red"><a href="bot/bot_info_edit.html" target="_blank">bot/bot_info_edit.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>bot 상태이력 조회</td>
+						<td>bot 상태이력 조회</td>
+						<td>pop-up</td>
+						<td class="red"><a href="bot/bot_history.html" target="_blank">bot/bot_history.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>공지사항 관리</td>
+						<td rowspan="3">공지사항 관리</td>
+						<td></td>
+						<td></td>
+						<td class="red"><a href="bot/notice_manage.html" target="_blank">bot/notice_manage.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>공지사항 등록</td>
+						<td>공지사항 등록</td>
+						<td>pop-up</td>
+						<td class="red"><a href="bot/notice_registration.html" target="_blank">bot/notice_registration.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>공지사항 수정</td>
+						<td>공지사항 수정</td>
+						<td>pop-up</td>
+						<td class="red"><a href="bot/notice_edit.html" target="_blank">bot/notice_edit.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>측정모델 분류관리</td>
+						<td rowspan="3">측정모델 분류관리</td>
+						<td></td>
+						<td></td>
+						<td class="red"><a href="bot/model_manage.html" target="_blank">bot/model_manage.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>측정모델분류 등록</td>
+						<td>측정모델분류 등록</td>
+						<td>pop-up</td>
+						<td class="red"><a href="bot/model_registration.html" target="_blank">bot/model_registration.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>측정모델분류 수정</td>
+						<td>측정모델분류 수정</td>
+						<td>pop-up</td>
+						<td class="red"><a href="bot/model_info_edit.html" target="_blank">bot/model_info_edit.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>측정모델 관리</td>
+						<td rowspan="3">측정모델 관리</td>
+						<td></td>
+						<td></td>
+						<td class="red"><a href="bot/model_manage02.html" target="_blank">bot/model_manage02.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>측정모델 등록</td>
+						<td>측정모델 등록</td>
+						<td>pop-up</td>
+						<td class="red"><a href="bot/model_registration02.html" target="_blank">bot/model_registration02.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>측정모델 수정</td>
+						<td>측정모델 수정</td>
+						<td>pop-up</td>
+						<td class="red"><a href="bot/model_info_edit02.html" target="_blank">bot/model_info_edit02.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>App별 권한관리</td>
+						<td rowspan="2">App별 권한관리</td>
+						<td></td>
+						<td></td>
+						<td class="red"><a href="bot/app_manage.html" target="_blank">bot/app_manage.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>App별 권한관리 등록</td>
+						<td>등록</td>
+						<td>pop-uo</td>
+						<td class="red"><a href="bot/app_authority.html" target="_blank">bot/app_authority.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td class="center" rowspan="40">BMT</td>
+						<td rowspan="3">메인</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td class="red"><a href="bmt/all_project_list.html" target="_blank">bmt/all_project_list.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td rowspan="2">새 프로젝트 등록</td>
+						<td></td>
+						<td></td>
+						<td>pop-up</td>
+						<td class="red"><a href="bmt/pop_new_project.html" target="_blank">bmt/pop_new_project.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td></td>
+						<td></td>
+						<td>메일양식</td>
+						<td class="red"><a href="bmt/email_new_project.html" target="_blank">bmt/email_new_project.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>전체 프로젝트 검색</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td class="red"><a href="bmt/all_prj_search.html" target="_blank">bmt/all_prj_search.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>전체 측정이력 조회</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td class="red"><a href="bmt/all_list_detail.html" target="_blank">bmt/all_list_detail.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td rowspan="35">프로젝트별 Main</td>
+						<td rowspan="3">Home</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td class="red"><a href="bmt/project_main.html" target="_blank">bmt/project_main.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>측정모델 버전변경 이력조회</td>
+						<td></td>
+						<td>pop-up</td>
+						<td class="red"><a href="bmt/pop_model_history.html" target="_blank">bmt/pop_model_history.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>연결구성 변경이력 조회</td>
+						<td></td>
+						<td>pop-up</td>
+						<td class="red"><a href="bmt/pop_network_history.html" target="_blank">bmt/pop_network_history.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td rowspan="7">성능평가</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td class="red"><a href="bmt/performance_manage.html" target="_blank">bmt/performance_manage.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>결과조회</td>
+						<td></td>
+						<td></td>
+						<td class="red"><a href="bmt/performance_manage2.html" target="_blank">bmt/performance_manage2.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>결과없음</td>
+						<td></td>
+						<td></td>
+						<td class="red"><a href="bmt/performance_data_none.html" target="_blank">bmt/performance_data_none.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td rowspan="2">성능평가 상세보기</td>
+						<td>채널변경</td>
+						<td>pop-up</td>
+						<td class="red"><a href="bmt/pop_performance_ev.html" target="_blank">bmt/pop_performance_ev.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>UI 반응시간</td>
+						<td>pop-up</td>
+						<td class="red"><a href="bmt/pop_performance_ev02.html" target="_blank">bmt/pop_performance_ev02.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>성능평가 결과 전달</td>
+						<td></td>
+						<td>pop-up</td>
+						<td class="red"><a href="bmt/pop_performance_result.html" target="_blank">bmt/pop_performance_result.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>성능평가 이메일 전달</td>
+						<td></td>
+						<td>이메일</td>
+						<td class="red"><a href="bmt/email_performance_result.html" target="_blank">bmt/email_performance_result.html</a></td>
+						<td class="center"></td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td rowspan="10">테스트 관리</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td class="red"><a href="bmt/test_manage.html" target="_blank">bmt/test_manage.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center">메모 아이콘 필요</td>
+					</tr>
+					<tr>
+						<td>비고 등록</td>
+						<td></td>
+						<td>pop-up</td>
+						<td class="red"><a href="bmt/pop_etc_reg.html" target="_blank">bmt/pop_etc_reg.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>측정결과등록</td>
+						<td></td>
+						<td>pop-up</td>
+						<td class="red"><a href="bmt/pop_result_reg.html" target="_blank">bmt/pop_result_reg.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>결과 상세보기</td>
+						<td></td>
+						<td>pop-up</td>
+						<td class="red"><a href="bmt/pop_test_result.html" target="_blank">bmt/pop_test_result.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>Text Case 수동등록</td>
+						<td></td>
+						<td>pop-up</td>
+						<td class="red"><a href="bmt/pop_tc_registration.html" target="_blank">bmt/pop_tc_registration.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>이슈 등록</td>
+						<td></td>
+						<td>pop-up</td>
+						<td class="red"><a href="bmt/pop_issue_registration.html" target="_blank">bmt/pop_issue_registration.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>이슈 수동 등록</td>
+						<td></td>
+						<td>pop-up</td>
+						<td class="red"><a href="bmt/pop_issue_registration02.html" target="_blank">bmt/pop_issue_registration02.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>대상 Test Case 추가</td>
+						<td>1</td>
+						<td>window pop-up</td>
+						<td class="red"><a href="bmt/pop_tc_add.html" target="_blank">bmt/pop_tc_add.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>대상 Test Case 추가</td>
+						<td>2</td>
+						<td>window pop-up</td>
+						<td class="red"><a href="bmt/pop_tc_add2.html" target="_blank">bmt/pop_tc_add2.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>대상 Test Case 검색</td>
+						<td></td>
+						<td>window pop-up</td>
+						<td class="red"><a href="bmt/pop_tc_search.html" target="_blank">bmt/pop_tc_search.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td rowspan="2">이슈 관리</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td class="red"><a href="bmt/issue_manage.html" target="_blank">bmt/issue_manage.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>이슈 이력 보기</td>
+						<td></td>
+						<td></td>
+						<td class="red"><a href="bmt/pop_issue_history.html" target="_blank">bmt/pop_issue_history.html</a></td>
+						<td class="center"></td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td rowspan="2">측정이력 조회</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td class="red"><a href="bmt/history_search.html" target="_blank">bmt/history_search.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>첨부파일 리스트</td>
+						<td></td>
+						<td></td>
+						<td class="red"><a href="bmt/pop_attach_list.html" target="_blank">bmt/pop_attach_list.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td rowspan="3">게시판</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td class="red"><a href="bmt/board_manage.html" target="_blank">bmt/board_manage.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>새글쓰기</td>
+						<td></td>
+						<td>pop-up</td>
+						<td class="red"><a href="bmt/pop_board_write.html" target="_blank">bmt/pop_board_write.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>게시글 조회</td>
+						<td></td>
+						<td>pop-up</td>
+						<td class="red"><a href="bmt/pop_board_view.html" target="_blank">bmt/pop_board_view.html</a></td>
+						<td class="center">진행중</td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td rowspan="8">프로젝트 관리</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td class="red"><a href="bmt/project_manage.html" target="_blank">bmt/project_manage.html</a></td>
+						<td class="center"></td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>완료된 프로젝트</td>
+						<td></td>
+						<td></td>
+						<td class="red"><a href="bmt/project_manage_complete.html" target="_blank">bmt/project_manage_complete.html</a></td>
+						<td class="center"></td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>프로젝트 정보수정</td>
+						<td></td>
+						<td>pop-up</td>
+						<td class="red"><a href="bmt/pop_prj_edit.html" target="_blank">bmt/pop_prj_edit.html</a></td>
+						<td class="center"></td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>측정환경 설정</td>
+						<td></td>
+						<td></td>
+						<td class="red"><a href="bmt/cond_setting_manage.html" target="_blank">bmt/cond_setting_manage.html</a></td>
+						<td class="center"></td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td rowspan="2">측정이력 관리</td>
+						<td></td>
+						<td></td>
+						<td class="red"><a href="bmt/history_manage.html" target="_blank">bmt/history_manage.html</a></td>
+						<td class="center"></td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>수정</td>
+						<td>pop-up</td>
+						<td class="red"><a href="bmt/pop_result_edit.html" target="_blank">bmt/pop_result_edit.html</a></td>
+						<td class="center"></td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td rowspan="2">분류 관리</td>
+						<td></td>
+						<td>pop-up</td>
+						<td class="red"><a href="bmt/pop_cate_manage.html" target="_blank">bmt/pop_cate_manage.html</a></td>
+						<td class="center"></td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>하위메뉴</td>
+						<td>pop-up</td>
+						<td class="red"><a href="bmt/pop_cate_manage02.html" target="_blank">bmt/pop_cate_manage02.html</a></td>
+						<td class="center"></td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td class="center" rowspan="4">Stats</td>
+						<td rowspan="4">메인</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td class="red"><a href="stats/home.html" target="_blank">stats/home.html</a></td>
+						<td class="center"></td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>리포트 추가</td>
+						<td></td>
+						<td></td>
+						<td>pop-up</td>
+						<td class="red"><a href="stats/pop_report_add.html" target="_blank">stats/pop_report_add.html</a></td>
+						<td class="center"></td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>리포트 수정</td>
+						<td></td>
+						<td></td>
+						<td>pop-up</td>
+						<td class="red"><a href="stats/pop_report_edit.html" target="_blank">stats/pop_report_edit.html</a></td>
+						<td class="center"></td>
+						<td class="center"></td>
+					</tr>
+					<tr>
+						<td>리포트 레이아웃</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td class="red"><a href="stats/report_layout.html" target="_blank">stats/report_layout.html</a></td>
+						<td class="center"></td>
+						<td class="center"></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</body>
+</html>

@@ -1,0 +1,538 @@
+<%@ page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://www.nextlab.co.kr/tags/nextlab" prefix="nl"%>
+<div class="pop_wrap" style="width: 1080px;">
+	<div class="pop_tit">
+		<p>이슈 이력 보기</p>
+	</div>
+	<div class="pop_cont">
+		<div class="g_table02">
+			<table>
+				<colgroup>
+					<col style="width: 120px;">
+					<col>
+				</colgroup>
+				<tbody>
+					<tr>
+						<th>이슈 제목</th>
+						<td v-if="(issueView.progressStat == 'B201' || issueView.progressStat == 'B202' || issueView.progressStat == 'B204' || issueView.progressStat == 'B205' || issueView.progressStat == 'B206') && projectView.projectStat !='C304'"><input
+							type="text" class="full" id="issueSubject"
+							v-model="issueView.issueSubject" maxlength="100"></td>
+						<td v-else>{{issueView.issueSubject}}</td>
+
+					</tr>
+					<tr>
+						<th>중요도</th>
+						<td v-if="(issueView.progressStat == 'B201' || issueView.progressStat == 'B202' || issueView.progressStat == 'B204' || issueView.progressStat == 'B205' || issueView.progressStat == 'B206') && projectView.projectStat!='C304'"><nl:select
+								codeType="B100" v-model="issueView.importance"></nl:select></td>
+						<td v-else><span
+							:class="[issueView.importance=='B101' ? 'state05' : issueView.importance=='B103' ? 'state01' : issueView.importance=='B102' ? 'state07' : 'state04']">{{
+								issueView.importance | code(importanceCode) }}</span></td>
+					</tr>
+					<tr>
+						<th>대분류</th>
+						<td v-if="(issueView.progressStat == 'B201' || issueView.progressStat == 'B202' || issueView.progressStat == 'B204' || issueView.progressStat == 'B205' || issueView.progressStat == 'B206') && projectView.projectStat!='C304'">
+							<nl:select v-model = "issueView.issueLcateCd">
+								<nl:option value="">- 선택 -</nl:option>
+								<nl:options codeType="D500"/>
+							</nl:select>
+						</td>
+						<td v-else><span>{{issueView.issueLcateCd | code(lCateNm)}}</span></td>
+					</tr>
+					<tr>
+						<th>측정모델</th>
+						<td v-if="(issueView.progressStat == 'B201' || issueView.progressStat == 'B202' || issueView.progressStat == 'B204' || issueView.progressStat == 'B205' || issueView.progressStat == 'B206') && projectView.projectStat!='C304'">
+							<project-model-select ref="modelSelect" :change-fn="addModelList" :pid="pid"></project-model-select>
+							<div class="msm_list" v-if="modelList.length > 0" >
+								<ul>
+									<li v-for="(list, index) in modelList" >
+										<span>{{list.modelNm}}({{list.modelVer}})</span>
+										<button class="del" @click="delModelList(index)"></button>
+									</li>
+								</ul>
+							</div>
+						</td>
+						<td v-else>
+							<div class="reg_list" v-if="modelList.length > 0" >
+								<ul>
+									<li v-for="(list, index) in modelList" class="gr">
+										<span>{{list.modelNm}}({{list.modelVer}})</span>
+									</li>
+								</ul>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<th>이슈내용</th>
+						<td class="issue_cont_txt" v-if="(issueView.progressStat == 'B201' || issueView.progressStat == 'B202' || issueView.progressStat == 'B204' || issueView.progressStat == 'B205' || issueView.progressStat == 'B206') && projectView.projectStat!='C304'">
+							<textarea class="full" v-model="issueView.issueCont"></textarea>
+						</td>
+						<td class="issue_cont_txt" v-else>
+							<div class="txt" v-html="issueView.issueCont"></div>
+						</td>
+					</tr>
+					<tr>
+						<th>파일 첨부</th>
+						<td class="file" v-if="(issueView.progressStat == 'B201' || issueView.progressStat == 'B202' || issueView.progressStat == 'B204' || issueView.progressStat == 'B205' || issueView.progressStat == 'B206') && projectView.projectStat!='C304'">
+							<p class="note">최대 10MB까지 첨부 가능합니다</p> <input type="file"
+							class="ir" id="file" name="file" @change="regFile"><label
+							for="file" class="sch_file">파일찾기</label>
+							<ul class="file_list">
+								<li class="full" v-for="(fl, index) in issueView.fileList"><a
+									@click="getFileDown(fl)">{{fl.orgFileNm}}</a>
+								<button class="del" @click="delFile(index)"></button></li>
+							</ul>
+						</td>
+						<td class="file" v-else>
+							<ul class="file_list">
+								<li class="full" v-for="(fl, index) in issueView.fileList"><a
+									@click="getFileDown(fl)">{{fl.orgFileNm}}</a></li>
+							</ul>
+						</td>
+					</tr>
+					<tr>
+						<th>이슈할당 대상</th>
+						<td v-if="(issueView.progressStat == 'B201' || issueView.progressStat == 'B202' || issueView.progressStat == 'B204' || issueView.progressStat == 'B205' || issueView.progressStat == 'B206') && projectView.projectStat!='C304'" class="sel_target02">
+							<div class="sel_sort">
+								<user-select ref="userSelect" :add-fn="addPartiList"></user-select>
+							</div>
+							<div class="reg_list" v-show="issueView.partiList.length>0">
+								<ul>
+									<li v-for="(p, index) in issueView.partiList"><span>{{p.userNm}}({{p.userGroupNm}})</span>
+									<button class="del" @click="delPartiList(index)"></button></li>
+								</ul>
+							</div>
+						</td>
+						<td	v-else>
+							<div class="reg_list" v-show="issueView.partiList.length>0">
+								<ul>
+									<li v-for="(p, index) in issueView.partiList" class="gr"><span>{{p.userNm}}({{p.userGroupNm}})</span></li>
+								</ul>
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<p class="cate_tit">선택된 Test Case</p>
+		<div class="g_table">
+			<table>
+				<colgroup>
+					<col style="width: 10%;">
+					<col style="width: 10%;">
+					<col style="width: 10%;">
+					<col style="width: 12%;">
+					<col style="width: 10%;">
+					<col>
+				</colgroup>
+				<thead>
+					<tr>
+						<th>구분</th>
+						<th>대분류</th>
+						<th>중분류</th>
+						<th>소분류</th>
+						<th>중요도</th>
+						<th>Test Case</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr v-for="list in issueView.tcList">
+						<td>{{ list.tcDivision | code(tcDivisionCodeNm) }}</td>
+						<td>{{ list.bigCateId | tcCategory(tcCategoryList) }}</td>
+						<td>{{ list.middleCateId | tcCategory(tcCategoryList) }}</td>
+						<td>{{ list.smallCateId | tcCategory(tcCategoryList) }}</td>
+						<td>{{ list.importance | code(importanceCode) }}</td>
+						<td class="l_align">{{ list.tc }}</td>
+					</tr>
+					<tr v-if="issueView.tcList.length == 0">
+						<td colspan="6">선택된 Test Case가 없습니다.</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<p class="cate_tit">코멘트</p>
+		<div class="search_area with_select" v-if="projectView.projectStat!='C304'" >
+			<select v-if="buttonFlag==false" v-model="issueView.chkProgressStat">
+				<option value="">- 선택 -</option>
+				<option v-for="list in getProgressStatMenuList" :value="list.codeId">{{list.codeId | code(testProgressStatNm)}}</option>
+			</select> 
+			<span v-else >{{issueView.progressStat | code(testProgressStatNm)}}</span>
+			<textarea class="issue_comment" v-model.trim="comment"></textarea>
+			<button v-if="buttonFlag==false" class="g_btn01" @click="regComment(issueView.chkProgressStat)">등록</button>
+			<button v-else class="g_btn01" @click="modComment">수정</button>
+		</div>
+		<div class="g_table">
+			<table>
+				<colgroup>
+					<col style="width: 15%;">
+					<col>
+					<col style="width: 20%;">
+					<col style="width: 10%;">
+				</colgroup>
+				<thead>
+					<tr>
+						<th>등록일시</th>
+						<th>코멘트</th>
+						<th>작성자</th>
+						<th>관리</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr v-for="list in pagingCommentList">
+						<td>{{ list.regDtm | dateTimeFormat }}</td>
+						<td class="l_align"><span v-html="list.comment"></span></td>
+						<td>{{ list.regNm }}({{ list.regGroupNm }})</td>
+						<td class="tb_fixed_btns">
+							<button class="tb_btn04" v-if="list.regId == userId" @click="commentEdit(list.comment, list.seq)">수정</button>
+						</td>
+					</tr>
+					<tr v-if="pagingCommentList.length==0">
+						<td colspan="4">등록된 코멘트가 없습니다.</td>
+					</tr>
+				</tbody>
+			</table>
+			<paginator ref="paginatorComment" :go-fn="getPagingCommentList"
+				init-rows="5"></paginator>
+		</div>
+	</div>
+	<div class="btn_wrap">
+		<button class="g_btn01" @click="modIssue"
+			v-if="issueView.progressStat != 'B203' && projectView.projectStat=='C301'">저장</button>
+		<button class="g_btn02" onclick="parent.list.goCurrentPageList(); hidePopupLayer(); return false">닫기</button>
+	</div>
+</div>
+<script>
+	var frm = new Vue({
+		el: '.pop_wrap'
+		, data: {
+			importanceCode: '<nl:codeListJson codeType="B100" />'
+			, tcDivisionCodeNm: '<nl:codeListJson codeType="B900" />'
+			, tcCategoryList: getListFromJsonStr('<nl:tcCateListJson pid="${param.pid}" />')
+			, issueView: {
+				partiList: []
+				, tcList: []
+				,chkProgressStat:''
+			}
+			, comment: ''
+			, seq: ''
+			, procChk: false
+			, issueId: '<c:out value="${param.issueId}"/>'
+			, pid: '<c:out value="${issueView.pid}"/>'
+			, fileSaveList: []
+			, partiSaveList: []
+			, pagingCommentList: []
+			, tcCateNm: ''
+			, cateList: []
+			, modelList: []
+			, projectView: {}
+			, userId: '<c:out value="${userSession.userId}"/>'
+			, buttonFlag: false
+			, setPopupChk: false
+			, lCateNm: '<nl:codeListJson codeType="D500" />'
+			, testProgressStatNm: '<nl:codeListJson codeType="B200" />'
+			, testProgressStatNmList: []
+			, testProgressStatFilter:['B202', 'B204', 'B205', 'B206']
+		}
+		, updated: function() {
+			if(this.setPopupChk == false){
+				setIssuePopup(2);
+				this.setPopupChk = true;
+			}else {
+				setPopup(2);
+			}
+			
+		}
+		, beforeMount: function () {
+			this.testProgressStatNmList = JSON.parse(decodeURIComponent(this.testProgressStatNm));
+			this.getIssueView();	
+		}
+		, mounted: function() {
+			setIssuePopup(2);
+		}
+		, computed: {
+			getProgressStatMenuList: function() {
+				var testProgressStatFilter = this.testProgressStatFilter;
+				return this.testProgressStatNmList.filter(function(testProgressStatMenu) {
+					return testProgressStatFilter.some(function(m) {
+						return testProgressStatMenu.codeId === m;
+					});
+				}).sort(function(a,b) {
+					return a.menuOrder - b.menuOrder;
+				});
+			}
+		}
+		, methods: {
+			getIssueView: function() {
+				$.post('/bmt/issue/getIssueView?issueId='+this.issueId, function(data){
+					frm.issueView = data.issueView;
+					if(isEmpty(frm.issueView.issueLcateCd)){
+						frm.issueView.issueLcateCd = "";
+					}
+					if(frm.issueView.progressStat == 'B201' || frm.issueView.progressStat == 'B203'){
+						frm.issueView.chkProgressStat = "";
+					}else{
+						frm.issueView.chkProgressStat = frm.issueView.progressStat;
+					}
+					frm.projectView = data.projectView;
+					frm.partiSaveList = data.issueView.partiList.slice();
+					frm.modelList = data.issueView.modelList;
+					frm.getPagingCommentList();
+					frm.goPageComment(1);
+					// 줄바꿈
+					if (frm.issueView.progressStat == 'B203' && frm.projectView.projectStat != 'C304') {
+						frm.issueView.issueCont = data.issueView.issueCont.replace(/(?:\n)/g, '<br>');
+						frm.issueView.issueCont.split('\n').join('<br>');
+					} else if(frm.projectView.projectStat == 'C304'){
+						frm.issueView.issueCont = data.issueView.issueCont.replace(/(?:\n)/g, '<br>');
+						frm.issueView.issueCont.split('\n').join('<br>');
+					}
+			
+				});
+			}
+			, addModelList: function(data){
+				var chk = true;
+				var modelList = this.modelList;
+				for (var i=0; i < modelList.length; i++){
+					if (modelList[i].modelId === data.modelId && modelList[i].modelVer === data.modelVer){
+						chk = false;
+						break;
+					}
+				}
+				if (chk) {
+					this.modelList.push(data);
+				} else {
+					alert("이미 추가된 측정모델입니다.");
+				}
+			}
+			, delModelList: function(index){
+				this.modelList.splice(index,1);
+			}
+			, commentEdit: function(comment, commentSeq){
+				if(this.buttonFlag == false){
+					this.buttonFlag = true;
+					frm.comment = comment.replace(/(<br>|<br\/>|<br \/>)/g, '\r\n');
+					frm.seq = commentSeq;
+				}else{
+					this.buttonFlag = false;
+					frm.comment = '';
+					frm.seq = '';
+				}
+			}
+			, addPartiList: function(data) {
+				var chk = this.issueView.partiList.some(function(p) {
+					return p.partiId == data.userId;
+				});
+				
+				if (!chk) {
+					data.partiId = data.userId;
+					this.issueView.partiList.push(data);
+				}
+				else {
+					alert("이미 추가된 참여인력입니다.");
+				}
+			}
+			, delPartiList: function(index) {
+				this.issueView.partiList.splice(index, 1);
+			}
+			, regFile: function() {
+				fileUpload($("#file"), {saveFilePath: "bmt/issue"}, function(data) {
+					var file = {
+						fileNm: data.saveFileNm
+						, orgFileNm: data.realFileNm
+						, filePath: data.saveFilePath
+					}
+					frm.issueView.fileList.push(file);
+				});
+			}
+			, delFile: function(index) {
+				this.issueView.fileList.splice(index, 1);
+			}
+			, modIssue: function(){
+				if (this.issueView.progressStat == 'B203') return;
+				var param = {
+					issueId: this.issueView.issueId
+					, issueSubject: this.issueView.issueSubject
+					, importance: this.issueView.importance
+					, issueCont: this.issueView.issueCont
+					, partiList: this.issueView.partiList
+					, fileList: this.issueView.fileList
+					, modelList: this.modelList
+					, issueLcateCd : this.issueView.issueLcateCd
+				}
+				//이슈 할당 맴버 체크
+				param.addPartiArray = [];
+				param.partiList.forEach(function(p) {
+					var chk = frm.partiSaveList.some(function(ps) {
+						return p.partiId == ps.partiId;
+					});
+					if (!chk) param.addPartiArray.push(p.partiId);
+				});
+				
+				//file 체크	
+				param.addFileArray = [];
+				param.fileList.forEach(function(fl) {
+					var fChk = frm.fileSaveList.some(function(fs) {
+						return fl.seq == fs.seq;
+					});
+					if (!fChk) param.addFileArray.push(fl.seq);
+				});
+				
+				if (param.partiList.length == 0) {
+					alert("이슈할당 대상을 추가하세요.");
+					return;
+				}
+				
+				if(param.issueLcateCd == ""){
+					alert("대분류를 선택하세요.");
+					return;
+				}
+
+				if (this.procChk) return;
+				this.procChk = true;
+				
+				$.ajax({
+					type: "post"
+					, url : "/bmt/issue/modIssuePrc"
+					, contentType: "application/json"
+					, data : JSON.stringify(param)
+					, beforeSend: function() { 
+						frm.procChk = true;
+						parent.startLoading();
+					}
+					, success: function(data) {
+						if (data.save) {
+							alert("이슈가 수정 되었습니다.");
+							frm.fileSaveList = param.fileList.slice();
+							frm.partiSaveList = param.partiList.slice();
+							parent.list.goCurrentPageList();
+							hidePopupLayer();
+						} else if (data.message) {
+							alert(data.message);
+						}
+					}
+					, error: function(xhr, status, error) {
+						alert($(xhr.responseText).text());
+					}
+					, complete : function() {
+						frm.procChk = false;
+						parent.endLoading();
+					}
+				});
+			}
+			, modComment: function(){
+				var param = {
+					issueId: this.issueView.issueId
+					, comment: this.comment
+					, seq: this.seq
+				}
+				if (param.issueId == "") {
+					alert("이슈 정보를 찾을 수 없습니다.");
+					return;
+				}
+				
+				if (param.comment == "") {
+					alert("코멘트를 입력하세요.");
+					$("#comment").focus();
+					return;
+				}
+				
+				if (this.procChk) return;
+				this.procChk = true;
+				
+				$.post('/bmt/issue/modIssueCommentPrc', param, function(data){
+					if (data.save) {
+						frm.issueView.commentList = data.commentList;
+						frm.getPagingCommentList();
+					} else if (data.message) {
+						alert(data.message);
+					}
+					frm.procChk = false;
+					frm.comment = "";
+					frm.seq = "";
+					frm.buttonFlag = false;
+				});
+				
+			}
+			, regComment: function(issueStat) {
+				var param = {
+					issueId: this.issueView.issueId
+					, comment: this.comment
+					, issueStat: issueStat
+				}
+				var issueId = this.issueView.issueId;
+				if (param.issueId == "") {
+					alert("이슈 정보를 찾을 수 없습니다.");
+					return;
+				}
+				
+				if (param.comment == "") {
+					alert("코멘트를 입력하세요.");
+					$("#comment").focus();
+					return;
+				}
+				
+				if(param.issueStat == ""){
+					alert("진행상황을 선택하세요.")
+					return;
+				}
+				
+				var statNm = this.testProgressStatNmList.filter(function(testProgressStatMenu) {
+					return testProgressStatMenu.codeId === issueStat;
+				})
+				
+				if (this.procChk) return;
+				this.procChk = true;
+				if(this.issueView.progressStat == "B203"){
+					var cmsg = "현재 완료처리된 상태입니다. 코멘트 등록시 "+statNm[0].codeNm.replace(/\+/g, " ")+"상태로 변경됩니다. 저장하시겠습니까?";
+					if (confirm(cmsg)){
+						$.post('/bmt/issue/regIssueCommentPrc', {issueId:param.issueId, comment:param.comment, issueStat: param.issueStat}, function(data){
+							if (data.save) {
+								frm.issueView.commentList = data.commentList;
+								frm.getPagingCommentList();
+								frm.goPageComment(1);
+							} else if (data.message) {
+								alert(data.message);
+							}
+							frm.procChk = false;
+							frm.comment = "";
+							frm.getIssueView();
+						});
+					}else{
+						frm.procChk = false;
+						return;
+					}
+				}else{
+					$.post('/bmt/issue/regIssueCommentPrc', {issueId:param.issueId, comment:param.comment, issueStat: param.issueStat}, function(data){
+						if (data.save) {
+							frm.issueView.commentList = data.commentList;
+							frm.getPagingCommentList();
+							frm.goPageComment(1);
+						} else if (data.message) {
+							alert(data.message);
+						}
+						frm.procChk = false;
+						frm.comment = "";
+					});
+				}
+			}
+			, getFileDown: function(f) {
+				fileDown(f.filePath, f.fileNm, f.orgFileNm);
+			}
+			, getPagingCommentList: function() {
+				var tempList = [];
+				console.log("11111111");
+				tempList =  this.$refs.paginatorComment.pagingList(this.issueView.commentList);
+				
+				tempList.forEach(function(o,i){
+					tempList[i].comment = o.comment.replace(/(?:\n)/g, '<br>');
+					tempList[i].comment.split('\n').join('<br>');
+				});
+				
+				this.pagingCommentList = tempList;
+			}
+			, goPageComment: function(page) {
+				this.$refs.paginatorComment.goPage(page);
+			}
+		}
+	});
+</script>

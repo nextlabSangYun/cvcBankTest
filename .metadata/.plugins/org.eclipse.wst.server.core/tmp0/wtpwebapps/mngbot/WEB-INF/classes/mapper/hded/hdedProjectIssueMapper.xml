@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.nextlab.hded.mapper.HdedProjectIssueMapper">
+	<select id="selectHeIssueList" parameterType="HeProjectIssueCriteria" resultType="HeProjectIssueVo">
+		SELECT	a.issue_id
+				, a.pid
+				, a.issue_subject
+				, a.issue_cont
+				, a.progress_stat
+				, a.importance
+				, a.reg_id 
+				, (SELECT user_nm FROM tb_user WHERE user_id = a.reg_id) AS reg_nm
+				, a.reg_dtm
+				, ISNULL(DATEDIFF(HH, a.mod_dtm, GETDATE()), -1) AS condition
+		FROM	tb_project_issue a
+		WHERE	a.pid = #{pid}
+				AND a.reg_dtm BETWEEN CONVERT(DATETIME,#{startDt}+' 00:00:00') AND CONVERT(DATETIME,#{endDt}+' 23:59:59')
+				<if test=" chkMyIssue ">
+				AND a.reg_id = #{partiId}
+				</if>
+				<if test="importanceArray != null and importanceArray.length > 0">
+					AND a.importance IN 
+					<foreach collection="importanceArray" item="array" open="(" separator="," close=")">
+						#{array}
+					</foreach>
+				</if>
+				<if test="progressStatArray != null and progressStatArray.length > 0">
+					AND a.progress_stat IN 
+					<foreach collection="progressStatArray" item="array" open="(" separator="," close=")">
+						#{array}
+					</foreach>
+				</if>
+				<if test="issueSubject != null and issueSubject != ''">
+					AND (
+						a.issue_subject LIKE '%' + REPLACE(REPLACE(REPLACE(#{issueSubject},'[','\['), ']','\]'),'_','\_') + '%' ESCAPE '\' 
+						OR a.issue_cont LIKE '%' + REPLACE(REPLACE(REPLACE(#{issueSubject},'[','\['), ']','\]'),'_','\_') + '%' ESCAPE '\'
+						)
+				</if>
+				<if test="tcNm != null and tcNm != ''">
+					AND EXISTS (SELECT c.tc_nm
+						FROM tb_project_issue_tc d
+						JOIN tb_project_tc b ON (b.project_tc_seq = d.project_tc_seq AND b.use_yn = 'Y')
+						JOIN tb_he_tc_tmpl c ON (c.tc_id = b.tc_id)
+						WHERE d.issue_id = a.issue_id
+						AND c.tc_nm LIKE '%' + REPLACE(REPLACE(REPLACE(#{tcNm},'[','\['), ']','\]'),'_','\_') + '%' ESCAPE '\')
+				</if>
+		ORDER BY a.issue_id DESC
+	</select>
+	<insert id="insertIssue" parameterType="HeProjectIssueVo">
+		INSERT INTO tb_project_issue
+			(issue_id, pid, sys_seq, issue_subject, issue_cont, importance
+			, progress_stat, reg_id, reg_dtm, mod_id, mod_dtm)
+		VALUES
+			(#{issueId}, #{pid}, #{sysSeq}, #{issueSubject}, #{issueCont}, #{importance}
+			, #{progressStat}, #{regId}, GETDATE(), #{modId}, GETDATE())
+	</insert>
+	
+	<insert id="insertIssueTc" parameterType="HeProjectIssueTcVo">
+		INSERT INTO tb_project_issue_tc
+			(issue_id, project_tc_seq)
+		VALUES
+			(#{issueId}, #{projectTcSeq})
+	</insert>
+	
+	<insert id="insertIssueParti" parameterType="HeProjectIssuePartiVo">
+		INSERT INTO tb_project_issue_parti
+			(issue_id, parti_id, reg_id, reg_dtm)
+		VALUES
+			(#{issueId}, #{partiId}, #{regId}, GETDATE())
+	</insert>
+	
+	<insert id="insertIssueFile" parameterType="HeProjectIssueFileVo">
+		INSERT INTO tb_project_issue_file
+			(issue_id, seq, file_nm, file_path, org_file_nm)
+		VALUES
+			(#{issueId}
+			, (SELECT ISNULL(CONVERT(INT,MAX(seq)+1), 1) FROM tb_project_issue_file WHERE issue_id = #{issueId})
+			, #{fileNm}, #{filePath}, #{orgFileNm})
+	</insert>
+	
+	<select id="selectIssueTcNmList" parameterType="String" resultType="HeProjectIssueTcVo">
+		SELECT c.tc_nm
+		FROM tb_project_issue_tc a
+		JOIN tb_project_tc b ON (b.project_tc_seq = a.project_tc_seq AND b.use_yn = 'Y')
+		JOIN tb_he_tc_tmpl c ON (c.tc_id = b.tc_id)
+		WHERE a.issue_id = #{issueId};
+	</select>
+	
+	<delete id="deleteIssueTc" parameterType="String">
+		DELETE FROM tb_project_issue_tc
+		WHERE issue_id = #{issueId}
+	</delete>
+	
+	<delete id="deleteIssueParti" parameterType="String">
+		DELETE FROM tb_project_issue_parti
+		WHERE issue_id = #{issueId}
+	</delete>
+	
+	<delete id="deleteIssueFile" parameterType="String">
+		DELETE FROM tb_project_issue_file
+		WHERE issue_id = #{issueId}
+	</delete>
+	
+	<delete id="deleteIssueComment" parameterType="String">
+		DELETE FROM tb_project_issue_comment
+		WHERE issue_id = #{issueId}
+	</delete>
+	
+	<delete id="deleteIssuePrc" parameterType="String">
+		DELETE FROM tb_project_issue
+		WHERE issue_id = #{issueId}
+	</delete>
+	
+	<update id="updateIssueProgressStat" parameterType="HeProjectIssueVo">
+		UPDATE tb_project_issue SET
+			progress_stat = #{progressStat}
+			, mod_id = #{modId}
+			, mod_dtm = GETDATE()
+		WHERE issue_id = #{issueId}
+	</update>
+	
+	<select id="selectIssueView" parameterType="String" resultType="HeProjectIssueVo">
+		SELECT issue_id
+			, pid
+			, sys_seq
+			, issue_subject
+			, issue_cont
+			, importance
+			, progress_stat
+			, reg_id
+			, reg_dtm
+			, mod_id
+			, mod_dtm 
+		FROM tb_project_issue
+		WHERE issue_id = #{issueId}
+	</select>
+	
+	<select id="selectIssueTcList" parameterType="String" resultType="HeProjectIssueTcVo">
+		SELECT a.issue_id
+			, a.project_tc_seq 
+			, c.tc_nm
+			, c.system_id
+			, (SELECT system_nm FROM tb_he_system WHERE system_id = c.system_id) as system_nm
+			, c.tc_nm
+			, c.tc_cate_id
+			, c.lcate_id
+			, c.mcate_id
+			, g.tc_cate_nm as l_cate_nm
+			, f.tc_cate_nm as m_cate_nm
+			, d.tc_cate_nm as s_cate_nm
+		FROM tb_project_issue_tc a
+		JOIN tb_project_tc b ON (b.project_tc_seq = a.project_tc_seq AND b.use_yn = 'Y')
+		JOIN tb_he_tc_tmpl c ON (c.tc_id = b.tc_id)
+		JOIN tb_he_tc_category d ON (d.tc_cate_id = c.tc_cate_id AND d.system_id = c.system_id)
+		JOIN tb_he_system e ON (e.system_id = d.system_id)
+		JOIN tb_he_tc_category f ON (f.tc_cate_id = c.mcate_id AND f.system_id = c.system_id)
+		JOIN tb_he_tc_category g ON (g.tc_cate_id = c.lcate_id AND g.system_id = c.system_id)
+		WHERE a.issue_id = #{issueId};
+	</select>
+	
+	<select id="selectIssuePartiList" parameterType="String" resultType="HeProjectIssuePartiVo">
+		SELECT a.issue_id
+			, a.parti_id
+			, b.user_nm
+			, (SELECT user_group_nm FROM tb_user_group WHERE user_group_id = b.user_group_id) AS user_group_nm
+		FROM tb_project_issue_parti a
+		JOIN tb_user b ON (b.user_id = a.parti_id)
+		WHERE a.issue_id = #{issueId}
+	</select>
+	
+	<select id="selectIssueFileList" parameterType="String" resultType="HeProjectIssueFileVo">
+		 SELECT a.issue_id
+		 	, a.seq
+		 	, a.file_nm
+		 	, a.file_path
+		 	, a.org_file_nm
+		 FROM tb_project_issue_file a
+		 WHERE a.issue_id = #{issueId}
+	</select>
+	
+	<select id="selectIssueCommentList" parameterType="String" resultType="HeProjectIssueComment">
+		SELECT a.seq
+			, a.issue_id
+			, a.content
+			, a.reg_id
+			, b.user_nm AS reg_nm
+			, a.reg_dtm
+			, (SELECT user_group_nm FROM tb_user_group WHERE user_group_id = b.user_group_id) AS reg_group_nm
+		FROM tb_project_issue_comment a
+		JOIN tb_user b ON (b.user_id = a.reg_id)
+		WHERE a.issue_id = #{issueId}
+		ORDER BY a.seq DESC
+	</select>
+	
+	<update id="updateProjectIssue" parameterType="HeProjectIssueVo">
+		UPDATE tb_project_issue SET
+			mod_id = #{modId}
+			, mod_dtm = GETDATE()
+		WHERE issue_id = #{issueId}
+	</update>
+	
+	<insert id="insertIssueComment" parameterType="HeProjectIssueComment">
+		INSERT INTO tb_project_issue_comment
+			(issue_id, content, reg_id, reg_dtm)
+		VALUES
+			(#{issueId}, #{content}, #{regId}, GETDATE())
+	</insert>
+	
+	<update id="updateIssueComment" parameterType="HeProjectIssueComment">
+		UPDATE tb_project_issue_comment SET
+			content = #{content}
+			, reg_id = #{regId}
+			, reg_dtm = GETDATE()
+		WHERE seq = #{seq}
+	</update>
+	
+	<update id="updateIssuePrc" parameterType="HeProjectIssueVo">
+		UPDATE tb_project_issue SET
+			issue_subject = #{issueSubject}
+			, issue_cont = #{issueCont}
+			, importance = #{importance}
+		WHERE issue_id = #{issueId}
+	</update>
+</mapper>

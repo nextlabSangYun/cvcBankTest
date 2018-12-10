@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>Management Bot</title>
+	<link rel="stylesheet" href="../css/common.css">
+	<link rel="stylesheet" href="../css/bmt.css">
+	<script src="../js/jquery-3.2.1.min.js"></script>
+	<script src="../js/jquery-ui.min.js"></script>
+	<script src="../js/jquery.form.min.js"></script>
+	<script src="../js/vue.min.js"></script>
+	<script src="../js/lodash.min.js"></script>
+	<script src="../js/calendar.js"></script>
+	<script src="../js/common.js"></script>
+</head>
+<body>
+<div class="wrap">
+	<header>
+		<div class="inner">
+			<a href="index.html" class="syt_name">Management Bot</a>
+			<button class="btn_nav"><span class="icon"></span></button>
+			<div class="btn_right">
+				<button class="btn_notice"><span class="ir">알림</span><span class="new">2</span></button>
+				<button class="btn_setting"><span class="photo" style="background-image:url('../images/common/btn_my.png')"></span>김성민</button>
+			</div>
+		</div>
+	</header>
+	<nav class="nav">
+		<div class="app_list">
+			<p class="cate_tit">Favorites</p>
+			<ul>
+				<li class="fav">
+					<a href="#">
+						<div class="app_icon"><img src="../images/common/app_bmt.png" alt="BMT 프로젝트"></div>
+						<span class="app_name">BMT 프로젝트</span>
+					</a>
+					<button class="btn_fav"></button>
+				</li>
+				<li class="fav">
+					<a href="#">
+						<div class="app_icon"><img src="../images/common/app_live.png" alt="실시간 방송 측정"></div>
+						<span class="app_name">실시간 방송 측정</span>
+					</a>
+					<button class="btn_fav"></button>
+				</li>
+			</ul>
+		</div>
+		<div class="app_list">
+			<p class="cate_tit">All</p>
+			<ul>
+				<li class="fav">
+					<a href="#">
+						<div class="app_icon"><img src="../images/common/app_bmt.png" alt="BMT 프로젝트"></div>
+						<span class="app_name">BMT 프로젝트</span>
+					</a>
+					<button class="btn_fav"></button>
+				</li>
+				<li class="fav">
+					<a href="#">
+						<div class="app_icon"><img src="../images/common/app_live.png" alt="실시간 방송 측정"></div>
+						<span class="app_name">실시간 방송 측정</span>
+					</a>
+					<button class="btn_fav"></button>
+				</li>
+				<li>
+					<a href="#">
+						<div class="app_icon"><img src="../images/common/app_err.png" alt="장애이력관리"></div>
+						<span class="app_name">장애이력관리</span>
+					</a>
+					<button class="btn_fav"></button>
+				</li>
+				<li>
+					<a href="#">
+						<div class="app_icon"><img src="../images/common/app_stat.png" alt="통계분석"></div>
+						<span class="app_name">통계분석</span>
+					</a>
+					<button class="btn_fav"></button>
+				</li>
+				<li>
+					<a href="system_setting_main.html">
+						<div class="app_icon"><img src="../images/common/app_setting.png" alt="시스템설정"></div>
+						<span class="app_name">시스템설정</span>
+					</a>
+					<button class="btn_fav"></button>
+				</li>
+			</ul>
+		</div>
+	</nav>
+	<div class="ly_notice">
+		<div class="notice_list">
+			<p class="cate_tit">Notice</p>
+			<ul>
+				<li>
+					<p class="tit"><a href="#">시스템 정기점검 공지</a></p>
+					<div class="info">
+						<p class="date">2017년 10월 30일</p>
+						<p class="writer">By 관리자</p>
+					</div>
+				</li>
+				<li>
+					<p class="tit"><a href="#">시스템 정기점검 공지</a></p>
+					<div class="info">
+						<p class="date">2017년 10월 30일</p>
+						<p class="writer">By 관리자</p>
+					</div>
+				</li>
+				<li>
+					<p class="tit"><a href="#">시스템 정기점검 공지</a></p>
+					<div class="info">
+						<p class="date">2017년 10월 30일</p>
+						<p class="writer">By 관리자</p>
+					</div>
+				</li>
+				<li>
+					<p class="tit"><a href="#">시스템 정기점검 공지</a></p>
+					<div class="info">
+						<p class="date">2017년 10월 30일</p>
+						<p class="writer">By 관리자</p>
+					</div>
+				</li>
+				<li>
+					<p class="tit"><a href="#">시스템 정기점검 공지</a></p>
+					<div class="info">
+						<p class="date">2017년 10월 30일</p>
+						<p class="writer">By 관리자</p>
+					</div>
+				</li>
+			</ul>
+		</div>
+		<div class="notice_list">
+			<p class="cate_tit">Received Messages</p>
+			<ul>
+				<li>
+					<p class="tit"><a href="#">이슈Update–채널전환 시간 이슈Update–채널전환 시간</a></p>
+					<div class="info">
+						<p class="date">2017년 10월 30일</p>
+						<p class="writer">By 관리자</p>
+					</div>
+				</li>
+				<li>
+					<p class="tit"><a href="#">이슈Update–채널전환 시간 이슈Update–채널전환 시간</a></p>
+					<div class="info">
+						<p class="date">2017년 10월 30일</p>
+						<p class="writer">By 관리자</p>
+					</div>
+				</li>
+				<li>
+					<p class="tit"><a href="#">이슈Update–채널전환 시간 이슈Update–채널전환 시간</a></p>
+					<div class="info">
+						<p class="date">2017년 10월 30일</p>
+						<p class="writer">By 관리자</p>
+					</div>
+				</li>
+				<li>
+					<p class="tit"><a href="#">이슈Update–채널전환 시간 이슈Update–채널전환 시간</a></p>
+					<div class="info">
+						<p class="date">2017년 10월 30일</p>
+						<p class="writer">By 관리자</p>
+					</div>
+				</li>
+				<li>
+					<p class="tit"><a href="#">이슈Update–채널전환 시간 이슈Update–채널전환 시간</a></p>
+					<div class="info">
+						<p class="date">2017년 10월 30일</p>
+						<p class="writer">By 관리자</p>
+					</div>
+				</li>
+			</ul>
+		</div>
+	</div>
+	<div class="ly_my_setting">
+		<ul>
+			<li><a href="#">개인정보 수정</a></li>
+			<li class="bg"><a href="#">배경화면 설정</a></li>
+			<li class="logout"><a href="#">로그아웃</a></li>
+		</ul>
+	</div>
+	
+	<div class="location">
+		<ol>
+			<!-- 17.12.18 수정 -->
+			<li><a href="#"><span class="app_ico"><img src="../images/common/app_bmt.png" alt=""></span>품질측정 프로젝트 Main</a></li>
+			<li><a href="#">Smart STB 4Q BMT</a></li>
+			<li><a href="#">테스트관리</a></li>
+		</ol>
+	</div>
+	<div class="snb">
+		<ul>
+			<li class="snb_m01"><a href="#"><span class="ico"><img src="../images/bmt/ico_snb_00020301_off.png" alt=""></span><span class="m_name">Home</span></a></li>
+			<li class="snb_m02"><a href="#"><span class="ico"><img src="../images/bmt/ico_snb_00020302_off.png" alt=""></span><span class="m_name">성능평가</span></a></li>
+			<li class="snb_m03 on"><a href="#"><span class="ico"><img src="../images/bmt/ico_snb_00020303_off.png" alt=""></span><span class="m_name">테스트관리</span></a></li>
+			<li class="snb_m04"><a href="#"><span ="ico"><img src="../images/bmt/ico_snb_00020304_off.png" alt=""></span><span class="m_name">이슈관리</span></a></li>
+			<li class="snb_m05"><a href="#"><span class="ico"><img src="../images/bmt/ico_snb_00020305_off.png" alt=""></span><span class="m_name">측정이력 조회</span></a></li>
+			<li class="snb_m06"><a href="#"><span class="ico"><img src="../images/bmt/ico_snb_00020306_off.png" alt=""></span><span class="m_name">게시판</span></a></li>
+			<li class="snb_m07"><a href="#"><span class="ico"><img src="../images/bmt/ico_snb_00020307_off.png" alt=""></span><span class="m_name">프로젝트 관리</span></a></li>
+		</ul>
+	</div>
+	<div class="content">
+		<div class="sub_layout has_snb">
+			<div class="cont_wrap">
+				<div class="sort_area">
+					<div class="sel_item">
+						<span class="sort_tit">대분류</span>
+						<select name="" id="">
+							<option value="">선택</option>
+						</select>
+					</div>
+					<div class="sel_item">
+						<span class="sort_tit">중요도</span>
+						<input type="checkbox" id="chk1"><label for="chk1">Major</label>
+						<input type="checkbox" id="chk2"><label for="chk2">Minor</label>
+						<input type="checkbox" id="chk3"><label for="chk3">Critical</label>
+					</div>
+					<button class="g_btn01">조회</button>
+				</div>
+				<!-- 18. 01. 11 수정 -->
+				<div class="tb_desc">
+					<p>조회결과 : 107건</p>
+					<div class="btn_wrap">
+						<button class="g_btn03">Test Case 등록</button>
+						<button class="g_btn03">이슈등록</button>
+					</div>
+				</div>
+				<div class="g_table">
+					<table>
+						<caption>분류, 중요도, Test Case 등으로 구성된 표 입니다.</caption>
+						<colgroup>
+							<col style="width:5%;">
+							<col style="width:7%;">
+							<col style="width:8%;">
+							<col style="width:10%;">
+							<col style="width:7%;">
+							<col>
+							<col style="width:7%;">
+							<col style="width:7%;">
+							<col style="width:8%;">
+							<col style="width:8%;">
+						</colgroup>
+						<thead>
+							<tr>
+								<th><input type="checkbox"></th>
+								<th>대분류</th>
+								<th>중분류</th>
+								<th>소분류</th>
+								<th>중요도</th>
+								<th>Test Case</th>
+								<th>참고자료</th>
+								<th>테스트결과</th>
+								<th colspan="2">관리</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td><input type="checkbox"></td>
+								<td>홈</td>
+								<td>마이Btv</td>
+								<td>최근시청VOD</td>
+								<td>minor</td>
+								<td class="l_align"><a href="#" class="link">콘텐츠 제목/속성정보/평점 정보 </a></td>
+								<td><span class="memo"></span></td>
+								<td><span class="state01">Fail</span></td>
+								<td class="br_none"><button class="tb_btn01"  onclick="showPopupLayer('pop_issue_registration.html'); return false;">결과등록</button></td>
+								<td class="br_none"><button class="tb_btn02">결과이력</button></td>
+							</tr>
+							<tr>
+								<td><input type="checkbox"></td>
+								<td>홈</td>
+								<td>마이Btv</td>
+								<td>최근시청VOD</td>
+								<td>minor</td>
+								<td class="l_align"><a href="#" class="link">콘텐츠 제목/속성정보/평점 정보 </a></td>
+								<td class="etc"><span class="memo"></span></td>
+								<td><span class="state01">Fail</span></td>
+								<td class="br_none"><button class="tb_btn01">결과등록</button></td>
+								<td class="br_none"><button class="tb_btn02">결과이력</button></td>
+							</tr>
+							<tr>
+								<td><input type="checkbox"></td>
+								<td>홈</td>
+								<td>마이Btv</td>
+								<td>최근시청VOD</td>
+								<td>minor</td>
+								<td class="l_align"><a href="#" class="link">콘텐츠 제목/속성정보/평점 정보 </a></td>
+								<td><span class="memo"></span></td>
+								<td><span class="state01">Fail</span></td>
+								<td class="br_none"><button class="tb_btn01"  onclick="showPopupLayer('pop_issue_registration.html'); return false;">결과등록</button></td>
+								<td class="br_none"><button class="tb_btn02">결과이력</button></td>
+							</tr>
+							<tr>
+								<td><input type="checkbox"></td>
+								<td>홈</td>
+								<td>마이Btv</td>
+								<td>최근시청VOD</td>
+								<td>minor</td>
+								<td class="l_align"><a href="#" class="link">콘텐츠 제목/속성정보/평점 정보 </a></td>
+								<td class="etc"><span class="memo"></span></td>
+								<td><span class="state01">Fail</span></td>
+								<td class="br_none"><button class="tb_btn01">결과등록</button></td>
+								<td class="br_none"><button class="tb_btn02">결과이력</button></td>
+							</tr>
+							<tr>
+								<td><input type="checkbox"></td>
+								<td>홈</td>
+								<td>마이Btv</td>
+								<td>최근시청VOD</td>
+								<td>minor</td>
+								<td class="l_align"><a href="#" class="link">콘텐츠 제목/속성정보/평점 정보 </a></td>
+								<td><span class="memo"></span></td>
+								<td><span class="state01">Fail</span></td>
+								<td class="br_none"><button class="tb_btn01"  onclick="showPopupLayer('pop_issue_registration.html'); return false;">결과등록</button></td>
+								<td class="br_none"><button class="tb_btn02">결과이력</button></td>
+							</tr>
+							<tr>
+								<td><input type="checkbox"></td>
+								<td>홈</td>
+								<td>마이Btv</td>
+								<td>최근시청VOD</td>
+								<td>minor</td>
+								<td class="l_align"><a href="#" class="link">콘텐츠 제목/속성정보/평점 정보 </a></td>
+								<td class="etc"><span class="memo"></span></td>
+								<td><span class="state01">Fail</span></td>
+								<td class="br_none"><button class="tb_btn01">결과등록</button></td>
+								<td class="br_none"><button class="tb_btn02">결과이력</button></td>
+							</tr>
+							<tr>
+								<td><input type="checkbox"></td>
+								<td>홈</td>
+								<td>마이Btv</td>
+								<td>최근시청VOD</td>
+								<td>minor</td>
+								<td class="l_align"><a href="#" class="link">콘텐츠 제목/속성정보/평점 정보 </a></td>
+								<td><span class="memo"></span></td>
+								<td><span class="state01">Fail</span></td>
+								<td class="br_none"><button class="tb_btn01"  onclick="showPopupLayer('pop_issue_registration.html'); return false;">결과등록</button></td>
+								<td class="br_none"><button class="tb_btn02">결과이력</button></td>
+							</tr>
+							<tr>
+								<td><input type="checkbox"></td>
+								<td>홈</td>
+								<td>마이Btv</td>
+								<td>최근시청VOD</td>
+								<td>minor</td>
+								<td class="l_align"><a href="#" class="link">콘텐츠 제목/속성정보/평점 정보 </a></td>
+								<td class="etc"><span class="memo"></span></td>
+								<td><span class="state01">Fail</span></td>
+								<td class="br_none"><button class="tb_btn01">결과등록</button></td>
+								<td class="br_none"><button class="tb_btn02">결과이력</button></td>
+							</tr>
+							<tr>
+								<td><input type="checkbox"></td>
+								<td>홈</td>
+								<td>마이Btv</td>
+								<td>최근시청VOD</td>
+								<td>minor</td>
+								<td class="l_align"><a href="#" class="link">콘텐츠 제목/속성정보/평점 정보 </a></td>
+								<td class="etc"><span class="memo"></span></td>
+								<td><span class="state01">Fail</span></td>
+								<td class="br_none"><button class="tb_btn01">결과등록</button></td>
+								<td class="br_none"><button class="tb_btn02">결과이력</button></td>
+							</tr>
+							<tr>
+								<td><input type="checkbox"></td>
+								<td>홈</td>
+								<td>마이Btv</td>
+								<td>최근시청VOD</td>
+								<td>minor</td>
+								<td class="l_align"><a href="#" class="link">콘텐츠 제목/속성정보/평점 정보 </a></td>
+								<td><span class="memo"></span></td>
+								<td><span class="state01">Fail</span></td>
+								<td class="br_none"><button class="tb_btn01"  onclick="showPopupLayer('pop_issue_registration.html'); return false;">결과등록</button></td>
+								<td class="br_none"><button class="tb_btn02">결과이력</button></td>
+							</tr>
+							<tr>
+								<td><input type="checkbox"></td>
+								<td>홈</td>
+								<td>마이Btv</td>
+								<td>최근시청VOD</td>
+								<td>minor</td>
+								<td class="l_align"><a href="#" class="link">콘텐츠 제목/속성정보/평점 정보 </a></td>
+								<td class="etc"><span class="memo"></span></td>
+								<td><span class="state01">Fail</span></td>
+								<td class="br_none"><button class="tb_btn01">결과등록</button></td>
+								<td class="br_none"><button class="tb_btn02">결과이력</button></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+</html>

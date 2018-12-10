@@ -1,0 +1,177 @@
+/**
+ * @title	: 파일 컨포넌트
+ * @package	: kr.co.nextlab.component
+ * @file	: FileComponent.java
+ * @author	: jnlee
+ * @date	: 2017. 11. 5.
+ * @desc	: 
+ */
+package kr.co.nextlab.component;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Base64;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
+
+import kr.co.nextlab.comm.model.FileVo;
+import kr.co.nextlab.security.SHA256;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Component
+public class FileComponent {
+	
+	@Value("${file.root-path}")
+	private String rootPath;
+	
+	/**
+	 * 파일저장
+	 * @param file 업로드 파일정보
+	 * @param path 업로드 파일 저장 위치
+	 */
+	public FileVo saveFile(MultipartFile file, String saveFilePath) {
+		FileVo fileVo = new FileVo();
+		fileVo.setRealFileNm(file.getOriginalFilename());
+		fileVo.setFileExtension(file.getOriginalFilename().substring(file.getOriginalFilename().indexOf(".")));
+		
+		// 저장경로, 이름 정의
+		String saveFileFullPath = rootPath + File.separator  + saveFilePath + File.separator;
+		String saveFileNm = SHA256.encrypt(fileVo.getRealFileNm()
+				+ Long.toString(System.currentTimeMillis()))
+				+ fileVo.getFileExtension();
+		
+		// 저장파일 경로 폴더 확인
+		File f = new File(saveFileFullPath);
+		if (!f.exists()) f.mkdirs();
+		
+		// 파일저장
+		try {
+			Files.copy(file.getInputStream(), Paths.get(saveFileFullPath + saveFileNm));
+			fileVo.setSaveFilePath(saveFilePath);
+			fileVo.setSaveFileNm(saveFileNm);
+		} catch (IOException e) {
+			log.error("file copy error", e);
+			return null;
+		}
+		return fileVo;
+	}
+	
+	/**
+	 * 파일 문자열을 파일로 저장
+	 * @param fileStr 파일 문자열
+	 * @param extension 확장자
+	 * @param saveFilePath 저장경로
+	 * @return 저장파일
+	 */
+	public File saveFileFromFileStr(String fileStr, String extension, String saveFilePath) {
+		FileOutputStream fos = null;
+		File saveFile = null;
+		String imgHeader = "data:image/"+extension+";base64,";
+		if (extension.equals("pdf")) imgHeader = "data:application/pdf;base64,";
+		
+		String saveFileDir = rootPath + File.separator  + saveFilePath + File.separator;
+		String saveFileName = SHA256.encrypt(Long.toString(System.currentTimeMillis())) + "." + extension;
+		try {
+			fileStr = fileStr.substring(imgHeader.length());
+			File file = new File(saveFileDir);
+			if (!file.exists()) file.mkdirs();
+			saveFile = new File(saveFileDir + saveFileName);
+			byte[] decodedData = Base64.getDecoder().decode(fileStr.getBytes());
+			fos = new FileOutputStream(saveFile);
+			fos.write(decodedData);
+		} catch (Exception e) {
+			log.error("file save error", e);
+		} finally {
+			try {
+				if (fos!=null) fos.close();
+			} catch (IOException e) {
+				log.error("file save fos close error", e);
+			}
+		}
+		return saveFile;
+	}
+	
+	/**
+	 * 저장 경로에 파일 리소스 로드
+	 * 	@param savePath 저장경로
+	 * @param saveName 저장파일명
+	 * @return 파일 리소스
+	 * @throws Exception
+	 */
+	public Resource loadAsResource(String savePath, String saveName) throws Exception {
+		Path file = Paths.get(rootPath + File.separator + savePath + File.separator + saveName);
+		Resource resource = new UrlResource(file.toUri());
+		if (resource.exists() || resource.isReadable()) {
+			return resource;
+		} else {
+			return null;
+		}
+	}
+	
+	/**
+	 * 저장 파일 삭제
+	 * @param savePath 저장경로
+	 * @param saveName 저장파일명
+	 */
+	public void deleteFile(String savePath, String saveName) {
+		File file = new File(rootPath + File.separator + savePath + File.separator + saveName);
+		if (file.exists()) {
+			file.delete();
+		}
+	}
+	
+	/**
+	 * txt 파일 읽어 String 으로 리턴
+	 * @param savePath
+	 * @param saveName
+	 * @return
+	 */
+	public String readFile(String savePath, String saveName) {
+		String returnStr = "";
+		BufferedReader br = null;
+		StringBuffer sb = new StringBuffer();
+		
+		try {
+			br = new BufferedReader(new FileReader(rootPath + File.separator + savePath + File.separator + saveName));
+			String line = null;
+			
+			while ((line = br.readLine()) != null) {
+				sb.append(line);
+			}
+			
+			returnStr = sb.toString();
+			
+		} catch (IOException e) {
+			log.error("file read error", e);
+		} finally {
+			try {
+				if (br!=null) {
+					br.close();
+				}
+			} catch (Exception e) {
+			}
+		}
+		
+		return returnStr;
+	}
+	
+	/**
+	 * fileVo 의 파일경로와 파일명으로 full경로를 리턴
+	 * @param fileVo
+	 * @return
+	 */
+	public String getFileFullPath(FileVo fileVo) {
+		return rootPath + File.separator + fileVo.getFilePath() + File.separator + fileVo.getFileNm();
+	}
+}

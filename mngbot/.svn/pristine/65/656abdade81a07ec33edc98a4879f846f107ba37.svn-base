@@ -1,0 +1,93 @@
+<%@page contentType="text/html charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<div class="pop_wrap" style="width:600px;">
+	<div class="pop_tit">
+		<p>요청번호 : {{reqId}}</p>
+	</div>
+	<div class="pop_cont">
+		<div class="g_table02">
+			<table>
+				<colgroup>
+					<col style="width:10%;">
+					<col>					
+				</colgroup>
+				<tbody>
+					<tr>
+						<th>제목</th>	
+						<td>{{ bmtRequest.reqSubject }}</td>
+					</tr>
+					<tr>
+						<th>내용</th>
+						<td><textarea class="full" id="cancelReason" v-model.trim="bmtRequest.cancelReason"></textarea></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<div class="btn_wrap">
+		<button class="g_btn01" @click="btnCancel">등록</button>
+		<button class="g_btn02" onclick="hidePopupLayer(); return false">닫기</button>
+	</div>
+</div>
+<script>
+	var view = new Vue({
+		el: ".pop_wrap"
+		, data: {
+			reqId : '<c:out value="${param.reqId}"/>'
+			, bmtRequest: {
+				reqSubject: ''
+				, cancelReason: ''
+				, regId: ''
+			}
+		}
+		, updated: function() {
+			setPopup(2);
+		}
+		, mounted: function() {
+			this.$nextTick(function(){
+				this.getView(view.reqId);
+			});
+			setPopup(2);
+		}
+		, methods: {
+			getView: function() {
+				$.get("/bmt/request/getRequestView?reqId=" + view.reqId,function(data){
+					view.bmtRequest = data.bmtRequest;
+					if (view.bmtRequest.cancelReason !== ''){
+						view.bmtRequest.cancelReason = '';
+					}
+				});
+			}
+			, btnCancel: function() {
+				if (view.bmtRequest.cancelReason === '') {
+					alert("코멘트를 입력하세요.");
+					$("#cancelReason").focus();
+					return;
+				}
+				
+				var cmsg = "반려처리 하시겠습니까?";
+				if (confirm(cmsg)){
+					startLoading();
+					$.post('/bmt/request/modReqProgrssStat', {reqId:view.reqId, progressStat:'D204', regId:view.bmtRequest.regId, reqSubject:view.bmtRequest.reqSubject, cancelReason:view.bmtRequest.cancelReason}, function(data){
+						if (data.save){
+							alert("반려처리 되었습니다.");
+							parent.opener.list.getList();
+							parent.window.close();
+						} else{
+							var message = data.messsage;
+							if(message == 'D203'){
+								alert("이미 승인완료된 요청건 입니다.");
+							}else if(message == 'D204'){
+								alert("이미 반려처리된 요청건 입니다.");
+							}
+							parent.opener.list.getList();
+							parent.window.location.reload();
+							hidePopupLayer();
+							endLoading();
+						}
+					});
+				}
+			}
+		}
+	});
+</script>

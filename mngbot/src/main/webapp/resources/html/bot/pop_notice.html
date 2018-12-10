@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>Management Bot</title>
+	<link rel="stylesheet" href="../css/common.css">
+	<link rel="stylesheet" href="../css/bot.css">
+	<script src="../js/jquery-3.2.1.min.js"></script>
+	<script src="../js/jquery-ui.min.js"></script>
+	<script src="../js/jquery.form.min.js"></script>
+	<script src="../js/vue.min.js"></script>
+	<script src="../js/lodash.min.js"></script>
+	<script src="../js/calendar.js"></script>
+	<script src="../js/common.js"></script>
+</head>
+<body>
+	<div class="pop_wrap" style="width:680px;">
+		<div class="pop_tit">
+			<p>이슈Update-채널전환 시점 확인요청 이슈Update-채널전환 시점 확인요청 이슈Update-채널전환 시점 확인요청</p>
+		</div>
+		<div class="pop_cont">
+			<div class="detail">
+				<div class="txt_box">
+					<p>휴맥스님이 “채널전환 시점 확인요청” 이슈를 업데이트 했습니다. (2017년 10월 29일 오후 1시30분) 휴맥스님이 “채널전환 시점 확인요청” 이슈를 업데이트 했습니다. (2017년 10월 29일 오후 1시30분) 휴맥스님이 “채널전환 시점 확인요청” 이슈를 업데이트 했습니다. (2017년 10월 29일 오후 1시30분) 휴맥스님이 “채널전환 시점 확인요청” 이슈를 업데이트 했습니다. (2017년 10월 29일 오후 1시30분)</p>
+					<p>다음 링크로 업데이트된 내용을 확인하십시오.</p>
+				</div>
+				<div class="file_link"><a href="#">보안서약서양식.docx</a></div>
+			</div>
+		</div>
+		<div class="btn_wrap">
+			<div class="l_btn_area">
+				<button class="g_btn01">바로가기</button>
+			</div>
+			<!-- 17.12.13 버튼 영역 수정 -->
+			<button class="g_btn01" onclick="showPopupLayer('pop_notice_list.html', 1); return false;" >목록보기</button>
+			<button class="g_btn02" onclick="hidePopupLayer(); return false" >닫기</button>
+		</div>
+	</div>
+	<script>
+		setPopup(2);
+	</script>
+</body>
+</html>

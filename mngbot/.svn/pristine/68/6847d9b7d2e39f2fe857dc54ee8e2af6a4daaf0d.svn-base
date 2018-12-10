@@ -1,0 +1,950 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.nextlab.bmt.mapper.ProjectMapper">
+	<select id="selectProjectList" parameterType="projectCriteria" resultType="projectVo">
+		SELECT	a.pid
+				, a.project_nm
+				, a.project_chasu
+				, a.yyyymmdd
+				, a.project_st_dt
+				, a.project_end_dt
+				, a.project_stat
+				, a.project_result
+				, c.chasu_wait_yn
+		FROM	tb_project a
+		LEFT JOIN tb_project_chasu_hst c
+		ON c.pid = a.pid
+		AND c.chasu = a.project_chasu
+		WHERE	<![CDATA[ a.project_st_dt <= #{endDt} AND a.project_end_dt >= #{startDt} ]]>
+				<if test=" chkIng ">
+					AND a.project_stat IN ('C301','C302','C303')
+				</if>
+				<if test=" modelIdArray != null ">
+				AND EXISTS (
+					SELECT	1
+					FROM	tb_project_bmt_model b
+					WHERE	a.pid = b.pid
+							AND b.model_id IN
+							<foreach collection="modelIdArray" item="array" open="(" separator="," close=")">
+							 	#{array}
+							</foreach>
+				)
+				</if>
+				<if test="projectNm != null and projectNm != ''">
+					AND a.project_nm LIKE '%' + REPLACE(REPLACE(REPLACE(#{projectNm},'[','\['), ']','\]'),'_','\_') + '%' ESCAPE '\'
+				</if>
+				AND a.use_yn = 'Y'
+		ORDER BY a.pid DESC
+	</select>
+	
+	<select id="selectMyProjectList" parameterType="projectVo" resultType="projectVo">
+		SELECT a.pid
+			, a.project_nm
+			, a.project_chasu
+			, a.yyyymmdd
+			, a.project_st_dt
+			, a.project_end_dt
+			, a.project_stat
+			, a.reg_dtm
+			, a.reg_id
+			, a.file_nm
+			, a.file_path
+			, a.org_file_nm
+			, a.bigo
+			, a.now_join_compose
+			, a.project_grade
+			, c.chasu_wait_yn
+			, DATEDIFF(MM, a.project_st_dt, GETDATE()) as st_dt_diff
+		FROM tb_project a
+		LEFT JOIN tb_project_chasu_hst c
+		ON c.pid = a.pid
+		AND c.chasu = a.project_chasu
+		<if test=" !mngYn ">
+			JOIN tb_project_parti b ON (a.pid = b.pid)
+		</if>
+		WHERE a.use_yn = 'Y'
+		<if test=" !mngYn ">
+			AND b.parti_id = #{partiId}
+		</if>
+		<if test=" progressYn ">
+			AND a.project_stat in ('C301','C302','C303')
+		</if>
+		ORDER BY a.reg_dtm DESC
+	</select>
+	
+	<select id="selectMyProjectChasuList" parameterType="projectVo" resultType="projectVo">
+		SELECT a.pid
+			, a.project_nm
+			, a.project_chasu
+			, a.yyyymmdd
+			, a.project_st_dt
+			, a.project_end_dt
+			, a.project_stat
+			, a.reg_dtm
+			, a.reg_id
+			, a.file_nm
+			, a.file_path
+			, a.org_file_nm
+			, a.bigo
+			, a.now_join_compose
+			, a.project_grade
+			, c.chasu
+			, c.chasu_st_dtm
+			, c.chasu_ed_dtm
+			, c.chasu_wait_yn
+			, DATEDIFF(MM, a.project_st_dt, GETDATE()) as st_dt_diff
+		FROM tb_project a
+		LEFT JOIN tb_project_chasu_hst c
+		ON c.pid = a.pid
+		<if test=" !mngYn ">
+			JOIN tb_project_parti b ON (a.pid = b.pid)
+		</if>
+		WHERE a.use_yn = 'Y'
+		<if test=" !mngYn ">
+			AND b.parti_id = #{partiId}
+		</if>
+		<if test=" progressYn ">
+			AND a.project_stat in ('C301','C302','C303')
+		</if>
+		ORDER BY a.reg_dtm DESC
+	</select>
+	
+	<select id="selectMyProjectOverviewList" parameterType="projectVo" resultType="projectVo">
+		SELECT a.pid
+			, a.project_nm
+			, a.project_chasu
+			, a.yyyymmdd
+			, a.project_st_dt
+			, a.project_end_dt
+			, a.project_stat
+			, a.reg_dtm
+			, a.reg_id
+			, a.file_nm
+			, a.file_path
+			, a.org_file_nm
+			, a.bigo
+			, a.now_join_compose
+			, a.project_grade
+			, a.improve_field
+			, c.chasu_wait_yn
+			, STUFF((SELECT ', '+ (SELECT code_nm FROM tb_code WHERE code_id = d.part_info)
+				FROM tb_project_part d
+				WHERE d.pid = a.pid
+				FOR XML PATH('')),1,1,'') as project_table_info
+			, STUFF((SELECT ';'+ (b.model_nm + '('+ aa.model_ver +')')
+				FROM tb_project_bmt_model aa
+				JOIN tb_model b ON (b.model_id = aa.model_id)
+				AND b.model_group_id = 'MG01'
+				WHERE aa.pid = a.pid
+				AND (aa.model_divi_cd = 'D701' OR aa.model_divi_cd IS NULL)
+				FOR XML PATH('')),1,1,'') as project_model_info
+			, STUFF((SELECT ';'+ (b.model_nm + '('+ aa.model_ver +')')
+				FROM tb_project_bmt_model aa
+				JOIN tb_model b ON (b.model_id = aa.model_id)
+				AND b.model_group_id = 'MG01'
+				WHERE aa.pid = a.pid
+				AND aa.model_divi_cd = 'D702'
+				FOR XML PATH('')),1,1,'') as project_compare_model_info
+			, STUFF((SELECT '/' + D.user_group_nm + '^' + D.user_nm
+				FROM (SELECT B.USER_GROUP_ID
+					, STUFF((
+						SELECT ', '+ e.user_nm
+						FROM tb_user e
+						INNER JOIN tb_project_parti C ON (C.parti_id = e.user_id)
+						WHERE e.USER_GROUP_ID = b.USER_GROUP_ID 
+						AND C.PID = a.pid
+						FOR XML PATH('')
+					),1,1,'') AS user_nm
+					, (SELECT user_group_nm FROM tb_user_group WHERE user_group_id = b.user_group_id) user_group_nm
+				FROM(SELECT aa.pid
+					, aa.parti_id
+					, b.user_nm
+					, b.USER_GROUP_ID
+				FROM tb_project_parti aa
+				JOIN tb_user b ON (b.user_id = aa.parti_id)
+				WHERE aa.pid =a.pid)B
+				GROUP BY B.USER_GROUP_ID) D
+				FOR XML PATH('')),1,1,'') as project_parti_info
+		FROM tb_project a
+		LEFT JOIN tb_project_chasu_hst c
+		ON c.pid = a.pid
+		AND c.chasu = a.project_chasu
+		<if test=" !mngYn ">
+			JOIN tb_project_parti b ON (a.pid = b.pid)
+		</if>
+		WHERE a.use_yn = 'Y'
+		<if test=" !mngYn ">
+			AND b.parti_id = #{partiId}
+		</if>
+		AND ((a.PROJECT_STAT = 'C304' AND (<![CDATA[DATEDIFF(mm, a.project_st_dt, GETDATE()) <= 1]]>)) or (a.PROJECT_STAT != 'C304'))
+		ORDER BY a.reg_dtm DESC
+	</select>
+	
+	<select id="selectProjectNm" parameterType="String" resultType="String">
+		SELECT project_nm
+		FROM tb_project
+		WHERE pid = #{pid}
+	</select>
+	
+	<select id="selectProjectView" parameterType="String" resultType="projectVo">
+		SELECT a.pid
+			, a.project_nm
+			, a.project_chasu
+			, a.yyyymmdd
+			, a.project_st_dt
+			, a.project_end_dt
+			, a.project_stat
+			, a.reg_dtm
+			, a.reg_id
+			, a.file_nm
+			, a.file_path
+			, a.org_file_nm
+			, a.bigo
+			, a.now_join_compose
+			, a.project_grade
+			, a.tc_batch_msg
+			, a.project_result
+			, b.chasu_wait_yn
+			, a.improve_field
+		FROM tb_project a
+		LEFT JOIN tb_project_chasu_hst b
+		ON b.pid = a.pid
+		AND b.chasu = a.project_chasu
+		WHERE a.pid = #{pid}
+	</select>
+	
+	<select id="selectProjectXqmsAttachList" parameterType="String" resultType="xqmsAttachVo">
+		SELECT
+			b.xqms_seq
+			, b.seq
+			, b.file_nm
+			, b.file_path
+		FROM tb_xqms a
+		JOIN tb_xqms_attach b
+		ON a.xqms_seq = b.xqms_seq
+		WHERE a.pid = #{pid}
+	</select>
+	
+	<delete id = "deleteProjectXqmsAttach" parameterType="String">
+		DELETE FROM tb_xqms_attach
+		WHERE xqms_seq IN (
+			SELECT a.xqms_seq
+			FROM tb_xqms a
+			WHERE a.pid = #{pid}
+		)
+	</delete>
+	
+	<insert id="insertProject" parameterType="projectVo">
+		INSERT INTO tb_project 
+			(pid
+			, project_nm
+			, project_chasu
+			, yyyymmdd
+			, project_st_dt
+			, project_end_dt
+			, project_stat
+			, reg_dtm
+			, reg_id
+			, file_nm
+			, file_path
+			, org_file_nm
+			, bigo
+			, now_join_compose
+			, project_grade
+			, project_result
+			, improve_field
+		) VALUES (
+			#{pid}
+			, #{projectNm}
+			, #{projectChasu}
+			, #{yyyymmdd}
+			, #{projectStDt}
+			, #{projectEndDt}
+			, #{projectStat}
+			, GETDATE()
+			, #{regId}
+			, #{fileNm}
+			, #{filePath}
+			, #{orgFileNm}
+			, #{bigo}
+			, #{nowJoinCompose}
+			, #{projectGrade}
+			, #{projectResult}
+			, #{improveField}
+		)
+	</insert>
+	
+	<update id="updateProject" parameterType="projectVo">
+		UPDATE	tb_project SET
+				project_nm = #{projectNm}
+				, project_st_dt = #{projectStDt}
+				, project_end_dt = #{projectEndDt}
+				, bigo = #{bigo}
+				, file_nm = #{fileNm}
+				, file_path = #{filePath}
+				, org_file_nm = #{orgFileNm}
+				, project_grade = #{projectGrade}
+				, mod_id = #{modId}
+				, mod_dtm = GETDATE()
+				, improve_field = #{improveField}
+		WHERE	pid = #{pid}
+	</update>
+	
+	<select id="selectLastProjectChasuHstByPid" parameterType="String" resultType="projectChasuHstVo">
+		SELECT TOP 1 
+			pid,
+			chasu,
+			chasu_st_dtm,
+			chasu_ed_dtm,
+			reg_id,
+			reg_dtm,
+			chasu_wait_yn
+		FROM tb_project_chasu_hst
+		WHERE pid = #{pid}
+		ORDER BY chasu DESC
+	</select>
+	
+	<update id="updateProjectChasuWaitY" parameterType="projectChasuHstVo">
+		UPDATE tb_project_chasu_hst
+		SET chasu_wait_yn = 'Y'
+			, chasu_ed_dtm = DATEADD(day,-1,CONVERT(DATETIME,CONVERT(VARCHAR(10),GETDATE(), 23) + ' 23:59:59'))
+		WHERE pid = #{pid}
+		AND chasu = #{chasu}
+	</update>
+	
+	<insert id="insertProjectChasuHst" parameterType="projectChasuHstVo">
+		INSERT INTO	tb_project_chasu_hst
+				(pid, chasu, chasu_st_dtm, chasu_ed_dtm, reg_id, reg_dtm)
+		SELECT	pid, project_chasu, CONVERT(VARCHAR, #{chasuStDtm}, 23)+ ' 00:00:00', CONVERT(VARCHAR, project_end_dt, 23)+ ' 23:59:59', #{regId}, GETDATE() 
+		FROM	TB_PROJECT WHERE pid = #{pid}
+	</insert>
+	
+	<update id="updateProjectChasuEdDtm" parameterType="String">
+		MERGE INTO tb_project_chasu_hst u
+		USING (
+			SELECT	MAX(project_chasu) AS project_chasu
+			FROM	tb_project
+			WHERE	pid = #{pid}
+		) t
+		ON u.pid = #{pid}
+			AND u.chasu = t.project_chasu
+		WHEN MATCHED THEN 
+			UPDATE SET chasu_ed_dtm = CONVERT(VARCHAR, DATEADD(DAY,-1,GETDATE()), 23) + ' 23:59:59'
+		;
+	</update>
+	<insert id = "insertProjectPart" parameterType="projectPartVo">
+		INSERT INTO tb_project_part
+			(pid, part_info, reg_id, reg_dtm)
+		VALUES
+			(#{pid}, #{partInfo}, #{regId}, GETDATE())
+	</insert>
+	<delete id = "deleteProjectPart" parameterType="String">
+		DELETE FROM tb_project_part
+		WHERE pid = #{pid}
+	</delete>
+	<insert id="insertProjectBmtModel" parameterType="projectBmtModelVo">
+		INSERT INTO tb_project_bmt_model
+			(pid, model_id, model_ver, model_divi_cd)
+		VALUES
+			(#{pid}, #{modelId}, #{modelVer}, #{modelDiviCd})
+	</insert>
+	
+	<insert id="insertProjectParti" parameterType="projectPartiVo">
+		INSERT INTO tb_project_parti
+			(pid, parti_id, reg_id, reg_dtm)
+		VALUES
+			(#{pid}, #{partiId}, #{regId}, GETDATE())
+	</insert>
+	
+	<delete id="deleteProjectParti" parameterType="String">
+		DELETE FROM tb_project_parti
+		WHERE pid = #{pid}
+	</delete>
+	
+	<update id="updateNextProjectChasu" parameterType="String">
+		UPDATE	tb_project SET
+				project_chasu = project_chasu + 1
+		WHERE	pid = #{pid}
+				AND project_stat IN ('C301','C302','C303')
+	</update>
+	
+	<update id="updateProjectStat" parameterType="projectVo">
+		UPDATE	tb_project SET
+				project_stat = #{projectStat}
+				, mod_id = #{modId}
+				, mod_dtm = GETDATE()
+				, project_result = #{projectResult}
+		WHERE	pid = #{pid}
+	</update>
+	 <select id="selectProjectPartiList" parameterType="String" resultType="projectPartiVo">
+			SELECT a.pid
+			, a.parti_id
+			, b.user_nm
+			, (SELECT user_group_nm FROM tb_user_group WHERE user_group_id = b.user_group_id) user_group_nm
+		FROM tb_project_parti a
+		JOIN tb_user b ON (b.user_id = a.parti_id)
+		WHERE a.pid = #{pid}
+	</select>
+	<select id="selectProjectEditPartiList" parameterType="String" resultType="projectPartiVo">
+		SELECT B.USER_GROUP_ID
+			, STUFF((
+				SELECT ', '+ A.user_nm
+				FROM tb_user A
+				INNER JOIN tb_project_parti C ON (c.parti_id = A.user_id)
+				WHERE A.USER_GROUP_ID = b.USER_GROUP_ID AND C.pid = #{pid}
+				FOR XML PATH('')
+			),1,1,'') AS user_nm
+			, (SELECT user_group_nm FROM tb_user_group WHERE user_group_id = b.user_group_id) user_group_nm
+		FROM(SELECT a.pid
+			, a.parti_id
+			, b.user_nm
+			, b.USER_GROUP_ID
+		FROM tb_project_parti a
+		JOIN tb_user b ON (b.user_id = a.parti_id)
+		WHERE a.pid = #{pid})B
+		GROUP BY B.USER_GROUP_ID
+	</select>
+	
+	<select id="selectProjectTableList" parameterType="String" resultType="projectPartVo">
+		SELECT a.pid
+			, a.part_info
+			, (SELECT code_nm FROM tb_code WHERE code_id = a.part_info) as part_table_nm 
+		FROM tb_project_part a
+		JOIN tb_project b ON (b.pid = a.pid)
+		WHERE a.pid = #{pid}
+	</select>
+	
+	<select id="selectProjectBmtModelList" parameterType="String" resultType="projectBmtModelVo">
+		SELECT a.pid
+			, a.model_id
+			, a.model_ver
+			, a.model_seq
+			, a.perform_yn
+			, b.model_nm
+		FROM tb_project_bmt_model a
+		JOIN tb_model b ON (b.model_id = a.model_id)
+		WHERE a.pid = #{pid}
+		AND (a.model_divi_cd = 'D701' OR a.model_divi_cd IS NULL)  
+		AND b.model_group_id = 'MG01'
+		ORDER BY a.model_id, a.model_seq
+	</select>
+	
+	<select id="selectProjectBmtCompareModelList" parameterType="String" resultType="projectBmtModelVo">
+		SELECT a.pid
+			, a.model_id
+			, a.model_ver
+			, a.model_seq
+			, a.perform_yn
+			, b.model_nm
+		FROM tb_project_bmt_model a
+		JOIN tb_model b ON (b.model_id = a.model_id)
+		WHERE a.pid = #{pid}
+		AND a.model_divi_cd = 'D702'  
+		AND b.model_group_id = 'MG01'
+		ORDER BY a.model_id, a.model_seq
+	</select>
+	
+	<select id="selectProjectBmtReqList" parameterType="String" resultType="bmtRequestVo">
+		SELECT a.req_id
+			, a.progress_stat
+			, a.req_subject
+		FROM tb_bmt_request a
+		WHERE a.progress_stat = #{ps}
+		ORDER BY a.req_id DESC
+	</select>
+	
+	<select id="selectProjectBmtRequestList" parameterType="String" resultType="bmtReqProjectVo">
+		SELECT a.PID
+			,a.REQ_ID
+			,(SELECT b.REQ_SUBJECT FROM tb_bmt_request b WHERE a.REQ_ID = b.REQ_ID) req_subject
+		FROM TB_REQ_PROJECT a
+		WHERE a.pid = #{pid}
+	</select>
+	
+	<select id="selectProjectBmtModelDetailList" parameterType="String" resultType="projectBmtModelVo">
+		SELECT	a.pid
+				, a.model_id
+				, a.model_ver
+				, a.model_seq
+				, a.perform_yn
+				, b.model_nm
+				, c.model_group_id
+				, c.model_type
+				, c.model_group_nm
+		FROM	tb_project_bmt_model a
+				JOIN tb_model b ON (b.model_id = a.model_id)
+				JOIN tb_model_group c ON (b.model_group_id = c.model_group_id)
+		WHERE	a.pid = #{pid}
+		ORDER BY a.model_id, a.model_seq
+	</select>
+	
+	<select id="selectProjectModelHstList" parameterType="String" resultType="projectModelVerHstVo">
+		SELECT a.seq
+			, a.pid
+			, a.model_ver
+			, a.reg_dtm
+			, a.model_seq
+			, b.model_nm
+		FROM tb_project_model_ver_hst a
+		JOIN tb_model b ON (b.model_id = a.model_id)
+		WHERE a.model_seq = #{modelSeq}
+		ORDER BY reg_dtm desc
+	</select>
+	
+	<update id="updateProjectBmtModelVer" parameterType="projectModelVerHstVo">
+		UPDATE tb_project_bmt_model
+		SET model_ver = #{modelVer}
+		WHERE model_seq = #{modelSeq}
+	</update>
+	
+	<insert id="insertProjectModelVerHst" parameterType="projectModelVerHstVo">
+		INSERT INTO tb_project_model_ver_hst
+			(pid, model_id, model_ver, reg_id, reg_dtm, model_seq)
+		VALUES
+			(#{pid}, #{modelId}, #{modelVer}, #{regId}, GETDATE(), #{modelSeq})
+	</insert>
+	
+	<insert id="insertProjectBmtReq" parameterType="bmtReqProjectVo">
+		INSERT INTO tb_req_project
+			(pid, req_id, reg_id, reg_dtm)
+		VALUES
+			(#{pid}, #{reqId}, #{regId}, GETDATE())
+	</insert>
+	
+	
+	<insert id="insertProjectModelVerHstInit" parameterType="projectModelVerHstVo">
+		INSERT INTO tb_project_model_ver_hst
+				(pid, model_seq, model_id, model_ver, reg_id, reg_dtm)
+		SELECT	pid, model_seq, model_id, model_ver, #{regId}, GETDATE()
+		FROM	tb_project_bmt_model
+		WHERE	pid = #{pid}
+				AND model_id = #{modelId}
+				AND model_ver = #{modelVer}
+	</insert>
+	
+	<update id="updatePerformYn" parameterType="projectBmtModelVo">
+		UPDATE tb_project_bmt_model
+		SET perform_yn = 'Y'
+		WHERE model_id = #{modelId}
+		AND pid = #{pid}
+		AND model_ver = #{modelVer}
+	</update>
+	
+	<select id="selectProjectStatusList" parameterType="projectVo" resultType="projectVo">
+		WITH v_temp AS
+		(
+		SELECT m.pid
+			, m.project_chasu
+			, COUNT(m.seq) AS test_cnt
+			, COUNT(m.last_bmt_result) AS test_ing_cnt
+		FROM (
+				SELECT a.pid
+					, t.seq
+					, a.project_chasu
+					, t.last_bmt_result
+				FROM tb_project a
+				LEFT JOIN tb_bmt_tc_info t ON (a.pid = t.pid)
+				WHERE a.project_stat IN ('C301','C302','C303')
+				AND (t.use_yn IS NULL OR t.use_yn = 'Y')
+				AND EXISTS (
+							SELECT 1 FROM tb_project_parti P
+							WHERE p.pid = a.pid
+							<if test=" !mngYn ">
+								AND p.parti_id = #{partiId}
+							</if>
+							)
+			) m
+		GROUP BY m.pid, m.project_chasu
+		)
+		SELECT b.project_nm
+			, b.pid
+			, b.project_chasu
+			, b.project_st_dt
+			, b.project_end_dt
+			, b.project_stat
+			, s.test_cnt
+			, s.test_ing_cnt
+			, FLOOR(CASE WHEN ISNULL(CAST(s.test_cnt AS FLOAT),0) = 0 THEN 0 ELSE CAST(s.test_ing_cnt AS FLOAT) / CAST(s.test_cnt AS FLOAT) END *100) xqms_percent
+			, s.issue_cnt
+			, s.issue_success_cnt
+			, FLOOR(CASE WHEN ISNULL(CAST(s.issue_cnt AS FLOAT),0) = 0 THEN 0 ELSE CAST(s.issue_success_cnt AS FLOAT) / CAST(s.issue_cnt AS FLOAT) END *100) issue_percent
+			, c.chasu_wait_yn
+		FROM (
+				SELECT v.pid
+					, v.test_cnt
+					, v.test_ing_cnt
+					, COUNT(i.issue_id) issue_cnt
+					, COUNT(CASE WHEN i.progress_stat = 'B203' THEN 1 ELSE NULL END) issue_success_cnt
+				FROM v_temp v
+				LEFT JOIN tb_issue i ON (v.pid = i.pid AND v.project_chasu = i.chasu)
+				GROUP BY v.pid, v.test_cnt, v.test_ing_cnt
+			) s
+		INNER JOIN tb_project b ON (b.pid = s.pid)
+		LEFT JOIN tb_project_chasu_hst c
+		ON c.pid = b.pid
+		AND c.chasu = b.project_chasu
+		ORDER BY b.reg_dtm DESC
+	</select>
+	
+	<update id="updateJoinCompose" parameterType="projectVo">
+		UPDATE	tb_project SET 
+				now_join_compose = #{nowJoinCompose}
+				, mod_id = #{modId}
+				, mod_dtm = GETDATE()
+		WHERE	pid = #{pid}
+	</update>
+	
+	<insert id="insertJoinComposeHst" parameterType="projectJoinComposeHstVo">
+		INSERT INTO tb_join_compose_hst
+			(pid, join_compose, reg_dtm, reg_id)
+		VALUES
+			(#{pid}, #{joinCompose}, GETDATE(), #{regId})
+	</insert>
+	
+	<select id="selectJoinComposeHst" parameterType="String" resultType="projectJoinComposeHstVo">
+		SELECT	seq, pid, join_compose, reg_dtm, reg_id
+		FROM	tb_join_compose_hst
+		WHERE	pid = #{pid}
+		ORDER BY seq DESC
+	</select>
+	
+	<select id="updateProjectUseYn" parameterType="projectVo" statementType="CALLABLE" flushCache="true" resultType="int">
+		DECLARE @outResult INT;
+		EXEC BMT_PROJECT_DEL #{pid}, #{modId}, @out_Return = @outResult OUTPUT;
+		SELECT @outResult;
+	</select>
+	
+	<select id="selectMyWeekProjectList" parameterType="projectVo" resultType="projectVo">
+		SELECT 
+			a.pid
+			, a.project_nm
+			, a.project_chasu
+			, a.yyyymmdd
+			, a.project_st_dt
+			, a.project_end_dt
+			, a.project_stat
+			, a.reg_dtm
+			, a.reg_id
+			, a.project_grade
+			, a.file_nm
+			, a.file_path
+			, a.org_file_nm
+			, a.bigo
+			, a.now_join_compose
+			, a.mod_id
+			, a.mod_dtm
+			, a.use_yn
+			, a.tc_batch_msg
+			, a.project_result
+			, CASE WHEN a.project_stat = 'C304' THEN '종료'
+				   WHEN a.project_st_dt > GETDATE() THEN '시작예정'
+				   WHEN a.project_end_dt <![CDATA[<]]> CONVERT(CHAR(10), GETDATE(), 23) THEN '종료'
+				   ELSE CAST(DATEDIFF(dd, a.PROJECT_END_DT, CONVERT(CHAR(10), GETDATE(), 23)) AS CHAR(10))
+			  END AS complete_dday_str
+			, c.chasu_wait_yn
+			, ISNULL(D.test_cnt, 0) AS test_cnt
+			, ISNULL(D.pass_cnt, 0) AS pass_cnt
+			, ISNULL(D.fail_cnt, 0) AS fail_cnt
+			, ISNULL(E.issue_cnt, 0) AS issue_cnt
+			, ISNULL(E.critical_cnt, 0) AS critical_cnt
+			, ISNULL(E.major_cnt, 0) AS major_cnt
+			, ISNULL(E.minor_cnt, 0) AS minor_cnt
+			, ISNULL(E.request_cnt, 0) AS request_cnt
+		FROM tb_project a
+		LEFT JOIN tb_project_chasu_hst c
+		ON c.pid = a.pid
+			AND c.chasu = a.project_chasu
+		LEFT JOIN (SELECT
+				d.pid
+				, COUNT(*) AS test_cnt
+				, SUM(CASE WHEN d.last_bmt_result = 'B301' THEN 1 ELSE 0 END) AS pass_cnt
+				, SUM(CASE WHEN d.last_bmt_result = 'B302' THEN 1 ELSE 0 END) AS fail_cnt
+			FROM tb_bmt_tc_info d
+			WHERE (d.use_yn = 'Y' OR d.use_yn is null)
+			GROUP BY d.pid) D
+		ON D.pid = a.pid
+		LEFT JOIN (SELECT
+				e.pid
+				, COUNT(*) AS issue_cnt
+				, SUM(CASE WHEN e.importance = 'B103' THEN 1 ELSE 0 END) AS critical_cnt
+				, SUM(CASE WHEN e.importance = 'B101' THEN 1 ELSE 0 END) AS major_cnt
+				, SUM(CASE WHEN e.importance = 'B102' THEN 1 ELSE 0 END) AS minor_cnt
+				, SUM(CASE WHEN e.importance = 'B104' THEN 1 ELSE 0 END) AS request_cnt
+			FROM tb_issue e
+			GROUP BY e.pid) E
+		ON E.pid = a.pid
+		AND c.chasu = a.project_chasu
+		WHERE a.use_yn = 'Y'
+			AND a.project_st_dt <![CDATA[<=]]> #{endDate}
+			AND a.project_end_dt >= #{startDate}
+		<if test=" !mngYn ">
+			AND EXISTS (SELECT 1 FROM tb_project_parti b WHERE b.pid = a.pid AND b.parti_id = #{partiId})
+		</if>
+		<if test=" progressYn ">
+			AND a.project_stat in ('C301','C302','C303')
+		</if>
+		ORDER BY a.reg_dtm DESC
+	</select>
+	
+	<select id="selectMyTodayProjectList" parameterType="projectVo" resultType="projectVo">
+		SELECT 
+			a.pid
+			, a.project_nm
+			, a.project_chasu
+			, a.yyyymmdd
+			, a.project_st_dt
+			, a.project_end_dt
+			, a.project_stat
+			, a.reg_dtm
+			, a.reg_id
+			, a.project_grade
+			, a.file_nm
+			, a.file_path
+			, a.org_file_nm
+			, a.bigo
+			, a.now_join_compose
+			, a.mod_id
+			, a.mod_dtm
+			, a.use_yn
+			, a.tc_batch_msg
+			, a.project_result
+			, CASE WHEN a.project_stat = 'C304' THEN '종료'
+				   WHEN a.project_st_dt > GETDATE() THEN '시작예정'
+				   WHEN a.project_end_dt <![CDATA[<]]> CONVERT(CHAR(10), GETDATE(), 23) THEN '종료'
+				   ELSE CAST(DATEDIFF(dd, a.PROJECT_END_DT, CONVERT(CHAR(10), GETDATE(), 23)) AS CHAR(10))
+			  END AS complete_dday_str
+			, DATEDIFF(dd, a.PROJECT_END_DT, CONVERT(CHAR(10), GETDATE(), 23)) AS complate_dday 
+			, c.chasu_wait_yn
+			, ISNULL(D.yesterday_test_cnt, 0) AS yesterday_test_cnt
+			, ISNULL(D.yesterday_success_cnt, 0) AS yesterday_success_cnt
+			, ISNULL(D.yesterday_fail_cnt, 0) AS yesterday_fail_cnt
+			, ISNULL(D.today_test_cnt, 0) AS today_test_cnt
+			, ISNULL(D.today_success_cnt, 0) AS today_success_cnt
+			, ISNULL(D.today_fail_cnt, 0) AS today_fail_cnt
+			, ISNULL(E.yesterday_issue_cnt, 0) AS yesterday_issue_cnt
+			, ISNULL(E.yesterday_critical_cnt, 0) AS yesterday_critical_cnt
+			, ISNULL(E.yesterday_major_cnt, 0) AS yesterday_major_cnt
+			, ISNULL(E.yesterday_minor_cnt, 0) AS yesterday_minor_cnt
+			, ISNULL(E.yesterday_request_cnt, 0) AS yesterday_request_cnt
+			, ISNULL(E.yesterday_critical_finish_cnt, 0) AS yesterday_critical_finish_cnt
+			, ISNULL(E.yesterday_major_finish_cnt, 0) AS yesterday_major_finish_cnt
+			, ISNULL(E.today_issue_cnt, 0) AS today_issue_cnt
+			, ISNULL(E.today_critical_cnt, 0) AS today_critical_cnt
+			, ISNULL(E.today_major_cnt, 0) AS today_major_cnt
+			, ISNULL(E.today_minor_cnt, 0) AS today_minor_cnt
+			, ISNULL(E.today_request_cnt, 0) AS today_request_cnt
+			, ISNULL(E.today_critical_finish_cnt, 0) AS today_critical_finish_cnt
+			, ISNULL(E.today_major_finish_cnt, 0) AS today_major_finish_cnt
+			, ISNULL(E.important_cnt, 0) AS important_cnt
+			, ISNULL(E.important_finish_cnt, 0) AS important_finish_cnt
+			, FLOOR(CASE WHEN ISNULL(CAST(E.important_cnt AS FLOAT),0) = 0 THEN 0 ELSE CAST(E.important_finish_cnt AS FLOAT) / CAST(E.important_cnt AS FLOAT) END *100) important_percent
+			, ISNULL(E.critical_cnt, 0) AS critical_cnt
+			, ISNULL(E.critical_finish_cnt, 0) AS critical_finish_cnt
+			, FLOOR(CASE WHEN ISNULL(CAST(E.critical_cnt AS FLOAT),0) = 0 THEN 0 ELSE CAST(E.critical_finish_cnt AS FLOAT) / CAST(E.critical_cnt AS FLOAT) END *100) critical_percent
+			, ISNULL(E.major_cnt, 0) AS major_cnt
+			, ISNULL(E.major_finish_cnt, 0) AS major_finish_cnt
+			, FLOOR(CASE WHEN ISNULL(CAST(E.major_cnt AS FLOAT),0) = 0 THEN 0 ELSE CAST(E.major_finish_cnt AS FLOAT) / CAST(E.major_cnt AS FLOAT) END *100) major_percent
+			, F.test_cnt
+			, F.test_ing_cnt
+			, FLOOR(CASE WHEN ISNULL(CAST(F.test_cnt AS FLOAT),0) = 0 THEN 0 ELSE CAST(F.test_ing_cnt AS FLOAT) / CAST(F.test_cnt AS FLOAT) END *100) xqms_percent
+		FROM tb_project a
+		LEFT JOIN tb_project_chasu_hst c
+		ON c.pid = a.pid
+			AND c.chasu = a.project_chasu
+		LEFT JOIN (SELECT 
+				d.pid
+				, SUM(CASE WHEN yyyymmdd = CONVERT(CHAR(8), DATEADD(DAY,-1,GETDATE()), 112) THEN 1
+						   ELSE 0
+					  END) AS yesterday_test_cnt
+				, SUM(CASE WHEN yyyymmdd = CONVERT(CHAR(8), DATEADD(DAY,-1,GETDATE()), 112) AND d.xqms_type = 'C401' AND g.bmt_result = 'B301' THEN 1
+						   WHEN yyyymmdd = CONVERT(CHAR(8), DATEADD(DAY,-1,GETDATE()), 112) AND d.xqms_type = 'C402' AND e.channel_result = 'B301' THEN 1
+						   WHEN yyyymmdd = CONVERT(CHAR(8), DATEADD(DAY,-1,GETDATE()), 112) AND d.xqms_type = 'C403' AND f.cold_reset_result = 'B301' THEN 1
+<!-- 						   WHEN yyyymmdd = CONVERT(CHAR(8), DATEADD(DAY,-1,GETDATE()), 112) AND d.xqms_type = 'C404' AND i.lkfs_result = 'B301' THEN 1 -->
+<!-- 						   WHEN yyyymmdd = CONVERT(CHAR(8), DATEADD(DAY,-1,GETDATE()), 112) AND d.xqms_type = 'C405' AND h.repeat_result = 'B301' THEN 1 -->
+						   ELSE 0
+					  END) AS yesterday_success_cnt
+				, SUM(CASE WHEN yyyymmdd = CONVERT(CHAR(8), DATEADD(DAY,-1,GETDATE()), 112) AND d.xqms_type = 'C401' AND g.bmt_result = 'B302' THEN 1
+						   WHEN yyyymmdd = CONVERT(CHAR(8), DATEADD(DAY,-1,GETDATE()), 112) AND d.xqms_type = 'C402' AND e.channel_result = 'B302' THEN 1
+						   WHEN yyyymmdd = CONVERT(CHAR(8), DATEADD(DAY,-1,GETDATE()), 112) AND d.xqms_type = 'C403' AND f.cold_reset_result = 'B302' THEN 1
+<!-- 						   WHEN yyyymmdd = CONVERT(CHAR(8), DATEADD(DAY,-1,GETDATE()), 112) AND d.xqms_type = 'C404' AND i.lkfs_result = 'B302' THEN 1 -->
+<!-- 						   WHEN yyyymmdd = CONVERT(CHAR(8), DATEADD(DAY,-1,GETDATE()), 112) AND d.xqms_type = 'C405' AND h.repeat_result = 'B302' THEN 1 -->
+						   ELSE 0
+					  END) AS yesterday_fail_cnt
+				, SUM(CASE WHEN yyyymmdd = CONVERT(CHAR(8), GETDATE(), 112) THEN 1
+						   ELSE 0
+					  END) AS today_test_cnt
+				, SUM(CASE WHEN yyyymmdd = CONVERT(CHAR(8), GETDATE(), 112) AND d.xqms_type = 'C401' AND g.bmt_result = 'B301' THEN 1
+						   WHEN yyyymmdd = CONVERT(CHAR(8), GETDATE(), 112) AND d.xqms_type = 'C402' AND e.channel_result = 'B301' THEN 1
+						   WHEN yyyymmdd = CONVERT(CHAR(8), GETDATE(), 112) AND d.xqms_type = 'C403' AND f.cold_reset_result = 'B301' THEN 1
+<!-- 						   WHEN yyyymmdd = CONVERT(CHAR(8), GETDATE(), 112) AND d.xqms_type = 'C404' AND i.lkfs_result = 'B301' THEN 1 -->
+<!-- 						   WHEN yyyymmdd = CONVERT(CHAR(8), GETDATE(), 112) AND d.xqms_type = 'C405' AND h.repeat_result = 'B301' THEN 1 -->
+						   ELSE 0
+					  END) AS today_success_cnt
+				, SUM(CASE WHEN yyyymmdd = CONVERT(CHAR(8), GETDATE(), 112) AND d.xqms_type = 'C401' AND g.bmt_result = 'B302' THEN 1
+						   WHEN yyyymmdd = CONVERT(CHAR(8), GETDATE(), 112) AND d.xqms_type = 'C402' AND e.channel_result = 'B302' THEN 1
+						   WHEN yyyymmdd = CONVERT(CHAR(8), GETDATE(), 112) AND d.xqms_type = 'C403' AND f.cold_reset_result = 'B302' THEN 1
+<!-- 						   WHEN yyyymmdd = CONVERT(CHAR(8), GETDATE(), 112) AND d.xqms_type = 'C404' AND i.lkfs_result = 'B302' THEN 1 -->
+<!-- 						   WHEN yyyymmdd = CONVERT(CHAR(8), GETDATE(), 112) AND d.xqms_type = 'C405' AND h.repeat_result = 'B302' THEN 1 -->
+						   ELSE 0
+					  END) AS today_fail_cnt
+			FROM tb_xqms d
+			LEFT JOIN tb_channel e
+			ON e.xqms_seq = d.xqms_seq
+			LEFT JOIN tb_cold_reset f
+			ON f.xqms_seq = d.xqms_seq
+			LEFT JOIN tb_bmt g
+			ON g.xqms_seq = d.xqms_seq
+<!-- 			LEFT JOIN tb_robot h -->
+<!-- 			ON h.xqms_seq = d.xqms_seq -->
+<!-- 			LEFT JOIN tb_lkfs i -->
+<!-- 			ON i.xqms_seq = d.xqms_seq -->
+			GROUP BY d.pid) D
+		ON D.pid = a.pid
+		LEFT JOIN (SELECT
+				j.pid
+				, SUM(CASE WHEN CONVERT(CHAR(8), j.reg_dtm, 112) = CONVERT(CHAR(8), DATEADD(DAY,-1,GETDATE()), 112) THEN 1
+						   ELSE 0
+					  END) AS yesterday_issue_cnt
+				, SUM(CASE WHEN CONVERT(CHAR(8), j.reg_dtm, 112) = CONVERT(CHAR(8), DATEADD(DAY,-1,GETDATE()), 112) AND j.importance = 'B103' THEN 1
+						   ELSE 0
+					  END) AS yesterday_critical_cnt
+				, SUM(CASE WHEN CONVERT(CHAR(8), j.reg_dtm, 112) = CONVERT(CHAR(8), DATEADD(DAY,-1,GETDATE()), 112) AND j.importance = 'B101' THEN 1
+						   ELSE 0
+					  END) AS yesterday_major_cnt
+				, SUM(CASE WHEN CONVERT(CHAR(8), j.reg_dtm, 112) = CONVERT(CHAR(8), DATEADD(DAY,-1,GETDATE()), 112) AND j.importance = 'B102' THEN 1
+						   ELSE 0
+					  END) AS yesterday_minor_cnt
+				, SUM(CASE WHEN CONVERT(CHAR(8), j.reg_dtm, 112) = CONVERT(CHAR(8), DATEADD(DAY,-1,GETDATE()), 112) AND j.importance = 'B104' THEN 1
+						   ELSE 0
+					  END) AS yesterday_request_cnt
+				, SUM(CASE WHEN CONVERT(CHAR(8), j.reg_dtm, 112) = CONVERT(CHAR(8), DATEADD(DAY,-1,GETDATE()), 112) AND j.importance = 'B103' AND j.progress_stat = 'B203' THEN 1
+						   ELSE 0
+					  END) AS yesterday_critical_finish_cnt
+				, SUM(CASE WHEN CONVERT(CHAR(8), j.reg_dtm, 112) = CONVERT(CHAR(8), DATEADD(DAY,-1,GETDATE()), 112) AND j.importance = 'B101' AND j.progress_stat = 'B203' THEN 1
+						   ELSE 0
+					  END) AS yesterday_major_finish_cnt
+				, SUM(CASE WHEN CONVERT(CHAR(8), j.reg_dtm, 112) = CONVERT(CHAR(8), GETDATE(), 112) THEN 1
+						   ELSE 0
+					  END) AS today_issue_cnt
+				, SUM(CASE WHEN CONVERT(CHAR(8), j.reg_dtm, 112) = CONVERT(CHAR(8), GETDATE(), 112) AND j.importance = 'B103' THEN 1
+						   ELSE 0
+					  END) AS today_critical_cnt
+				, SUM(CASE WHEN CONVERT(CHAR(8), j.reg_dtm, 112) = CONVERT(CHAR(8), GETDATE(), 112) AND j.importance = 'B101' THEN 1
+						   ELSE 0
+					  END) AS today_major_cnt
+				, SUM(CASE WHEN CONVERT(CHAR(8), j.reg_dtm, 112) = CONVERT(CHAR(8), GETDATE(), 112) AND j.importance = 'B102' THEN 1
+						   ELSE 0
+					  END) AS today_minor_cnt
+				, SUM(CASE WHEN CONVERT(CHAR(8), j.reg_dtm, 112) = CONVERT(CHAR(8), GETDATE(), 112) AND j.importance = 'B104' THEN 1
+						   ELSE 0
+					  END) AS today_request_cnt
+				, SUM(CASE WHEN CONVERT(CHAR(8), j.reg_dtm, 112) = CONVERT(CHAR(8), GETDATE(), 112) AND j.importance = 'B103' AND j.progress_stat = 'B203' THEN 1
+						   ELSE 0
+					  END) AS today_critical_finish_cnt
+				, SUM(CASE WHEN CONVERT(CHAR(8), j.reg_dtm, 112) = CONVERT(CHAR(8), GETDATE(), 112) AND j.importance = 'B101' AND j.progress_stat = 'B203' THEN 1
+						   ELSE 0
+					  END) AS today_major_finish_cnt
+				, SUM(CASE WHEN (j.importance = 'B103' OR j.importance = 'B101') THEN 1
+						   ELSE 0
+					  END) AS important_cnt
+				, SUM(CASE WHEN (j.importance = 'B103' OR j.importance = 'B101') AND j.progress_stat = 'B203' THEN 1
+						   ELSE 0
+					  END) AS important_finish_cnt
+				, SUM(CASE WHEN j.importance = 'B103' THEN 1
+						   ELSE 0
+					  END) AS critical_cnt
+				, SUM(CASE WHEN j.importance = 'B103' AND j.progress_stat = 'B203' THEN 1
+						   ELSE 0
+					  END) AS critical_finish_cnt
+				, SUM(CASE WHEN j.importance = 'B101' THEN 1
+						   ELSE 0
+					  END) AS major_cnt
+				, SUM(CASE WHEN j.importance = 'B101' AND j.progress_stat = 'B203' THEN 1
+						   ELSE 0
+					  END) AS major_finish_cnt
+			FROM tb_issue j
+			GROUP BY j.pid) E
+		ON E.pid = a.pid
+		LEFT JOIN (SELECT m.pid
+					, m.project_chasu
+					, COUNT(m.seq) AS test_cnt
+					, COUNT(m.last_bmt_result) AS test_ing_cnt
+				FROM (
+						SELECT a.pid
+							, t.seq
+							, a.project_chasu
+							, t.last_bmt_result
+						FROM tb_project a
+						LEFT JOIN tb_bmt_tc_info t ON (a.pid = t.pid)
+						WHERE a.project_stat IN ('C301','C302','C303')
+						AND (t.use_yn IS NULL OR t.use_yn = 'Y')
+						<if test=" !mngYn ">
+						AND EXISTS (
+									SELECT 1 FROM tb_project_parti P
+									WHERE p.pid = a.pid
+										AND p.parti_id = #{partiId}
+									)
+						</if>
+					) m
+				GROUP BY m.pid, m.project_chasu
+		) F
+		ON F.pid = a.pid
+		WHERE a.use_yn = 'Y'
+			AND a.project_st_dt <![CDATA[<=]]> CONVERT(CHAR(8), GETDATE(), 112)
+			AND a.project_end_dt >= CONVERT(CHAR(8), GETDATE(), 112)
+		<if test=" !mngYn ">
+			AND EXISTS (SELECT 1 FROM tb_project_parti b WHERE b.pid = a.pid AND b.parti_id = #{partiId})
+		</if>
+		<if test=" progressYn ">
+			AND a.project_stat in ('C301','C302','C303')
+		</if>
+		ORDER BY a.reg_dtm DESC
+	</select>
+	
+	<select id="selectPreEndProjectList" parameterType="projectVo" resultType="projectVo">
+		SELECT TOP 5
+			a.pid
+			, a.project_nm
+			, a.project_chasu
+			, a.yyyymmdd
+			, a.project_st_dt
+			, a.project_end_dt
+			, a.project_stat
+			, a.reg_dtm
+			, a.reg_id
+			, a.project_grade
+			, a.file_nm
+			, a.file_path
+			, a.org_file_nm
+			, a.bigo
+			, a.now_join_compose
+			, a.mod_id
+			, a.mod_dtm
+			, a.use_yn
+			, a.tc_batch_msg
+			, a.project_result
+			, DATEDIFF(dd, a.PROJECT_END_DT, CONVERT(CHAR(10), GETDATE(), 23)) AS complate_dday
+			, ROUND(CAST((DATEDIFF(dd, a.PROJECT_ST_DT, CONVERT(CHAR(10), GETDATE(), 23)) + 1) AS FLOAT) / CAST((DATEDIFF(dd, a.PROJECT_ST_DT, a.PROJECT_END_DT) + 1) AS FLOAT) * 100, 0) AS project_progress
+		FROM tb_project a
+		WHERE a.use_yn = 'Y'
+		AND project_end_dt >= CONVERT(CHAR(10), GETDATE(), 23)
+		<if test=" !mngYn ">
+			AND EXISTS (SELECT 1 FROM tb_project_parti b WHERE b.pid = a.pid AND b.parti_id = #{partiId})
+		</if>
+		ORDER BY project_end_dt ASC
+	</select>
+	
+	<update id="updateProjectChasuHstChausEndDt" parameterType="ProjectChasuHstVo">
+		MERGE INTO tb_project_chasu_hst u
+		USING (
+			SELECT	MAX(project_chasu) AS project_chasu
+			FROM	tb_project
+			WHERE	pid = #{pid}
+		) t
+		ON u.pid = #{pid}
+			AND u.chasu = t.project_chasu
+		WHEN MATCHED THEN 
+			UPDATE SET chasu_ed_dtm = #{chasuEdDtm} + ' 23:59:59'
+		;
+	</update>
+</mapper>

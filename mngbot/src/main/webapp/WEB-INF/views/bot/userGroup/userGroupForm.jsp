@@ -1,0 +1,160 @@
+<%@ page contentType="text/html" pageEncoding="UTF-8" %>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<%@ taglib uri="http://www.nextlab.co.kr/tags/nextlab" prefix="nl"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+
+<div class="pop_wrap" style="width:580px;" id="vueApp">
+	<div class="pop_tit">
+		<p>사용자그룹 {{btnMsg}}</p>
+	</div>
+	<div class="pop_cont">
+		<div class="g_table02">
+			<table>
+				<caption>그룹이름, App별 권한담당 확인 및 수정하는 표 입니다.</caption>
+				<colgroup>
+					<col style="width:120px;">
+					<col>
+				</colgroup>
+				<tbody>
+					<tr>
+						<th>그룹이름</th>
+						<td class="verify">
+							<input type="text" v-model="userGroupInfo.userGroupNm" placeholder="3~15자 사이로 입력" class="full">
+						</td>
+					</tr>
+					<tr>
+						<th>App별 권한담당</th>
+						<td>
+							<div class="g_table">
+								<table>
+									<colgroup>
+										<col style="width:20%;">
+										<col>
+										<col>
+									</colgroup>
+									<thead>
+										<tr>
+											<th>번호</th>
+											<th>앱이름</th>
+											<th>권한</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr v-for="(app, index) in appList">
+											<td>{{index+1}}</td>
+											<td>{{app.appNm}}</td>
+											<td>
+ 												<select v-model="app.authId">
+ 													<option value=" ">권한없음</option>
+													<option v-for="auth in filterAuths(app)" :value="auth.authId">{{auth.authNm}}</option>
+												</select>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<div class="btn_wrap">
+		<button class="g_btn01" @click="regUserGroup">{{btnMsg}}</button>
+		<button class="g_btn02" @click="hidePopupLayer();">닫기</button>
+	</div>
+</div>
+<script>
+	setPopup(2);
+	var vueApp = new Vue({
+		el: '#vueApp'
+		, data: {
+			errmsg:""
+			,targetMethod:"regUserGroupProc"
+			,btnMsg:"등록"
+			,appList:{}
+			,authList:{}
+			,userGroupInfo:{
+				userGroupId:'<c:out value="${param.userGroupId}"/>'
+				,userGroupNm:''
+			}
+			, procChk:false
+			
+		}
+		, mounted: function() {
+			this.$nextTick(function() {
+				this.getUserGroupView();
+			});
+			setPopup(2);
+		}, updated: function() {
+			   setPopup(2);
+		}
+		, methods: {
+			filterAuths: function(app){
+				console.log(this.authList);
+				return this.authList.filter(function(v) {
+					return v.appId === app.appId;
+				});
+			},
+			getUserGroupView:function(){
+				if(this.userGroupInfo.userGroupId)
+				{
+					this.targetMethod = "modUserGroupProc";
+					this.btnMsg= "수정";
+				}
+				$.get('/bot/userGroup/getUserGroupView?userGroupId='+this.userGroupInfo.userGroupId, function(data) {
+					vueApp.appList = data.appList;
+					vueApp.authList = data.authList;
+					if(data.userGroupInfo)
+					{
+						vueApp.userGroupInfo = data.userGroupInfo;
+					}
+				});
+			},
+			regUserGroup: function(){
+				if(this.userGroupInfo.userGroupNm == "")
+				{
+					alert("제목을 입력하지 않았습니다.");
+					return;
+				}
+				if(this.userGroupInfo.userGroupNm.length <3 || this.userGroupInfo.userGroupNm.length > 15)
+				{
+					alert("유저그룹은 최소 3글자 최대 15문자 이내입니다.");
+					return;
+				}
+				this.userGroupInfo.appList = this.appList;
+				if (this.procChk) return;
+				$.ajax({
+					url: "/bot/userGroup/"+this.targetMethod,
+					method: "post",
+					type: "json",
+					contentType: "application/json",
+					data: JSON.stringify(this.userGroupInfo)
+					, beforeSend: function() { 
+						vueApp.procChk = true;
+						parent.startLoading();
+					}
+					, success: function(data) {
+						if(data.result)
+						{
+							alert(vueApp.userGroupInfo.userGroupNm+" 을 "+ vueApp.btnMsg+"했습니다.");
+							parent.parent.vueApp.getList();
+							hidePopupLayer();
+						}
+						else if (data.message) {
+							alert(data.message);
+						}
+					}
+					, error: function(xhr, status, error) {
+						alert($(xhr.responseText).text());
+					}
+					, complete : function() {
+						vueApp.procChk = false;
+						parent.endLoading();
+					}
+				});
+			}
+		}
+	});
+
+</script>

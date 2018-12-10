@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>CVCBank</title>
+	<link rel="shortcut icon" href="../../images/favicon.ico" type="image/x-icon">
+	<link rel="stylesheet" href="../../css/common.css">
+	<link rel="stylesheet" href="../../css/qa.css">
+	<script src="../../js/jquery-3.2.1.min.js"></script>
+	<script src="../../js/jquery-ui.min.js"></script>
+	<script src="../../js/jquery.form.min.js"></script>
+	<script src="../../js/vue.min.js"></script>
+	<script src="../../js/lodash.min.js"></script>
+	<script src="../../js/calendar.js"></script>
+	<script src="../../js/common.js"></script>
+</head>
+<body>
+	<div class="pop_wrap">
+		<div class="pop_tit">
+			<p>시나리오파일 업로드</p>
+		</div>
+		<div class="pop_cont pop_new_prj">
+			<p class="info_tit">파일 등록</p>
+			<div class="g_table02">
+				<table>
+					<caption></caption>
+					<colgroup>
+						<col style="width:120px;">
+						<col>
+					</colgroup>
+					<tbody>
+						<tr>
+							<th>파일정보<strong>*</strong></th>
+							<td>
+								<textarea class="full" id="" placeholder="업로드할 시나리오 파일에 대한 정보를 입력해주세요."></textarea>
+							</td>
+						</tr>
+						<tr>
+							<th>파일첨부<strong>*</strong></th>
+							<td class="file">
+								<p class="note">최대 10GB까지 첨부 가능합니다. (최대 1개, 확장자 : .nts)</p>
+								<input type="file" class="ir" id="file" name=""><label for="file" class="sch_file">파일찾기</label>
+							</td>
+						</tr>
+						<tr>
+							<th>파일첨부<strong>*</strong></th>
+							<td class="file">
+								<p class="note">최대 10GB까지 첨부 가능합니다. (최대 1개, 확장자 : .nts)</p>
+								<ul class="file_list">
+									<li class="full scenario" ><a href="#">abc.nts</a><button class="del"></button></li>
+								</ul>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<ul class="notice">
+				<li>용량이 큰 파일의 경우 네트워크 및 인터넷 환경에 따라 파일 등록이 지연될 수 있습니다.</li>
+			</ul>
+		</div>
+		<div class="btn_wrap">
+			<button v-else class="btn_proc">등록</button>
+			<button class="btn_cancel">취소</button>
+		</div>
+	</div>
+</body>
+</html>

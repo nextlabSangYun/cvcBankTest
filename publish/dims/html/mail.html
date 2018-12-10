@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>DIMS</title>	
+	<style>
+		/* reset ============= */
+		*{margin:0; padding:0;}
+		ol, ul{list-style:none;}
+		a{outline:0; text-decoration:none; color:#333;}
+		img{border:0;}
+		html{height:100%;}
+		body{font-size:62.5%; font-family:'Malgun Gothic', '맑은 고딕', Dotum, '돋움', sans-serif;}
+		button{outline:0; font-family:'Malgun Gothic', '맑은 고딕', Dotum, '돋움', sans-serif;}
+
+		.wrapper_mail{position:relative; width:751px; height:782px; box-sizing:border-box;}/* background:black url(../images/bg_mail.png); */
+		.content_wrap{position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); display:inline-block; width:620px;}
+		.content_wrap h1{margin-bottom:20px; text-align:left;}
+		.content_wrap .date{position:absolute; right:0; top:40px; font-size:10px; color:#666;}
+		.content_box{width:620px; height:477px; box-sizing:border-box; padding:50px; background:#fff; box-shadow:0px 0px 10px 2px rgba(51, 51, 51,0.3);}
+		.content_box .info{height:160px; margin-bottom:40px;}
+		.content_box .info .img{float:left; display:inline-block;}
+		.content_box .info .title{float:right; width:370px; margin-top:10px; font-size:24px; color:#333;}
+		.content_box .info .txt{float:right; width:370px; margin-top:20px; line-height:20px; font-size:14px; color:#333;}
+		.content_box .info strong{font-weight:normal; font-size:11px; color:#e51937;} 
+		.content_box table{width:100%; border-spacing:0; border-collapse:collapse; margin:0 0 30px;}
+		.content_box table th{height:40px; font-weight:normal; font-size:14px; color:#fff; text-align:center; border-top:1px solid #fff;  background:#777;}
+		.content_box table td{height:40px; padding:0 20px; font-size:14px; color:#333; text-align:left; border-top:1px solid #fff; background:#f5f5f5;}
+		.content_box .btn_go{width:100%; height:56px; line-height:56px; box-sizing:border-box; font-size:24px; color:#fff; text-align:center; background:hsl(31, 100%, 50%) url(../images/arrow_mail.png) 480px center no-repeat; border-radius:3px; border:none; cursor:pointer;}
+		.content_box .btn_go:hover{background:hsl(31, 100%, 45%) url(../images/arrow_mail.png) 480px center no-repeat; border-radius:3px; border:none;}
+		.content_wrap .company{margin-top:20px; line-height:20px; font-size:11px; color:#666; text-align:center;}
+		.content_wrap .notice{margin-top:20px; margin-bottom:20px; font-size:14px; color:#ff8400; text-align:center;}
+		.wrapper_mail footer{position:absolute; bottom:0; left:0; width:100%;  height:30px; background:#666; text-align:center; }
+		.wrapper_mail footer .footertext{display:inline-block; line-height:30px; font-size:10px; color:#fff;}
+	</style>
+</head>
+<body>   		
+	<div class="wrapper_mail">
+		<div class="content_wrap">
+			<h1>
+				<img src="../images/logo_mail.png" alt="단말통합관리시스템">
+			</h1>
+			<div class="date">YYYY.MM.DD</div>
+			<div class="content_box">
+				
+				<div class="info">
+					<div class="img"><img src="../images/icon_mail.png" alt=""></div>
+					<div class="title">임시비밀번호를 안내해드립니다.</div>
+					<div class="txt">
+						안녕하세요.<br>
+						SK브로드밴드 단말통합관리시스템입니다.<br>
+						임시비밀번호를 안내해드립니다.<br>
+						<strong>로그인 후 반드시 비밀번호를 변경하여 사용하여 주시기 바랍니다.</strong>
+					</div>
+				</div>
+				<table>
+					<colgroup>
+						<col width="140">
+						<col width="">
+					</colgroup>
+					<tbody>
+						<tr>
+							<th>임시비밀번호</th>
+							<td>Qlalf!23</td>
+						</tr>
+						<tr>
+							<th>발급일시</th>
+							<td>2018년 04월 02일 16시 31분</td>
+						</tr>
+					</tbody>
+				</table>
+				<button type="submit" class="btn_go">바로가기</button>				
+			</div>
+			<div class="company">
+				SK브로드밴드(주) | 대표이사/사장 : 이형희 | 서울특별시중구퇴계로24SK남산그린빌딩<br>
+				사업자등록번호:214-86-18758/통신판매업신고번호:서울중구제2008-1608호<br>
+				고객센터:가입문의국번없이106(당사전화고객무료,타사전화고객유료)/080-8282-106(무료)
+			</div>
+			<div class="notice">본메일은발신전용으로회신되지않습니다.</div>
+		</div>			
+		<footer>
+			<div class="footertext">
+				COPYRIGHT SK broadband CO.,LTD. ALL RIGHTS RESERVED.								
+			</div>			
+		</footer>
+    </div><!-- end .wrapper_mail -->		
+</body>
+</html>

@@ -1,0 +1,215 @@
+/**
+ * @title	: 이슈 service
+ * @package	: kr.co.nextlab.bmt.service
+ * @file	: IssueService.java
+ * @author	: jnlee
+ * @date	: 2018. 1. 4.
+ * @desc	: 
+ */
+package kr.co.nextlab.bmt.service;
+
+import java.util.List;
+
+import kr.co.nextlab.bmt.model.DecisionMakingVo;
+import kr.co.nextlab.bmt.model.IssueCateVo;
+import kr.co.nextlab.bmt.model.IssueCommentVo;
+import kr.co.nextlab.bmt.model.IssueCriteria;
+import kr.co.nextlab.bmt.model.IssueFileVo;
+import kr.co.nextlab.bmt.model.IssueModelVo;
+import kr.co.nextlab.bmt.model.IssuePartiVo;
+import kr.co.nextlab.bmt.model.IssueTcVo;
+import kr.co.nextlab.bmt.model.IssueVo;
+import kr.co.nextlab.bmt.model.ProjectVo;
+import kr.co.nextlab.bmt.model.VoteIssueVo;
+import kr.co.nextlab.bmt.model.VoteManagementVo;
+import kr.co.nextlab.bmt.model.VoterVo;
+
+public interface IssueService {
+
+	/**
+	 * 이슈 리스트
+	 * @param criteria
+	 * @return
+	 */
+	public List<IssueVo> selectIssueList(IssueCriteria criteria);
+	
+	/**
+	 * 이슈 상세조회
+	 * @param issueId 이슈아이디
+	 * @return 이슈 상세정보
+	 */
+	public IssueVo selectIssueView(String issueId);
+	
+	/**
+	 * 이슈 테스트케이스리스트
+	 * @param issueId 이슈아이디
+	 * @return 이슈 테스트케이스리스트
+	 */
+	public List<IssueTcVo> selectIssueTcList(String issueId);
+	
+	/**
+	 * 이슈 대상자 리스트
+	 * @param issueId 이슈아이디
+	 * @return 이슈 대상자 리스트
+	 */
+	public List<IssuePartiVo> selectIssuePartiList(String issueId);
+	
+	/**
+	 * 이슈 파일 리스트
+	 * @param issueId 이슈아이디
+	 * @return 이슈 파일 리스트
+	 */
+	public List<IssueFileVo> selectIssueFileList(String issueId);
+	
+	/**
+	 * 이슈 코멘트 리스트
+	 * @param issueId 이슈아이디
+	 * @return 이슈 코멘트 리스트
+	 */
+	public List<IssueCommentVo> selectIssueCommentList(String issueId);
+	
+	/**
+	 * 이슈 카테고리 리스트
+	 * @param issueId 이슈아이디
+	 * @return 이슈 카테고리 리스트
+	 */
+	public List<IssueCateVo> selectIssueCateList(String issueId);
+	
+	/**
+	 * 이슈 카테고리 리스트
+	 * @param issueId 이슈아이디
+	 * @return 이슈 카테고리 리스트
+	 */
+	public List<IssueCateVo> selectIssueCategoryList(String pid);
+	
+	/**
+	 * 이슈 측정모델 리스트
+	 * @param issueId 이슈아이디
+	 * @return 이슈 측정모델 리스트
+	 */
+	public List<IssueModelVo> selectIssueModelList(String issueId);
+	
+	/**
+	 * 이슈 등록
+	 * @param issueVo 이슈 정보
+	 * @return 등록 결과
+	 */
+	public boolean insertIssue(IssueVo issueVo);
+	
+	/**
+	 * 이슈 할당대상 수정
+	 * @param issueVo 이슈 정보 (issueId, partiList)
+	 * @return 수정 결과
+	 */
+	public boolean updateIssuePartiList(IssueVo issueVo);
+	
+	/**
+	 * 이슈 코멘트 등록
+	 * @param issueCommentVo 이슈 코멘트 정보
+	 * @return 등록 결과
+	 */
+	public boolean insertIssueComment(IssueCommentVo issueCommentVo, IssueVo issueVo);
+	
+	/**
+	 * 이슈 코멘트 수정
+	 * @param issueCommentVo 이슈 코멘트 정보
+	 * @return 등록결과
+	 */
+	public boolean updateIssueComment(IssueCommentVo issueCommentVo);
+	/**
+	 * 이슈 진행상태 변경
+	 * @param issueVo 이슈 정보
+	 * @return 처리 결과
+	 */
+	public boolean updateIssueProgressStat(IssueVo issueVo);
+	
+	/**
+	 * 코멘트 등록시 이슈 진행상태 변경
+	 * @param issueVo 이슈 정보
+	 * @return 처리 결과
+	 */
+	public boolean updateIssueProgressStatComment(IssueVo issueVo);
+	
+	/**
+	 * 이슈 삭제하기
+	 * @param issueId
+	 * @return
+	 */
+	public boolean deleteIssuePrc(String[] param);
+	
+	/**
+	 * 이슈 수정하기
+	 * @param issueVo
+	 * @return
+	 */
+	public boolean updateIssuePrc(IssueVo issueVo);
+	
+	/**
+	 * bmt 의사결정 투표가 있는지 체크
+	 * @param pid
+	 * @return
+	 */
+	public boolean selectCheckVote(String pid);
+	
+	/**
+	 * 등록된 투표대상자인지 체크
+	 * @return
+	 */
+	public boolean selectCheckVoter(VoterVo voterVo);
+	
+	/**
+	 * 투표 조회
+	 * @param pid
+	 * @return
+	 */
+	public DecisionMakingVo selectVote(String pid);
+	
+	/**
+	 * 이슈 리스트를 이슈아이디로 조회
+	 * @param criteria
+	 * @return
+	 */
+	public List<IssueVo> selectIssueListByIssueIds(IssueCriteria criteria);
+	
+	/**
+	 * bmt 의사결정 등록
+	 * @param decisionMakingVo
+	 * @return
+	 */
+	public boolean insertDecisionMaking(DecisionMakingVo decisionMakingVo);
+	
+	/**
+	 * 투표 등록
+	 * @param voteManagementList
+	 * @return
+	 */
+	public boolean insertVoteManagementList(List<VoteManagementVo> voteManagementList, String userId);
+	
+	/**
+	 * 투표 이슈 등록
+	 * @param decisionMakingVo
+	 * @return
+	 */
+	public boolean insertVoteIssueList(DecisionMakingVo decisionMakingVo);
+	
+	/**
+	 * 투표 이슈 use_yn 수정
+	 * @param voteIssueVo
+	 * @return
+	 */
+	public boolean updateVoteIssueUseYn(VoteIssueVo voteIssueVo);
+	
+	/**
+	 * 투표 수정
+	 * @param decisionMakingVo
+	 * @return
+	 */
+	public boolean updateDecisionMaking(DecisionMakingVo decisionMakingVo);
+	
+	/**
+	 * 프로젝트 명 조회
+	 * @param pid
+	 * @return
+	 */
+	public ProjectVo selectProjectNm(String pid);
+}

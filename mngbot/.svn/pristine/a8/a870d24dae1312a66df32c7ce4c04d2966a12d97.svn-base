@@ -1,0 +1,320 @@
+<%@ page contentType="text/html" pageEncoding="UTF-8" %>
+<%@ taglib uri="http://www.nextlab.co.kr/tags/nextlab" prefix="nl"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<link href="/css/kendo.common-material.min.css" rel="stylesheet">
+<link href="/css/kendo.material.min.css" rel="stylesheet">
+<script type="text/javascript" src="/js/kendo.all.min.js"></script>
+<div class="content">
+	<div class="sub_layout has_snb">
+		<div class="cont_wrap">
+			<div class="g_table04">
+				<table>
+					<caption>기간, 현재상태, 참여인력 등을 확인할 수 있는 표 입니다.</caption>
+					<colgroup>
+						<col style="width:170px;">
+						<col>
+						<col style="width:170px;">
+						<col>
+					</colgroup>
+					<tbody>
+						<tr>
+							<th>프로젝트명</th>
+							<td>{{ heProjectView.projectNm }}</td>
+							<th>차수</th>
+							<td v-if="heProjectView.chasuStat == 'Y'">{{ heProjectView.chasu }}차</td>
+							<td v-else>{{ heProjectView.chasu }}차(수정개발중)</td>
+						</tr>
+						<tr>
+							<th>프로젝트 기간</th>
+							<td colspan="3">{{ heProjectView.projectStDt | dateFormat}} ~ {{ heProjectView.projectEndDt | dateFormat}}</td>
+						</tr>
+						<tr>
+							<th>차수별 기간</th>
+							<td colspan="3">
+								<div class="g_table04">
+									<table>
+										<colgroup>
+											<col style="width:150px;">
+											<col>
+										</colgroup>
+										<tbody>
+											<tr v-for="(list, index) in heProjectChasuHstList">
+												<th style="text-align: center;">{{list.chasu}} 차</th>
+												<td>{{ list.chasuStDtm | dateFormat}} ~ {{ list.chasuEdDtm | dateFormat}}</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<th>시스템</th>
+							<td colspan="3">{{ heProjectView.systemNm}}</td>
+						</tr>
+						<tr>
+							<th>참여인력</th>
+							<td colspan="3">
+								<div class="g_table inner">
+									<table>
+										<thead>
+											<tr>
+												<th>그룹명</th>
+												<th>참여자</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr v-for="(list, index) in heProjectManagerList">
+												<td>{{list.userGroupNm}}</td>
+												<td>{{list.userNm}}</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<th>비고</th>
+							<td colspan="3">{{ heProjectView.bigo }}</td>
+						</tr>
+						<tr>
+							<th>최초작성자</th>
+							<td>{{ heProjectView.regNm }}</td>
+							<th>최초 작성일시</th>
+							<td>{{ heProjectView.regDtm | dateTimeFormat}}</td>
+						</tr>
+						<tr>
+							<th>최종작성자</th>
+							<td>{{ heProjectView.modNm }}</td>
+							<th>최종 작성일시</th>
+							<td>{{ heProjectView.modDtm | dateTimeFormat}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<p class="cate_tit">프로젝트 관리</p>
+			<div class="now_state">
+				<ul>
+					<li>
+						<span>현재</span>
+						<p v-if="heProjectView.chasuStat == 'Y'"><strong>{{heProjectView.chasu}}</strong>회차</p>
+						<p v-else>수정개발중</p>
+						<button class="btn_default" @click="modHeProjectNextChasu">다음회차시작</button>
+					</li>
+					<li>
+						<span>프로젝트</span>
+						<p><strong class="point_cr">진행중</strong></p>
+						<div class="state_desc">
+							<nl:select v-model="projectResultStat" id="ptl">
+								<nl:option value="">- 검증결과 -</nl:option>
+								<nl:options codeType="D100" />
+							</nl:select>
+							<button class="btn_default" @click="modHeProjectComplete">프로젝트 완료 처리</button>
+						</div>
+					</li>
+					<li v-if="userGroupId == 'G01'">
+						<button class="btn_cancel" @click="delHeProject">프로젝트 삭제</button>
+					</li>
+					<li class="setting_list">
+						<a href="#" @click="goProjectEdit()"><span class="ico"><img src="/images/bmt/ico_bmt_set_0002030701.png" alt="프로젝트 정보수정"></span><span class="name">프로젝트 정보 수정</span></a>
+					</li>
+				</ul>
+			</div>
+			
+			
+			<p class="cate_tit">T.C Pass rate</p>
+			<div class="tc_chart" id="tc_chart"></div>
+			
+		</div>
+	</div>
+</div>
+
+<script>
+	var cont = new Vue({
+		el: '.content'
+		, data: {
+			heProjectView: {}
+			,heProjectManagerList: {}
+			, heProjectChasuHstList: {}
+			, projectStatNm: '<nl:codeListJson codeType="C300" />'
+			, codeListD100: '<nl:codeListJson codeType="D100" />'
+			, userGroupId: '<c:out value="${userSession.userGroupId}"/>'
+			, projectResultStat: ''
+			, pid: '<c:out value="${param.pid}"/>'
+			, proc: false
+			, tcPassRateList: {}
+		}
+		, mounted: function() {
+			this.$nextTick(function() {
+				this.getProjectView();
+				this.getTcPassRateChart();
+			});
+		}
+		, methods: {
+			getProjectView: function(){
+				$.get("/hded/project/getHeProjectInfoView?pid="+cont.pid, function(data){
+					cont.heProjectView = data.heProjectView;
+					cont.heProjectManagerList = data.heProjectManagerList;
+					cont.heProjectChasuHstList = data.heProjectChasuHstList;
+				});
+			}
+			, goProjectEdit: function(){
+				var url = "/hded/project/projectForm?pid="+cont.pid
+				var menuNm = "프로젝트 정보수정"
+				if (url) {
+					popup(url, menuNm, 620, 470, 'yes');
+				}
+			}
+			,modHeProjectComplete: function(){
+				if(this.projectResultStat == ""){
+					alert("프로젝트 검증결과를 선택해주세요.")
+					return;
+				}
+				
+				var param = {
+					pid: this.pid
+					, projectResultCd: this.projectResultStat
+				}
+				if (!confirm("프로젝트 완료처리를 하시겠습니까?")) return;
+				cont.proc = true;
+				$.post("/hded/project/modHeProjectCompletePrc", {pid:param.pid, projectResultCd:param.projectResultCd}, function(data) {
+					if (data.save) {
+						alert("프로젝트가 완료 되었습니다.");
+						cont.getProjectView();
+					} else if (data.message) {
+						alert(data.message);
+					}
+					cont.projectResultStat = "";
+					cont.proc = false;
+				});
+			}
+			, modHeProjectNextChasu: function(){
+				var param = this.heProjectView;
+				var confirmStr = "다음 차수로 변경 하시겠습니까?";
+				var completeStr = "다음 차수로 변경 되었습니다.";
+				if (cont.heProjectView.chasuStat !== 'N') {
+					confirmStr = "수정개발 상태로 변경 하시겠습니까?";
+					completeStr = "수정개발 상태 변경 되었습니다.";
+				}
+				if (!confirm(confirmStr)) return;
+				cont.proc = true;
+				$.ajax({
+					type: "post"
+					, url : "/hded/project/modNextHeProjectSystemChasuPrc"
+					, contentType: "application/json"
+					, data : JSON.stringify(param)
+					, beforeSend: function() { 
+						cont.proc = true;
+					}
+					, success: function(data) {
+						if (data.save) {
+							alert(completeStr);
+							cont.getProjectView();
+						} else if (data.message) {
+							alert(data.message);
+						}
+					}
+					, error: function(xhr, status, error) {
+						alert($(xhr.responseText).text());
+					}
+					, complete : function() {
+						cont.proc = false;
+					}
+				});
+				
+			}
+			, delHeProject: function(){
+				var param = this.heProjectView;
+				
+				if (!confirm("프로젝트를 삭제하시겠습니까?")) return;
+				
+				$.ajax({
+					type: "post"
+					, url: "/hded/project/modHeProjectUseYnPrc"
+					, contentType: "application/json"
+					, data : JSON.stringify(param)
+					, beforeSend: function() {
+						parent.startLoading();
+					}
+					, success: function(data) {
+						if (data.save) {
+							alert("프로젝트가 삭제되었습니다.");
+							location.href = "/hded/main";
+						} else {
+							alert("프로젝트 삭제에 실패하였습니다.");
+						}
+					}
+					, error: function(xhr, status, error) {
+						alert($(xhr.responseText).text());
+					}
+					, complete: function() {
+						parent.endLoading();
+					}	
+				});
+			}
+			, getTcPassRateChart: function() {
+				$.get("/hded/project/getTcPassRate?pid="+cont.pid, function(data){
+					cont.tcPassRateList = data.tcPassRateList;
+					cont.getTcPassRateChartView();
+				});
+			}
+			, getTcPassRateChartView: function() {
+				if (this.tcPassRateList.length < 1) {
+					return;
+				}
+				var data = [];
+				var tcPassPercent = "";
+				for (var i=0; i<this.tcPassRateList.length; i++) {
+					var tcPassRate = this.tcPassRateList[i];
+					var temp = {
+						"chasu" : tcPassRate.chasu
+						, "tcTotalCnt": tcPassRate.tcTotalCnt
+						, "tcPassCnt": tcPassRate.tcPassCnt
+					}
+					data.push(temp);
+					
+					if (i == this.tcPassRateList.length - 1) {
+						tcPassPercent = "전체 T.C 수 : " + tcPassRate.tcTotalCnt + "\n" + tcPassRate.chasu + "차 Pass rate : " +tcPassRate.tcPassPercent + "%";
+					}
+				}
+				
+				$("#tc_chart").kendoChart({
+					dataSource: {
+						data: data
+					},
+					title: {
+						text: tcPassPercent
+					},
+					legend: {
+						position: "bottom"
+					},
+					seriesDefaults: {
+						type: "line"
+					},
+					series: [{
+						name: "PASS",
+						field: "tcPassCnt",
+						categoryField: "chasu",
+					}, {
+						name: "TOTAL",
+						field: "tcTotalCnt",
+						categoryField: "chasu",
+					}],
+					valueAxis: {
+						line: {
+							visible: false
+						}
+					},
+					categoryAxis: {
+						majorGridLines: {
+							visible: false
+						}
+					},
+					tooltip: {
+						visible: true,
+						template: "#= series.name #: #= value #건"
+					}
+				});
+			}
+		}
+	});
+</script>

@@ -1,0 +1,444 @@
+<%@ page contentType="text/html" pageEncoding="UTF-8" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://www.nextlab.co.kr/tags/nextlab" prefix="nl"%>
+<link href="/css/fullcalendar.min.css" rel="stylesheet">
+<link href="/css/fullcalendar.print.min.css" rel="stylesheet" media="print">
+<script src="/js/fullcalendar.min.js"></script>
+<script src="/js/locale-all.js"></script>
+<script src="/js/gcal.min.js"></script>
+<div class="content">
+	<div class="sub_layout dashboard">
+		<div class="con_col2">
+			<div class="l_cont dashboard">
+				<p class="cate_tit">프로젝트 스케줄</p>
+				<div class="prj_sch_frame">
+					<div id="calendar"></div>
+				</div>
+			</div>
+			<div class="r_cont dashboard">
+				<div class="con_col2 row">
+					<div class="l_cont">
+						<p class="cate_tit">금주의 프로젝트</p>
+						<div class="dash-frame weekly">
+							<div class="sub-tit">
+								<p class="total">
+									<span>총 프로젝트 개수</span>
+									<span>{{myThisWeekProjectList.length}}</span>
+								</p>
+								<p class="period">{{startDate}} ~ {{endDate}}</p>
+							</div>
+							<div class="slide-view swiper-container">
+								<ul class="weekly-list swiper-wrapper">
+									<li class="swiper-slide" v-for="(project, idx) in myThisWeekProjectList">
+										<div class="desc-wrap">
+											<div class="con_tit">
+												<p class="title">
+													<a :href="projectUrl+project.pid">{{project.projectNm}}</a>
+												</p>
+												<p>{{project.projectStDt}} ~ {{project.projectEndDt}}</p>
+											</div>
+											<div class="con_col2">
+												<div class="l_cont">
+													<span v-if="project.chasuWaitYn == 'Y'">{{project.projectChasu}}차 (대기중)</span>
+													<span v-else>{{project.projectChasu}}차 진행중</span><br/>
+												</div>
+												<div class="r_cont">
+													<div class="row">
+														<p class="total">
+															<span class="ico-tc">총 TC 개수</span>
+															<span class="count">{{project.testCnt}}</span>
+														</p>
+														<p class="desc">
+															<span class="ico-pass">{{project.passCnt}}</span>
+															<span class="ico-fail">{{project.failCnt}}</span>
+														</p>
+													</div>
+													<div class="row">
+														<p class="total">
+															<span class="ico-issue">중요 이슈 개수</span>
+															<span class="count">{{project.criticalCnt + project.majorCnt}}</span>
+														</p>
+														<p class="desc">
+															<span class="ico-critical">{{project.criticalCnt}}</span>
+															<span class="ico-major">{{project.majorCnt}}</span>
+														</p>
+													</div>
+												</div>
+											</div>
+										</div>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</div>
+					<div class="r_cont">
+						<p class="cate_tit">종료예정 프로젝트</p>
+						<div class="dash-frame">
+							<ul class="end-list" id="end-list">
+								<li v-for="(project, idx) in preEndProjectList">
+									<p class="title">
+										<a :href="projectUrl+project.pid">{{project.projectNm}}</a>
+									</p>
+									<div class="period">
+										<div>{{project.projectStDt}} ~ {{project.projectEndDt}}</div>
+										<div class="count" v-if="project.complateDday == 0">D-day</div>
+										<div class="count" v-else>D{{project.complateDday}}</div>
+										<div class="stick">
+											<!-- perc의 width값에 따라 아래 클래스 추가
+												0~25%이면 great
+												26~50%이면 much
+												51~75%이면 bit
+												76~99%이면 left
+												100%이면 none -->
+											<div v-if="project.projectProgress <= 25" class="perc great" style="width: 25%;" :progressNum="project.projectProgress"></div>
+											<div v-else-if="project.projectProgress <= 50" class="perc much" style="width: 50%;" :progressNum="project.projectProgress"></div>
+											<div v-else-if="project.projectProgress <= 75" class="perc bit" style="width: 75%;" :progressNum="project.projectProgress"></div>
+											<div v-else-if="project.projectProgress <= 99" class="perc left" style="width: 99%;" :progressNum="project.projectProgress"></div>
+											<div v-else class="perc none" style="width: 100%;" :progressNum="project.projectProgress"></div>
+										</div>
+									</div>
+								</li>
+							</ul>
+							<div class="notice">종료일이 얼마 남지 않은 다섯개의 프로젝트만 표시됩니다.</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<p class="cate_tit">오늘의 프로젝트</p>
+					<div class="dash-frame daily">
+						<div class="today">{{today}}</div>
+						<div class="slide-view swiper-container2">
+							<ul class="daily-list swiper-wrapper">
+								<li class="swiper-slide" v-for="(project, idx) in myTodayProjectList">
+									<p class="title">
+										<a :href="projectUrl+project.pid">{{project.projectNm}}</a>
+									</p>
+									<div class="period">
+										<div class="d-day">
+											<span class="ico-calendar"></span>
+											<span v-if="project.complateDday == 0">D-day</span>
+											<span v-else>D-{{project.complateDday}}</span>
+										</div>
+										<div>
+											<span>{{project.projectStDt}} ~ {{project.projectEndDt}}</span>
+											<span class="times" v-if="project.chasuWaitYn == 'Y'">{{project.projectChasu}}차 (대기중)</span>
+											<span class="times" v-else>{{project.projectChasu}}차</span><br/>
+										</div>
+									</div>
+									<div class="desc">
+										<div class="desc-wrap tc">
+											<div class="txt">
+												<p>테스트 현황</p>
+												<p>
+													<span class="count">{{project.testIngCnt}}</span>
+													<span>/ {{project.testCnt}}</span>
+												</p>
+											</div>
+											<a :href="projectTcUrl+project.pid">
+												<div :class="['st_grape', project.xqmsPercent==100 ? 'full' : '']">
+													<div :class="['grape', project.xqmsPercent>50 ? 'over' : '']">
+														<div class="bar" :style="{transform:'rotate('+setRotate(project.xqmsPercent)+')'}" v-if ="project.xqmsPercent>0"></div>
+														<p class="per">{{ project.xqmsPercent }}<span>%</span></p>
+													</div>
+												</div>
+											</a>
+										</div>
+										<div class="desc-wrap">
+											<div class="txt">
+												<p>중요 이슈 현황</p>
+												<p>
+													<span class="count">{{project.importantFinishCnt}}</span>
+													<span>/ {{project.importantCnt}}</span>
+												</p>
+											</div>
+											<a :href="projectIssueUrl+project.pid">
+												<div :class="['st_grape', project.importantPercent==100 ? 'full' : '']">
+													<div :class="['grape', project.importantPercent>50 ? 'over' : '']">
+														<div class="bar" :style="{transform:'rotate('+setRotate(project.importantPercent)+')'}" v-if ="project.importantPercent>0"></div>
+														<p class="per">{{ project.importantPercent }}<span>%</span></p>
+													</div>
+												</div>
+											</a>
+										</div>
+										<div class="desc-wrap small">
+											<div :class="['st_grape','red', project.criticalPercent==100 ? 'full' : '']">
+												<div :class="['grape', project.criticalPercent>50 ? 'over' : '']">
+													<div class="bar" :style="{transform:'rotate('+setRotate(project.criticalPercent)+')'}" v-if ="project.criticalPercent>0"></div>
+													<p class="per">{{ project.criticalPercent }}<span>%</span></p>
+												</div>
+											</div>
+											<p class="ico-critical">Critical</p>
+											<p class="count">{{project.criticalFinishCnt}}/{{project.criticalCnt}}</p>
+										</div>
+										<div class="desc-wrap small">
+											<div :class="['st_grape','red', project.majorPercent==100 ? 'full' : '']">
+												<div :class="['grape', project.majorPercent>50 ? 'over' : '']">
+													<div class="bar" :style="{transform:'rotate('+setRotate(project.majorPercent)+')'}" v-if ="project.majorPercent>0"></div>
+													<p class="per">{{ project.majorPercent }}<span>%</span></p>
+												</div>
+											</div>
+											<p class="ico-major">Major</p>
+											<p class="count">{{project.majorFinishCnt}}/{{project.majorCnt}}</p>
+										</div>
+										<div class="desc-wrap txt">
+											<p class="title">전일 현황</p>
+											<p class="ico-critical">
+												<span>발생</span>
+												<span>{{project.yesterdayCriticalCnt}}</span>
+												<span>완료</span>
+												<span>{{project.yesterdayCriticalFinishCnt}}</span>
+											</p>
+											<p class="ico-major">
+												<span>발생</span>
+												<span>{{project.yesterdayMajorCnt}}</span>
+												<span>완료</span>
+												<span>{{project.yesterdayMajorFinishCnt}}</span>
+											</p>
+										</div>
+										<div class="desc-wrap txt realtime">
+											<p class="title">금일 실시간 현황</p>
+											<p class="ico-critical">
+												<span>발생</span>
+												<span>{{project.todayCriticalCnt}}</span>
+												<span>완료</span>
+												<span>{{project.todayCriticalFinishCnt}}</span>
+											</p>
+											<p class="ico-major">
+												<span>발생</span>
+												<span>{{project.todayMajorCnt}}</span>
+												<span>완료</span>
+												<span>{{project.todayMajorFinishCnt}}</span>
+											</p>
+										</div>
+									</div>
+								</li>
+							</ul>
+						</div>
+						<div class="pagenation">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="ico-info">
+			<p class="ico-pass">Pass</p>
+			<p class="ico-fail">Fail</p>
+			<p class="ico-critical">Critical</p>
+			<p class="ico-major">Major</p>
+		</div>
+	</div>
+</div>
+<link rel="stylesheet" href="/css/swiper.min.css">
+<script src="/js/swiper.min.js"></script>
+<script>
+	var mainView = new Vue({
+		el: '.content'
+			, data: {
+				startDate : '<c:out value="${startDate}"/>'
+				, endDate : '<c:out value="${endDate}"/>'
+				, today : '<c:out value="${today}"/>'
+				, myThisWeekProjectList: []
+				, preEndProjectList: []
+				, myTodayProjectList: []
+				, swiper : null
+				, todaySwiper : null
+				, timer : null
+				, projectUrl: "/bmt/projectMain?pid="
+				, projectTcUrl: "/bmt/tc/tcList?pid="
+				, projectIssueUrl: "/bmt/issue/issueList?pid="
+			}
+		, mounted: function() {
+			this.$nextTick(function() {
+				this.getCalendarView();
+				this.getProjectList();
+				this.getThisWeekProjectList();
+				this.getPreEndProjectList();
+				this.getMyTodayProjectList();
+			});
+			
+			setTimeout(function(){
+				mainView.swiper = new Swiper('.swiper-container', {
+					direction: 'vertical',
+					slidesPerView: 3,
+					loop: true,
+		 			autoplay: {
+		 				delay: 5000,
+		 			},
+				});
+				
+				mainView.todaySwiper = new Swiper('.swiper-container2', {
+					loop: true,
+		 			autoplay: {
+		 				delay: 5000,
+		 			},
+		 			setWrapperSize: true,
+		 			pagination: {
+		 				el: '.pagenation',
+		 				clickable: true,
+		 			},
+				});
+				
+				mainView.timer = setTimeout(function(){
+					window.location.reload();
+				}, 1000 * 60 * 5);
+				
+				$('#end-list li').each(function() {
+					var progressNum = $(this).find('.period').find('.stick').find('div').attr('progressNum');
+					$(this).find('.period').find('.stick').find('div').css('width', progressNum + '%');
+				});
+				
+				$(".swiper-container .swiper-wrapper .swiper-slide").on("mouseover", function(e) {
+					mainView.mouseOverFun();
+				});
+				$(".swiper-container2 .swiper-wrapper .swiper-slide , .pagenation").on("mouseover", function(e) {
+					mainView.mouseOverFun2();
+				});
+				$(".swiper-container .swiper-wrapper .swiper-slide").on("mouseout",function(e) {
+					mainView.mouseOutFun();
+				});
+				$(".swiper-container2 .swiper-wrapper .swiper-slide , .pagenation").on("mouseout",function(e) {
+					mainView.mouseOutFun2();
+				});
+			}, 1000);
+		}
+		, methods: {
+			getCalendarView: function() {
+				var view = this;
+				$('#calendar').fullCalendar({
+					header: {
+						left: 'myPrev,myNext',
+						center: 'title',
+						right: 'today fullButton'
+					}
+					, customButtons: {
+						myPrev: {
+							icon: 'left-single-arrow',
+							click: function() {
+								$('#calendar').fullCalendar('prev');
+								view.clickArrow('prev');
+							}
+						}
+						, myNext: {
+							icon: 'right-single-arrow',
+							click: function() {
+								$('#calendar').fullCalendar('next');
+								view.clickArrow('next');
+							}
+						}
+						, fullButton:{
+							text: '크게보기',
+							click: function(){
+								location.href = "/bmt/fullCalendar"
+							}
+						}
+					}
+					, locale: 'ko'
+					, height: 820
+					, editable: false
+					, navLinks: false
+					, eventLimit: true
+					, eventLimitText: '더보기'
+					, googleCalendarApiKey: 'AIzaSyD54ma_Q0Tcnu-N6y978iiD8IA4QIk0phg'
+					, events: function(start, end, timezone, callback) {
+						$.get("/bmt/project/getMyProjectList", function(data){
+							if (!isEmpty(data)) {
+								var events = [];
+								var cnt = 0;
+								var _color = ["#58c9b9","#548687","#4f86c6","#aacd6e","#1ec0ff","#aaabd3","#ff7473","#ee6e9f","#f3a632","#c24f5d"];
+								$(data.myProjectList).each(function(i,e) {
+									events.push({
+										title: e.projectNm+" ("+e.projectStDt.substring(5,10)+"~"+e.projectEndDt.substring(5,10)+")"
+										, start: e.projectStDt
+										, end: e.projectEndDt + ' 23:59:59'
+										, color: _color[cnt]
+										, id: e.pid
+// 										, url: '/bmt/projectMain?pid='+e.pid
+									});
+									if (cnt == _color.length-1) cnt = 0
+									else cnt = cnt+1
+								});
+							callback(events);
+							}
+						});
+					}
+					, eventClick: function(eventObj) {
+						view.clickProject(eventObj.id);
+					}
+					, eventSources : [
+						{
+							googleCalendarId : "ko.south_korea#holiday@group.v.calendar.google.com"
+							, color : "#FFFFFF"
+							, textColor : "#DF0101"
+							, className: "googleCalendar"
+						}
+					]
+				});
+			}
+			, clickProject: function(id) {
+				location.href = '/bmt/projectMain?pid='+id;
+			}
+			, clickArrow: function(type) {
+				if (type === 'prev') {
+					this.nowMonth = this.nowMonth - 1;
+				} else {
+					this.nowMonth = this.nowMonth + 1;
+				}
+				this.getProjectList();
+			}
+			, getProjectList: function() {
+			}
+			, getThisWeekProjectList: function() {
+				$.get("/bmt/project/getMyThisWeekProjectList", function(data){
+					if (!isEmpty(data)) {
+						mainView.myThisWeekProjectList = data.myThisWeekProjectList;
+					}
+				});
+			}
+			, getPreEndProjectList : function() {
+				$.get("/bmt/project/getPreEndProjectList", function(data){
+					if (!isEmpty(data)) {
+						mainView.preEndProjectList = data.preEndProjectList;
+					}
+				});
+			}
+			, getMyTodayProjectList: function() {
+				$.get("/bmt/project/getMyTodayProjectList", function(data){
+					if (!isEmpty(data)) {
+						mainView.myTodayProjectList = data.myTodayProjectList;
+					}
+				});
+			}
+			, setRotate: function(percent) {
+				var retVal = 0;
+				// 1% ~ 50% 사이에서는 (해당% * 3.6deg) 스타일 적용
+				// 50% ~ 100% 사이에서는 (100%-해당%) * -3.6deg 스타일 적용 , grape 태그에 over 클래스 추가
+				if (percent>0 && percent<=50) {
+					retVal = (percent*3.6);
+				} else if (percent>50 && percent<=100) {
+					retVal = (100-percent)*-3.6;
+				}
+				return retVal+"deg";
+			}
+			, mouseOverFun: function() {
+				if (this.swiper != null) {
+					this.swiper.autoplay.stop();
+				}
+			}
+			, mouseOverFun2: function() {
+				if (this.todaySwiper != null) {
+					this.todaySwiper.autoplay.stop();
+				}
+			}
+			, mouseOutFun: function() {
+				if (this.swiper != null) {
+					this.swiper.autoplay.start();
+				}
+			}
+			, mouseOutFun2: function() {
+				if (this.todaySwiper != null) {
+					this.todaySwiper.autoplay.start();
+				}
+			}
+		}
+	});
+</script>

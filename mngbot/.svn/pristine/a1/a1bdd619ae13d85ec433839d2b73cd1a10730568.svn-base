@@ -1,0 +1,34 @@
+/**
+ * @title	: QA Xqms service 구현
+ * @package	: kr.co.nextlab.qa.service.impl
+ * @file	: QaXqmsServiceImpl.java
+ * @author	: sangyun.kim
+ * @date	: 2018. 07. 10.
+ * @desc	: 
+ */
+package kr.co.nextlab.qa.service.impl;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import kr.co.nextlab.qa.mapper.QaXqmsMapper;
+import kr.co.nextlab.qa.model.QaXqmsCriteria;
+import kr.co.nextlab.qa.model.QaXqmsVo;
+import kr.co.nextlab.qa.service.QaXqmsService;
+
+@Service
+public class QaXqmsServiceImpl implements QaXqmsService{
+	
+	@Autowired
+	private QaXqmsMapper qaXqmsMapper;
+	
+	/**
+	 * 사용자 이름으로 조회한 마지막 xqms 리포트를 리턴
+	 * @param qaXqmsCriteria
+	 * @return
+	 */
+	@Override
+	public QaXqmsVo selectLastReport(QaXqmsCriteria qaXqmsCriteria){
+		return qaXqmsMapper.selectLastReport(qaXqmsCriteria);
+	}
+}

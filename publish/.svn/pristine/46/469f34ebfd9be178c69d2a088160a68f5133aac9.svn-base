@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>Management Bot</title>
+	<link rel="stylesheet" href="../css/common.css">
+	<link rel="stylesheet" href="../css/bot.css">
+	<script src="../js/jquery-3.2.1.min.js"></script>
+	<script src="../js/jquery-ui.min.js"></script>
+	<script src="../js/jquery.form.min.js"></script>
+	<script src="../js/vue.min.js"></script>
+	<script src="../js/lodash.min.js"></script>
+	<script src="../js/calendar.js"></script>
+	<script src="../js/common.js"></script>
+</head>
+<body>
+	<div class="pop_wrap" style="width:480px;">
+		<div class="pop_tit">
+			<p>권한등록</p>
+		</div>
+		<div class="pop_cont">
+			<div class="g_table02">
+				<table>
+					<caption>앱이름, 권한명, App 할당권한 표시 하는 표 입니다.</caption>
+					<colgroup>
+						<col style="width:120px;">
+						<col>
+					</colgroup>
+					<tbody>
+						<tr>
+							<th>앱이름</th>
+							<td>
+								<input type="text" class="full bg_gr" placeholder="5~20자 사이로 입력">
+							</td>
+						</tr>
+						<tr>
+							<th>권한명</th>
+							<td><input type="text" class="full bg_gr" placeholder="5~20자 사이로 입력"></td>
+						</tr>
+						<tr>
+							<th>App 할당권한</th>
+							<!-- 17.12.21 수정 -->
+							<td class="sel_tree">
+								<ul class="sel_tree_list">
+									<li>
+										<div class="list tit">
+											<label for="all_m">메뉴명</label>
+										 <input type="checkbox" id="all_m">
+										</div>
+									</li>
+									<li>
+										<div class="top list"><label for="chk01" class="auth_name">BMT Main</label> <input type="checkbox" id="chk01"></div>
+									</li>
+									<li>
+										<div class="list sub1"><label for="chk02" class="auth_name">프로젝트 생성</label> <input type="checkbox" id="chk02"></div>
+									</li>
+									<li>
+										<div class="list sub1"><label for ="chk03" class="auth_name">프로젝트 메인</label> <input type="checkbox" id="chk03"></div>
+									</li>
+												
+									<li>
+										<div class="list sub2"><label for="chk04" class="auth_name">성능평가</label> <input type="checkbox" id="chk04"></div>
+									</li>
+									<li>
+										<div class="list sub2"><label for="chk05" class="auth_name">테스트 관리</label> <input type="checkbox" id="chk05"></div>
+									</li>
+									<li>
+										<div class="list sub2"><label for="chk06" class="auth_name">이슈 관리</label> <input type="checkbox" id="chk06"></div>
+									</li>
+									<li>
+										<div class="list sub2"><label for="chk07" class="auth_name">성능평가</label> <input type="checkbox" id="chk07"></div>
+									</li>
+									<li>
+										<div class="list sub2"><label for="chk08" class="auth_name">테스트 관리</label> <input type="checkbox" id="chk08"></div>
+									</li>
+									<li>
+										<div class="list sub2"><label for="chk09" class="auth_name">이슈 관리</label> <input type="checkbox" id="chk09"></div>
+									</li>
+									<li>
+										<div class="list sub3"><label for="chk10" class="auth_name">이슈 관리</label> <input type="checkbox" id="chk10"></div>
+									</li>
+								</ul>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<div class="btn_wrap">
+			<button class="g_btn01">등록</button>
+			<button class="g_btn02" onclick="hidePopupLayer(); return false">닫기</button>
+		</div>
+	</div>
+	<script>
+		setPopup(2);
+	</script>
+</body>
+</html>

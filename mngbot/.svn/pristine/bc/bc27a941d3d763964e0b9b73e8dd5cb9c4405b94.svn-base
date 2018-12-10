@@ -1,0 +1,25 @@
+/**
+ * @title	: QA 프로젝트관리 mapper
+ * @package	: kr.co.nextlab.qa.mapper
+ * @file	: QaProjectMapper.java
+ * @author	: sangyun.kim
+ * @date	: 2018. 07. 24.
+ * @desc	: 
+ */
+package kr.co.nextlab.qa.mapper;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import kr.co.nextlab.qa.model.QaXqmsCriteria;
+import kr.co.nextlab.qa.model.QaXqmsVo;
+
+@Mapper
+public interface QaXqmsMapper {
+	
+	/**
+	 * pid와 사용자 이름에 해당하는 가장 최신 리포트를 1건 리턴
+	 * @param xqmsCriteria
+	 * @return
+	 */
+	public QaXqmsVo selectLastReport(QaXqmsCriteria qaXqmsCriteria);
+}

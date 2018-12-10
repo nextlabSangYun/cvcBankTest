@@ -1,0 +1,336 @@
+package kr.co.nextlab.qa.controller;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.View;
+import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
+
+import kr.co.nextlab.annotation.security.Auth;
+import kr.co.nextlab.comm.controller.BaseController;
+import kr.co.nextlab.excel.ExcelDownloadView;
+import kr.co.nextlab.excel.ExcelHeader;
+import kr.co.nextlab.excel.ExcelResource;
+import kr.co.nextlab.qa.model.QaXqmsCriteria;
+import kr.co.nextlab.qa.model.QaXqmsVo;
+import kr.co.nextlab.qa.service.QaProjectService;
+import kr.co.nextlab.qa.service.QaXqmsService;
+
+@Controller
+public class QaXqmsController extends BaseController{
+	
+	@Autowired
+	private QaProjectService qaProjectService;
+	
+	@Autowired
+	private QaXqmsService qaXqmsService;
+	
+	/**
+	 * qaxqms 리스트 페이지
+	 * @param model
+	 * @param pid
+	 */
+	@RequestMapping("/qa/xqms/xqmsList")
+	public void xqmsList(Model model, String pid){
+		model.addAttribute("projectView", qaProjectService.selectProjectView(pid));
+		// 검색조건 정의
+		model.addAttribute("startDt", new SimpleDateFormat("yyyy-MM-dd").format(DateUtils.addDays(new Date(), -7)));
+		model.addAttribute("endDt", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));	
+	}
+	/**
+	 * bmt 측정이력 리스트 조회
+	 * @param model
+	 * @param criteria
+	 * @return
+	 */
+	@RequestMapping("/qa/xqms/getQaProjectXqmsBmtList")
+	public View getQaProjectXqmsBmtList(Model model, QaXqmsCriteria criteria){
+		//기본정보 업데이트
+		if( !StringUtils.isEmpty(criteria.getStartDt()) && !StringUtils.isEmpty(criteria.getEndDt())){
+			criteria.setStartDt(criteria.getStartDt().substring(0, 10)+" 00:00:00");
+			criteria.setEndDt(criteria.getEndDt().substring(0, 10)+" 23:59:59");
+		}
+		model.addAttribute("qaProjectXqmsBmtList", qaXqmsService.selectQaProjectXqmsBmtList(criteria));
+		return new MappingJackson2JsonView();
+	}
+	/**
+	 * 채널 측정이력 리스트 조회
+	 * @param model
+	 * @param criteria
+	 * @return
+	 */
+	@RequestMapping("/qa/xqms/getQaProjectXqmsChannelList")
+	public View getQaProjectXqmsChannelList(Model model, QaXqmsCriteria criteria){
+		if( !StringUtils.isEmpty(criteria.getStartDt()) && !StringUtils.isEmpty(criteria.getEndDt())){
+			criteria.setStartDt(criteria.getStartDt().substring(0, 10)+" 00:00:00");
+			criteria.setEndDt(criteria.getEndDt().substring(0, 10)+" 23:59:59");
+		}
+		model.addAttribute("qaProjectXqmsChannelList", qaXqmsService.selectQaProjectXqmsChannelList(criteria));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * UIREACTION 측정이력 리스트 조회
+	 * @param model
+	 * @param criteria
+	 * @return
+	 */
+	@RequestMapping("/qa/xqms/getQaProjectXqmsUiReactionList")
+	public View getQaProjectXqmsUiReactionList(Model model, QaXqmsCriteria criteria){
+		if( !StringUtils.isEmpty(criteria.getStartDt()) && !StringUtils.isEmpty(criteria.getEndDt())){
+			criteria.setStartDt(criteria.getStartDt().substring(0, 10)+" 00:00:00");
+			criteria.setEndDt(criteria.getEndDt().substring(0, 10)+" 23:59:59");
+		}
+		model.addAttribute("qaProjectXqmsUiReactionList", qaXqmsService.selectQaProjectXqmsUiReactionList(criteria));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 해당  pid 프로젝트 BMT 측정이력 엑셀 다운로드
+	 * @param model
+	 * @param criteria
+	 * @return
+	 */
+	@RequestMapping("/qa/xqms/getQaProjectXqmsBmtExcel")
+	public ExcelDownloadView getQaProjectXqmsBmtExcel(Model model, QaXqmsCriteria criteria){
+		//기본정보 업데이트
+		if( !StringUtils.isEmpty(criteria.getStartDt()) && !StringUtils.isEmpty(criteria.getEndDt())){
+			criteria.setStartDt(criteria.getStartDt().substring(0, 10)+" 00:00:00");
+			criteria.setEndDt(criteria.getEndDt().substring(0, 10)+" 23:59:59");
+		}
+		List<QaXqmsVo> list = qaXqmsService.selectQaProjectXqmsBmtList(criteria);
+		ExcelHeader[] headers = new ExcelHeader[]{
+				new ExcelHeader("tcNm", "Test Case 이름", HorizontalAlignment.LEFT )
+				, new ExcelHeader("modelNm", "측정모델", HorizontalAlignment.CENTER)
+				, new ExcelHeader("modelVer", "S/W 버전", HorizontalAlignment.CENTER)
+				, new ExcelHeader("tcImpoCd", "중요도", "", "B100", HorizontalAlignment.CENTER)
+				, new ExcelHeader("tcDiviCd", "구분","", "B900", HorizontalAlignment.CENTER)	
+				, new ExcelHeader("lcateNm", "대분류", HorizontalAlignment.CENTER)	
+				, new ExcelHeader("chasu", "차수", HorizontalAlignment.CENTER)
+				, new ExcelHeader("remocon", "리모컨", HorizontalAlignment.CENTER)
+				, new ExcelHeader("xqmsPerson", "담당자", HorizontalAlignment.CENTER)	
+				, new ExcelHeader("xqmsDtm", "측정일시", HorizontalAlignment.CENTER)
+				, new ExcelHeader("tcResultCd", "측정결과", "", "B300", HorizontalAlignment.CENTER)
+		};
+		return new ExcelDownloadView(new ExcelResource(list, headers),"TESTCASE 측정이력.xlsx");
+	}
+	
+	/**
+	 * 해당  pid 프로젝트 채널 측정이력 엑셀 다운로드
+	 * @param model
+	 * @param criteria
+	 * @return
+	 */
+	@RequestMapping("/qa/xqms/getQaProjectXqmsChannelExcel")
+	public ExcelDownloadView getQaProjectXqmsChannelExcel(Model model, QaXqmsCriteria criteria){
+		//기본정보 업데이트
+		if( !StringUtils.isEmpty(criteria.getStartDt()) && !StringUtils.isEmpty(criteria.getEndDt())){
+			criteria.setStartDt(criteria.getStartDt().substring(0, 10)+" 00:00:00");
+			criteria.setEndDt(criteria.getEndDt().substring(0, 10)+" 23:59:59");
+		}
+		List<QaXqmsVo> list = qaXqmsService.selectQaProjectXqmsChannelList(criteria);
+		ExcelHeader[] headers = new ExcelHeader[]{
+				new ExcelHeader("tcNm", "Test Case 이름", HorizontalAlignment.LEFT )
+				, new ExcelHeader("modelNm", "측정모델", HorizontalAlignment.CENTER)
+				, new ExcelHeader("modelVer", "S/W 버전", HorizontalAlignment.CENTER)
+				, new ExcelHeader("tcImpoCd", "중요도", "", "B100", HorizontalAlignment.CENTER)
+				, new ExcelHeader("tcDiviCd", "구분","", "B900", HorizontalAlignment.CENTER)	
+				, new ExcelHeader("lcateNm", "대분류", HorizontalAlignment.CENTER)	
+				, new ExcelHeader("chasu", "차수", HorizontalAlignment.CENTER)
+				, new ExcelHeader("remocon", "리모컨", HorizontalAlignment.CENTER)
+				, new ExcelHeader("xqmsPerson", "담당자", HorizontalAlignment.CENTER)	
+				, new ExcelHeader("xqmsDtm", "측정일시", HorizontalAlignment.CENTER)
+				, new ExcelHeader("remoconReactTime", "A구간")
+				, new ExcelHeader("firstStopTime", "B구간")
+				, new ExcelHeader("secondStopTime", "C구간")
+				, new ExcelHeader("totalTime", "총소요")
+				, new ExcelHeader("networkReactTime", "네트워크")
+				, new ExcelHeader("tcResultCd", "측정결과", "", "B300", HorizontalAlignment.CENTER)
+		};
+		return new ExcelDownloadView(new ExcelResource(list, headers),"채널변경시간 측정이력.xlsx");
+	}
+	
+	/**
+	 * 해당  pid 프로젝트  UIReaction측정이력 엑셀 다운로드
+	 * @param model
+	 * @param criteria
+	 * @return
+	 */
+	@RequestMapping("/qa/xqms/getQaProjectXqmsUiReationExcel")
+	public ExcelDownloadView getQaProjectXqmsUiReationExcel(Model model, QaXqmsCriteria criteria){
+		//기본정보 업데이트
+		if( !StringUtils.isEmpty(criteria.getStartDt()) && !StringUtils.isEmpty(criteria.getEndDt())){
+			criteria.setStartDt(criteria.getStartDt().substring(0, 10)+" 00:00:00");
+			criteria.setEndDt(criteria.getEndDt().substring(0, 10)+" 23:59:59");
+		}
+		List<QaXqmsVo> list = qaXqmsService.selectQaProjectXqmsUiReactionList(criteria);
+		ExcelHeader[] headers = new ExcelHeader[]{
+				new ExcelHeader("tcNm", "Test Case 이름", HorizontalAlignment.LEFT )
+				, new ExcelHeader("modelNm", "측정모델", HorizontalAlignment.CENTER)
+				, new ExcelHeader("modelVer", "S/W 버전", HorizontalAlignment.CENTER)
+				, new ExcelHeader("tcImpoCd", "중요도", "", "B100", HorizontalAlignment.CENTER)
+				, new ExcelHeader("tcDiviCd", "구분","", "B900", HorizontalAlignment.CENTER)	
+				, new ExcelHeader("lcateNm", "대분류", HorizontalAlignment.CENTER)	
+				, new ExcelHeader("chasu", "차수", HorizontalAlignment.CENTER)
+				, new ExcelHeader("remocon", "리모컨", HorizontalAlignment.CENTER)
+				, new ExcelHeader("xqmsPerson", "담당자", HorizontalAlignment.CENTER)	
+				, new ExcelHeader("xqmsDtm", "측정일시", HorizontalAlignment.CENTER)
+				, new ExcelHeader("matchTime", "매칭")
+				, new ExcelHeader("reactTime", "커서")
+				, new ExcelHeader("diffTime", "변화율")
+				, new ExcelHeader("tcResultCd", "측정결과", "", "B300", HorizontalAlignment.CENTER)
+		};
+		return new ExcelDownloadView(new ExcelResource(list, headers),"Ui반응시간 측정이력.xlsx");
+	}
+	
+	/**
+	 * 측정이력 조회 -> xqms 리포트 리스트 화면
+	 * @param model
+	 */
+	@Auth(url={"/qa/xqms/xqmsList"})
+	@RequestMapping("/qa/xqms/xqmsFileList")
+	public void xqmsFileList(Model model){
+		
+	}
+	
+	/**
+	 * xqmsSeq에 맞는 측정이력 첨부파일 리스트조회
+	 * @param model
+	 * @param xqmsSeq
+	 * @return
+	 */
+	@RequestMapping("/qa/xqms/getXqmsFileList")
+	public View getXqmsFileList(Model model, String seq){
+		model.addAttribute("xqmsFileList", qaXqmsService.selectXqmsFileList(seq));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * qaxqms 리스트 페이지
+	 * @param model
+	 * @param pid
+	 */
+	@RequestMapping("/qa/xqms/xqmsMngList")
+	public void xqmsMngList(Model model, String pid){
+		model.addAttribute("projectView", qaProjectService.selectProjectView(pid));
+		// 검색조건 정의
+		model.addAttribute("startDt", new SimpleDateFormat("yyyy-MM-dd").format(DateUtils.addDays(new Date(), -7)));
+		model.addAttribute("endDt", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));	
+	}
+	
+	/**
+	 * 측정이력관리 수정 폼
+	 * @param model
+	 */
+	@Auth(url={"/qa/xqms/xqmsMngList"})
+	@RequestMapping("/qa/xqms/xqmsMngForm")
+	public void xqmsMngForm(Model model){
+		
+	}
+	
+	/**
+	 * 측적이력 관리BMT 측정결과 상세
+	 * @param seq
+	 * @return
+	 */
+	@RequestMapping("/qa/xqms/getXqmsMngBmtView")
+	public View getXqmsMngBmtView(Model model, String seq){
+		model.addAttribute("bmtView",qaXqmsService.selectProjectXqmsBmtView(seq));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 측적이력 관리채널 측정결과 상세
+	 * @param seq
+	 * @return
+	 */
+	@RequestMapping("/qa/xqms/getXqmsMngChannelView")
+	public View getXqmsMngChannelView(Model model, String seq){
+		model.addAttribute("channelView",qaXqmsService.selectProjectXqmsChannelView(seq));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 측적이력 관리 uiReaction 측정결과 상세
+	 * @param seq
+	 * @return
+	 */
+	@RequestMapping("/qa/xqms/getXqmsMngUiReactionView")
+	public View getXqmsMngUiReactionView(Model model, String seq){
+		model.addAttribute("uiReactionView",qaXqmsService.selectProjectXqmsUiReactionView(seq));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 측정이력관리 측정결과 수정 처리 프로세스
+	 * @param model
+	 * @param vo
+	 * @return
+	 */
+	@Auth(url={"/qa/xqms/xqmsMngList"})
+	@RequestMapping("/qa/xqms/modXqmsMngPrc")
+	public View modXqmsMngPrc(Model model, QaXqmsVo qaXqmsVo){
+		int save = 0;
+		if(StringUtils.equals(qaXqmsVo.getXqmsTypeCd(), "C401")){
+			//BMT 결과 수정
+			save = qaXqmsService.updateProjectXqmsBmtResult(qaXqmsVo); 
+		} else if(StringUtils.equals(qaXqmsVo.getXqmsTypeCd(), "C402")){
+			//채널 결과 수정
+			save = qaXqmsService.updateProjectXqmsChannelResult(qaXqmsVo);
+		} else if(StringUtils.equals(qaXqmsVo.getXqmsTypeCd(), "C403")){
+			//uireatction 결과수정
+			save = qaXqmsService.updateProjectXqmsUiReactionResult(qaXqmsVo);
+		}
+		if (save == 1) {
+			model.addAttribute("save",save);
+		}
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 측정이력관리 Bmt 삭제 프로세스
+	 * @param model
+	 * @param qaXqmsVo
+	 * @return
+	 */
+	@Auth(url={"/qa/xqms/xqmsMngList"})
+	@RequestMapping("/qa/xqms/delXqmsMngBmtPrc")
+	public View delXqmsMngBmtPrc(Model model, QaXqmsVo qaXqmsVo){
+		model.addAttribute("del", qaXqmsService.deleteProjectXqmsBmt(qaXqmsVo));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 측정이력관리 채널 삭제 프로세스
+	 * @param model
+	 * @param qaXqmsVo
+	 * @return
+	 */
+	@Auth(url={"/qa/xqms/xqmsMngList"})
+	@RequestMapping("/qa/xqms/delXqmsMngChannelPrc")
+	public View delXqmsMngChannelPrc(Model model, QaXqmsVo qaXqmsVo){
+		model.addAttribute("del", qaXqmsService.deleteProjectXqmsChannel(qaXqmsVo));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 측정이력관리 UiReaction 삭제 프로세스
+	 * @param model
+	 * @param qaXqmsVo
+	 * @return
+	 */
+	@Auth(url={"/qa/xqms/xqmsMngList"})
+	@RequestMapping("/qa/xqms/delXqmsMngUiReactionPrc")
+	public View delXqmsMngUiReactionPrc(Model model, QaXqmsVo qaXqmsVo){
+		model.addAttribute("del", qaXqmsService.deleteProjectXqmsUiReaction(qaXqmsVo));
+		return new MappingJackson2JsonView();
+	}
+}

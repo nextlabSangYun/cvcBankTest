@@ -1,0 +1,308 @@
+/**
+ * @title	: QA 프로젝트 관리 관련 컨트롤러
+ * @package	: kr.co.nextlab.qa.controller
+ * @file	: QaProjectController.java
+ * @author	: winolonam
+ * @date	: 2018. 07. 10.
+ * @desc	: 
+ */
+package kr.co.nextlab.qa.controller;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.View;
+import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
+
+import kr.co.nextlab.annotation.security.Auth;
+import kr.co.nextlab.bot.model.MessageVo;
+import kr.co.nextlab.comm.controller.BaseController;
+import kr.co.nextlab.component.MailComponent;
+import kr.co.nextlab.component.MessageComponent;
+import kr.co.nextlab.qa.model.QaProjectCriteria;
+import kr.co.nextlab.qa.model.QaProjectVo;
+import kr.co.nextlab.qa.service.QaProjectService;
+import kr.co.nextlab.qa.service.QaTcService;
+import kr.co.nextlab.util.ObjectUtil;
+
+@Controller
+public class QaProjectController extends BaseController {
+	
+	@Autowired
+	private QaProjectService qaProjectService;
+	
+	@Autowired
+	private MessageComponent messageComponent;
+	
+	@Autowired
+	private MailComponent mailComponent;
+	
+	@Autowired
+	private QaTcService qaTcService;
+	
+	/**
+	 * 참여 + 전체 프로젝트 차수 리스트 조회
+	 * @param model
+	 * @return 참여 + 전체 프로젝트 차수 리스트
+	 */
+	@RequestMapping("/qa/project/getMyProjectChasuList")
+	public View getMyProjectChasuList(Model model) {
+		QaProjectVo vo = new QaProjectVo();
+		
+		/**
+		 * 관리자 권한인지 체크
+		 */
+		if (StringUtils.equals(super.getAuthId(), "AU013")) {
+			vo.setMngYn(true);
+		}
+		vo.setPartiId(super.getUser().getUserId());
+		
+		/**
+		 * 전체 프로젝트 조회
+		 */
+		model.addAttribute("myProjectList", qaProjectService.selectMyProjectChasuList(vo));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 프로젝트 진행현황 리스트 조회
+	 * @param model
+	 * @return 프로젝트 진행현황 리스트
+	 */
+	@RequestMapping("/qa/project/getProjectStatusList")
+	public View getProjectStatusList(Model model) {
+		QaProjectVo vo = new QaProjectVo();
+		
+		/**
+		 * 관리자 권한인지 체크
+		 */
+		if (StringUtils.equals(super.getAuthId(), "AU013")) {
+			vo.setMngYn(true);
+		}
+		vo.setPartiId(super.getUser().getUserId());
+		
+		/**
+		 * 프로젝트 진행현황 조회
+		 */
+		model.addAttribute("projectStatusList", qaProjectService.selectProjectStatusList(vo));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 참여 + 진행중인 프로젝트 리스트 조회
+	 * @param model
+	 * @return 참여 + 진행중인 프로젝트 리스트
+	 */
+	@RequestMapping("/qa/project/getMyProjectProgressList")
+	public View getMyProjectProgressList(Model model) {
+		QaProjectVo vo = new QaProjectVo();
+		
+		/**
+		 * 관리자 권한인지 체크
+		 */
+		if (StringUtils.equals(super.getAuthId(), "AU013")) {
+			vo.setMngYn(true);
+		}
+		vo.setPartiId(super.getUser().getUserId());
+		/**
+		 * 진행중인 프로젝트만
+		 */
+		vo.setProgressYn(true);
+		model.addAttribute("myProjectProgressList", qaProjectService.selectMyProjectList(vo));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 참여 + 전체 프로젝트 overview리스트 조회
+	 * @param model
+	 * @return 참여 + 전체 프로젝트 리스트
+	 */
+	@RequestMapping("/qa/project/getMyProjectOverviewList")
+	public View getMyProjectOverviewList(Model model) {
+		QaProjectVo vo = new QaProjectVo();
+		/**
+		 * 관리자 권한인지 체크
+		 */
+		if (StringUtils.equals(super.getAuthId(), "AU013")) {
+			vo.setMngYn(true);
+		}
+		vo.setPartiId(super.getUser().getUserId());
+		
+		/**
+		 * 전체 프로젝트 조회
+		 */
+		model.addAttribute("myProjectOverviewList", qaProjectService.selectMyProjectOverviewList(vo));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 프로젝트 전체 리스트 화면
+	 * @param model
+	 */
+	@RequestMapping("/qa/project/projectList")
+	public void projectList(Model model) {
+		model.addAttribute("startDt", new SimpleDateFormat("yyyy-MM-dd").format(DateUtils.addDays(new Date(), -7)));
+		model.addAttribute("endDt", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+	}
+	
+	/**
+	 * 프로젝트 리스트 조회
+	 * @param model
+	 * @param projectCriteria
+	 * @return
+	 */
+	@RequestMapping("/qa/project/getProjectList")
+	public View getProjectList(Model model, QaProjectCriteria QaProjectCriteria) {
+		model.addAttribute("projectList", qaProjectService.selectProjectList(QaProjectCriteria));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 프로젝트 폼
+	 * @param model
+	 */
+	@RequestMapping("/qa/project/projectForm")
+	public void projectForm(Model model) {
+	}
+	
+	/**
+	 * 등록된 투표대상자인지 체크
+	 * @param model
+	 * @param pid
+	 * @return
+	 */
+	@Auth(url={"/qa/project/projectForm"})
+	@RequestMapping("/qa/issue/getCheckTcPrefix")
+	public View getCheckTcPrefix(Model model, String tcPrefix) {
+		model.addAttribute("isCheck", qaProjectService.selectCheckTcPrefix(tcPrefix));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 새 프로젝트 등록
+	 * @param model
+	 * @param projectVo
+	 * @return
+	 */
+	@Auth(url={"/qa/project/projectForm"})
+	@RequestMapping(value="/qa/project/regProjectPrc")
+	public View regProjectPrc(Model model, @RequestBody QaProjectVo qaProjectVo)
+	{
+		boolean save = false;
+		qaProjectVo.setRegId(super.getUser().getUserId());
+		qaProjectVo.setModId(super.getUser().getUserId());
+		try {
+			// 프로젝트 등록
+			save = qaProjectService.insertProject(qaProjectVo);
+			if (!save) {
+				model.addAttribute("message", "저장 실패");
+			} else {
+				/**
+				 * CVCBANK@nextlab.co.kr 메일주소 구성원
+				 */
+				String userId = "U0001";
+				/**
+				 * 구성원
+				 */
+				String [] partiArray = ObjectUtil.getStringArrayFromList(qaProjectVo.getPartiList(), "partiId");
+				
+				/**
+				 * 메시지 알림 등록
+				 */
+				MessageVo messageVo = messageComponent.setMessageCreateQaProject(qaProjectVo, super.getAppId(), super.getUser());
+				messageComponent.sendMessage(messageVo, partiArray);
+				
+				/**
+				 * 메일 발송
+				 */
+//				mailComponent.sendMailUser("/mail/qa/newProject", partiArray, "새 프로젝트 구성원 등록 알림", JsonUtil.getJsonStrFromObject(qaProjectVo));
+				
+				/**
+				 * CVCBANK@nextlab.co.kr에만 메일전송
+				 */
+//				mailComponent.sendMailUser("/mail/qa/newProject", userId, "새프로젝트 구성원 등록알림", JsonUtil.getJsonStrFromObject(qaProjectVo));
+			}
+		} catch (Exception e) {
+			if (e.getCause() != null) model.addAttribute("message", "저장 실패");
+			else model.addAttribute("message", e.getMessage());
+		}
+		
+		model.addAttribute("save", save);
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 프로젝트 기본정보 조회
+	 * @param model
+	 * @param pid 프로젝트 아이디
+	 * @return 프로젝트 기본정보
+	 */
+	@RequestMapping("/qa/project/getProjectEditInfoView")
+	public View getProjectEditInfoView(Model model, String pid) {
+		/**
+		 * 기본정보
+		 */
+		model.addAttribute("projectView", qaProjectService.selectProjectView(pid));
+		/**
+		 * 측정모델
+		 */
+		model.addAttribute("projectModelList", qaProjectService.selectQaProjectModelList(pid));
+		/**
+		 * 참여인력
+		 */
+		model.addAttribute("projectPartiList", qaProjectService.selectProjectPartiList(pid));
+
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 측정모델 버전 변경이력 리스트 화면
+	 * @param model
+	 * @param
+	 */
+	@Auth(url={"/qa/projectMain"})
+	@RequestMapping("/qa/project/projectModelHstList")
+	public void projectModelHistoyList(Model model, String modelSeq) {
+	}
+	
+	/**
+	 * 측정모델 버전 변경이력 리스트 조회
+	 * @param model
+	 * @param modelSeq 모델시퀀스
+	 * @return 측정모델 버전 변경이력 리스트
+	 */
+	@RequestMapping("/qa/project/getProjectModelHstList")
+	public View getProjectModelHistoyList(Model model, Integer modelSeq) {
+		model.addAttribute("projectModelHstList", qaProjectService.selectProjectModelHstList(modelSeq));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 테스트 현황 조회
+	 * @param model
+	 * @param vo
+	 */
+	@RequestMapping("/qa/project/getTcChartList")
+	public View getChartDateList(Model model, String pid) {
+		model.addAttribute("tcChartList", qaTcService.selectTcStatList(pid));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 결함 현황 조회
+	 * @param model
+	 * @param vo
+	 */
+	@RequestMapping("/qa/project/getFlawChartList")
+	public View getFlawChartList(Model model, String pid) {
+		model.addAttribute("flawChartList", qaTcService.selectFlawStatList(pid));
+		return new MappingJackson2JsonView();
+	}
+}

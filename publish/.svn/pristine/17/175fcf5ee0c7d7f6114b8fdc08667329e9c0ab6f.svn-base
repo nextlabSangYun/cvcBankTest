@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>CVCBank</title>
+	<link rel="shortcut icon" href="../../images/favicon.ico" type="image/x-icon">
+	<link rel="stylesheet" href="../../css/common.css">
+	<link rel="stylesheet" href="../../css/bmt.css">
+	<script src="../../js/jquery-3.2.1.min.js"></script>
+	<script src="../../js/jquery-ui.min.js"></script>
+	<script src="../../js/jquery.form.min.js"></script>
+	<script src="../../js/vue.min.js"></script>
+	<script src="../../js/lodash.min.js"></script>
+	<script src="../../js/calendar.js"></script>
+	<script src="../../js/common.js"></script>
+</head>
+<body>
+<div class="wrap">
+	<!-- 내용 -->
+	<div class="content">
+		<div class="sub_layout has_snb">
+			<div class="tit_wrap">
+				<p class="cate_tit">투표 개요</p>
+			</div>
+			<div class="g_table04">
+				<table>
+					<caption></caption>
+					<colgroup>
+						<col style="width: 170px;">
+						<col>
+					</colgroup>
+					<tbody>
+						<tr>
+							<th>등록일시</th>
+							<td>2018-05-24 16:42</td>
+						</tr>
+						<tr>
+							<th>투표제목</th>
+							<td>OOO 의사결정 지원 2</td>
+						</tr>
+						<tr>
+							<th>투표내용</th>
+							<td>이슈 1, 2, 3, 4 에 대한 투표 참여자들의 의견을 묻습니다.</td>
+						</tr>
+						<tr>
+							<th>투표대상</th>
+							<td class="reg_button">
+								<div class="reg_list border_none">
+									<ul>
+										<li>
+											<span>넥스트랩(시스템어드민)</span>
+											<button class="del"></button>
+										</li>
+										<li>
+											<span>홍길동 (테스트그룹_관리자)</span>
+											<button class="del"></button>
+										</li>
+										<li>
+											<span>임꺽정 (그룹1)</span>
+											<button class="del"></button>
+										</li>
+										<li>
+											<span>장보고 (시스템어드민)</span>
+											<button class="del"></button>
+										</li>
+										<li>
+											<span>을지문덕 (투표한사람)</span>
+											<button class="del"></button>
+										</li>
+										<li>
+											<span>권율 (나야나)</span>
+											<button class="del"></button>
+										</li>
+										<li>
+											<span>이순신 (거북선_대장)</span>
+											<button class="del"></button>
+										</li>
+										<li>
+											<span>김사과 (우리집과수원)</span>
+											<button class="del"></button>
+										</li>
+										<li>
+											<span>박수박 (이마트)</span>
+											<button class="del"></button>
+										</li>
+										<li>
+											<span>서참외 (홈뿌라스)</span>
+											<button class="del"></button>
+										</li>
+									</ul>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<th>진행상황</th>
+							<td>진행중</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="tit_wrap mgtop40">
+				<p class="cate_tit">이슈 목록</p>
+				<div class="btn_wrap">
+					<button class="g_btn03">저장</button>
+				</div>
+			</div>
+			<div class="issue_list">
+				<div class="list_title">
+					<p>#. 1</p>
+				</div>
+				<div class="table_wrap">
+					<div class="g_table04 w100">
+						<table>
+							<caption></caption>
+							<colgroup>
+								<col style="width: 170px;">
+								<col>
+								<col style="width: 170px;">
+								<col>
+							</colgroup>
+							<tbody>
+								<tr>
+									<th>이슈제목</th>
+									<td colspan="3">인터넷 장애</td>
+								</tr>
+								<tr>
+									<th>측정모델</th>
+									<td colspan="3" class="insert_con">
+										<button class="tb_btn02_home">BHX-UH200(1.1.1)</button>
+										<button class="tb_btn02_home">BHX-UH200(12345)</button>
+										<button class="tb_btn02_home">BHX-UH200(12345)</button>
+									</td>
+								</tr>
+								<tr>
+									<th>중요도</th>
+									<td>Major</td>
+									<th>대분류</th>
+									<td>서비스</td>
+								</tr>
+								<tr>
+									<th>첨부파일</th>
+									<td colspan="3" class="insert_con">
+										<ul class="inc_file">
+											<li><a href="#">test_result.png (356kb)</a></li>
+											<li><a href="#">test_result2.png (356kb)</a></li>
+											<li><a href="#">test_sample_video.mp4 (356kb)</a></li>
+											<!-- <li><a href="#">test_sample.mp4 (356kb)</a></li> -->
+										</ul>
+									</td>
+								</tr>
+								<tr>
+									<th>결과</th>
+									<td colspan="3" class="reg insert_con">
+										<select>
+											<option value="">-- 선택 --</option>
+											<option>Pass</option>
+											<option>Fail </option>
+										</select>
+									</td>
+								</tr>
+								<tr>
+									<th>코멘트</th>
+									<td colspan="3" class="reg insert_con">
+										<textarea class="full" cols="30" rows="5"></textarea>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+			<div class="issue_list">
+				<div class="list_title">
+					<p>#. 2</p>
+				</div>
+				<div class="table_wrap">
+					<div class="g_table04 w100">
+						<table>
+							<caption></caption>
+							<colgroup>
+								<col style="width: 170px;">
+								<col>
+								<col style="width: 170px;">
+								<col>
+							</colgroup>
+							<tbody>
+								<tr>
+									<th>이슈제목</th>
+									<td colspan="3">인터넷 장애</td>
+								</tr>
+								<tr>
+									<th>측정모델</th>
+									<td colspan="3" class="insert_con">
+										<button class="tb_btn02_home">BHX-UH200(1.1.1)</button>
+										<button class="tb_btn02_home">BHX-UH200(12345)</button>
+										<button class="tb_btn02_home">BHX-UH200(123456789)</button>
+										<button class="tb_btn02_home">BHX-UH200(123456789)</button>
+										<button class="tb_btn02_home">BHX-UH200(12345)</button>
+									</td>
+								</tr>
+								<tr>
+									<th>중요도</th>
+									<td>Major</td>
+									<th>대분류</th>
+									<td>서비스</td>
+								</tr>
+								<tr>
+									<th>첨부파일</th>
+									<td colspan="3" class="insert_con">
+										<ul class="inc_file">
+											<li><a href="#">test_result.png (356kb)</a></li>
+											<li><a href="#">test_result2.png (356kb)</a></li>
+											<li><a href="#">test_sample_video.mp4 (356kb)</a></li>
+											<!-- <li><a href="#">test_sample.mp4 (356kb)</a></li> -->
+										</ul>
+									</td>
+								</tr>
+								<tr>
+									<th>결과</th>
+									<td colspan="3" class="reg insert_con">
+										<select>
+											<option value="">-- 선택 --</option>
+											<option>Pass</option>
+											<option>Fail </option>
+										</select>
+									</td>
+								</tr>
+								<tr>
+									<th>코멘트</th>
+									<td colspan="3" class="reg insert_con">
+										<textarea class="full" cols="30" rows="5"></textarea>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+</html>

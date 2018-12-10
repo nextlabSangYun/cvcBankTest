@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<settings>
+		<setting name="mapUnderscoreToCamelCase" value="true" />
+		<setting name="jdbcTypeForNull" value="NULL" />
+	</settings>
+	<typeAliases>
+		<package name="kr.co.nextlab.comm.model"/>
+		<package name="kr.co.nextlab.bot.model"/>
+		<package name="kr.co.nextlab.bmt.model"/>
+		<package name="kr.co.nextlab.stats.model"/>
+		<package name="kr.co.nextlab.hded.model"/>
+		<package name="kr.co.nextlab.test.model"/>
+	</typeAliases>
+</configuration>

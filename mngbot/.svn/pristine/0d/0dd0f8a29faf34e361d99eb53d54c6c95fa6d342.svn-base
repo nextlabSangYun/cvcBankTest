@@ -1,0 +1,70 @@
+/**
+ * @title	: 채번 서비스 (pk)
+ * @package	: kr.co.nextlab.comm.service
+ * @file	: SequenceService.java
+ * @author	: sist818
+ * @date	: 2017. 12. 4.
+ * @desc	: 
+ */
+package kr.co.nextlab.comm.service;
+
+public interface SequenceService {
+	
+	/**
+	 * 증가값
+	 * @param sequenceId
+	 * @param sequenceKey
+	 * @return
+	 */
+	String next(String sequenceId, String sequenceKey);
+	
+	/**
+	 * 프로젝트 아이디 채번
+	 */
+	String getProjectId();
+	
+	/**
+	 * 측정모델 아이디 채번
+	 */
+	String getModelId();
+	
+	/**
+	 * 위젯아이디 채번
+	 */
+	String getWidgetId();
+	
+	/**
+	 * 사용자 그룹 아이디 채번
+	 */
+	String getUserGroupId();
+	
+	/**
+	 * 사용자아이디 채번
+	 */
+	String getUserId();
+	
+	/**
+	 * 측정모델분류 채번
+	 */
+	String getModelGroupId();
+	
+	/**
+	 *이슈아이디 채번
+	 */
+	String getIssueId();
+	
+	/**
+	 * 메시지(푸쉬) 채번
+	 */
+	String getMessageId();
+	
+	/**
+	 * 바탕화면 아이디 채번
+	 */
+	String getWallpaperId();
+	
+	/**
+	 * bmt요청아이디 채번
+	 */
+	String getRequestId();
+}

@@ -1,0 +1,151 @@
+/**
+ * @title	: H/E 테스트 케이스 서비스 
+ * @package	: kr.co.nextlab.hded.service
+ * @file	: HdedTcService.java
+ * @author	: winolonam
+ * @date	: 2018. 4. 26.
+ * @desc	: 
+ */
+package kr.co.nextlab.hded.service;
+
+import java.util.List;
+
+import kr.co.nextlab.comm.model.FileVo;
+import kr.co.nextlab.hded.model.HeProjectTcVo;
+import kr.co.nextlab.hded.model.HeTcResultFileVo;
+import kr.co.nextlab.hded.model.HeTcResultVo;
+import kr.co.nextlab.hded.model.HeTcTmplCriteria;
+import kr.co.nextlab.hded.model.HeTcTmplVo;
+
+public interface HdedTcService {
+	/**
+	 * 테스트 케이스 대량 등록 
+	 * @param tcVo
+	 * @return
+	 */
+	public FileVo insertLargeTcList(FileVo fileVo, HeTcTmplVo heTcTmplVo) throws Exception;
+	
+	/**
+	 * 버킷리스트 조회
+	 * @param criteria
+	 * @return
+	 */
+	public List<HeTcTmplVo> selectBucketList(HeTcTmplCriteria criteria);
+	
+	/**
+	 * TC 추가시 버킷리스트 조회
+	 * @param criteria
+	 * @return
+	 */
+	public List<HeTcTmplVo> selectSystemIdBucketList(HeTcTmplCriteria criteria);
+	
+	/**
+	 * 버킷리스트에서 TC 등록
+	 * @param heTcTmplVo
+	 * @return
+	 */
+	public boolean insertTsetCase(HeTcTmplVo heTcTmplVo);
+	
+	/**
+	 * 테스트 케이스 변경 이력 최근 30건
+	 * @return
+	 */
+	public List<HeTcTmplVo> selectTcChangeHistList();
+	
+	/**
+	 * 테스트 케이스 변경 이력 전체 리스트 조회
+	 * @return
+	 */
+	public List<HeTcTmplVo> selectTcChangeHistAllList(HeTcTmplCriteria heTcTmplCriteria);
+	
+	/**
+	 * 해당 그룹 아이디에 속하는 이력 리스트 조회
+	 * @return
+	 */
+	public List<HeTcTmplVo> selectTcChangeHistByGroupIdList(String groupId);
+	
+	/**
+	 * 선택데이터 와 현재데이터 비교 리스트
+	 * @param tcId
+	 * @return
+	 */
+	public List<HeTcTmplVo> selectTcChangeHistDetail(String tcId);
+	
+	/**
+	 * 버킷TC 상세조회
+	 * @param tcId
+	 * @return
+	 */
+	public HeTcTmplVo selectTcView(String tcId);
+	
+	/**
+	 * 버킷TC 수정하기
+	 * @param heTcTmplVo
+	 * @return
+	 */
+	public boolean updateBucketTestCase(HeTcTmplVo heTcTmplVo);
+	
+	/**
+	 * 프로젝트 TC리스트 조회
+	 * @param criteria
+	 * @return
+	 */
+	public List<HeProjectTcVo> selectProjectTcList(HeTcTmplCriteria criteria);
+	
+	/**
+	 * 프로젝트 Tc 등록
+	 * @param heProjectTcVo
+	 * @return
+	 */
+	public boolean insertProjectTc(HeProjectTcVo heProjectTcVo);
+	
+	/**
+	 * 프로젝트 Tc 등록시 수정
+	 * @param heTcTmplVo
+	 * @return
+	 */
+	public HeTcTmplVo updateProjectTestCase(HeTcTmplVo heTcTmplVo);
+	
+	/**
+	 * 프로젝트 Tc 삭제하기
+	 * @param param
+	 * @return
+	 */
+	public boolean deleteProjectTcPrc(String[] param);
+	
+	/**
+	 * 테스트 결과 등록하기위한 기본정보 조회
+	 * @param projectTcSeq
+	 * @return
+	 */
+	public HeProjectTcVo selectProjectTc(String projectTcSeq);
+	
+	/**
+	 * 테스트 결과 등록하기위한 결과이력 조회
+	 * @param model
+	 * @param projectTcSeq
+	 * @return
+	 */
+	public List<HeTcResultVo> selectProjectTcResult(String projectTcSeq);
+	
+	/**
+	 * 테스트 결과 등록
+	 * @param heProjectTcVo
+	 * @return
+	 */
+	public boolean insertRegResult(HeProjectTcVo heProjectTcVo);
+	
+	/**
+	 * 파일리스트 불러오기
+	 * @param tcResultSeq
+	 * @return
+	 */
+	public List<HeTcResultFileVo> selectProjectTcFileList(Integer tcResultSeq);
+	
+	/**
+	 * 결과자료 조회
+	 * @param tcResultSeq
+	 * @return
+	 */
+	public HeTcResultVo selectTcResultData(String tcResultSeq);
+}

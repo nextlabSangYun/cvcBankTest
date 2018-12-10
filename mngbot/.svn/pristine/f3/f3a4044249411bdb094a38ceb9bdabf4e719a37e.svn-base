@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>Management Bot</title>
+	<link rel="stylesheet" href="../css/common.css">
+	<link rel="stylesheet" href="../css/bmt.css">
+	<script src="../js/jquery-3.2.1.min.js"></script>
+	<script src="../js/jquery-ui.min.js"></script>
+	<script src="../js/jquery.form.min.js"></script>
+	<script src="../js/vue.min.js"></script>
+	<script src="../js/lodash.min.js"></script>
+	<script src="../js/calendar.js"></script>
+	<script src="../js/common.js"></script>
+</head>
+<body>
+	<div class="pop_wrap" style="width:1080px;">
+		<div class="pop_tit">
+			<p>이슈 등록</p>
+		</div>
+		<div class="pop_cont">
+			<div class="g_table02">
+				<table>
+					<caption>분류, 중요도, Test Case 이름을 확인 할 수 있는 표 입니다.</caption>
+					<colgroup>
+						<col style="width:120px;">
+						<col>
+					</colgroup>
+					<tbody>
+						<tr>
+							<th>대상 Test Case</th>
+							<td>회차에서 OK 버튼을 누르면 (회차 선택), 해당 회차의 구매 팝업 표시</td>
+						</tr>
+						<tr>
+							<th>중요도</th>
+							<td>
+								<select name="" id="">
+									<option value="">Major</option>
+								</select>
+							</td>
+						</tr>
+						
+						<tr>
+							<th>이슈 제목 </th>
+							<td><input type="text" class="full"></td>
+						</tr>
+						<tr>
+							<th>이슈 내용</th>
+							<td><input type="text" class="full"></td>
+						</tr>
+						<tr>
+							<th>파일 첨부</th>
+							<td colspan="3">
+								<input type="file" class="ir" id="file"><label for="file" class="sch_file">파일찾기</label>
+								<ul class="file_list">
+									<li><a href="#">UHD4Q_checklist.xlsx (356kb)</a><button class="del"></button></li>
+
+								</ul>
+							</td>
+						</tr>
+						<tr>
+							<th>이슈할당 대상</th>
+							<td colspan="3" class="sel_target">
+								<select name="" id="">
+									<option value="">사용자선택</option>
+								</select>
+								<div class="reg_list">
+									<ul>
+										<li><span>김승용(미디어솔루션팀)</span><button class="del"></button></li>
+										<li><span>박윤아(미디어팀)</span><button class="del"></button></li>
+										<li><span>박윤아(미디어팀)</span><button class="del"></button></li>
+										<li><span>김승용(미디어솔루션팀)</span><button class="del"></button></li>
+										<li><span>김승용(미디어솔루션팀)</span><button class="del"></button></li>
+
+									</ul>
+								</div>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<p class="area_tit">측정이력</p>
+			<div class="g_table">
+				<table>
+					<caption>측정일시, 측정모델 등 확인 하는 표 입니다.</caption>
+					<colgroup>
+						<col style="width:4%;">
+						<col style="width:14%;">
+						<col style="width:12%;">
+						<col style="width:6.5%;">
+						<col style="width:6.5%;">
+						<col style="width:9%;">
+						<col style="width:13%;">
+						<col>
+						<col>
+						<col>
+						<col>
+						<col>
+						<col style="width:9%;">
+					</colgroup>
+					<thead>
+						<tr>
+							<th rowspan="2"><input type="checkbox"></th>
+							<th rowspan="2">측정 모델</th>
+							<th rowspan="2">Mac</th>
+							<th rowspan="2">차수</th>
+							<th rowspan="2">리모컨</th>
+							<th rowspan="2">담당자</th>
+							<th rowspan="2">측정일시</th>
+							<th colspan="5">측정 결과</th>
+							<th rowspan="2">XQMS 리포트</th>
+						</tr>
+						<tr>
+							<th>A구간</th>
+							<th>B구간</th>
+							<th>C구간</th>
+							<th>총소요</th>
+							<th>네트워크</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td><input type="checkbox"></td>
+							<td>BHX-UH200(5.4.2)</td>
+							<td>15:78:10:f1:y5:36</td>
+							<td>1차</td>
+							<td>IR</td>
+							<td>김현우</td>
+							<td>2017/04/28/09:33</td>
+							<td>358</td>
+							<td>247</td>
+							<td>918</td>
+							<td>1523</td>
+							<td>30</td>
+							<td><button class="btn_show"></button></td>
+						</tr>
+						<tr>
+							<td><input type="checkbox"></td>
+							<td>BHX-UH200(5.4.2)</td>
+							<td>15:78:10:f1:y5:36</td>
+							<td>1차</td>
+							<td>IR</td>
+							<td>김현우</td>
+							<td>2017/04/28/09:33</td>
+							<td>358</td>
+							<td>247</td>
+							<td>918</td>
+							<td>1523</td>
+							<td>30</td>
+							<td><button class="btn_show"></button></td>
+						</tr>
+						<tr>
+							<td><input type="checkbox"></td>
+							<td>BHX-UH200(5.4.2)</td>
+							<td>15:78:10:f1:y5:36</td>
+							<td>1차</td>
+							<td>IR</td>
+							<td>김현우</td>
+							<td>2017/04/28/09:33</td>
+							<td>358</td>
+							<td>247</td>
+							<td>918</td>
+							<td>1523</td>
+							<td>30</td>
+							<td><button class="btn_show"></button></td>
+						</tr>
+						<tr>
+							<td><input type="checkbox"></td>
+							<td>BHX-UH200(5.4.2)</td>
+							<td>15:78:10:f1:y5:36</td>
+							<td>1차</td>
+							<td>IR</td>
+							<td>김현우</td>
+							<td>2017/04/28/09:33</td>
+							<td>358</td>
+							<td>247</td>
+							<td>918</td>
+							<td>1523</td>
+							<td>30</td>
+							<td><button class="btn_show"></button></td>
+						</tr>
+						<tr>
+							<td><input type="checkbox"></td>
+							<td>BHX-UH200(5.4.2)</td>
+							<td>15:78:10:f1:y5:36</td>
+							<td>1차</td>
+							<td>IR</td>
+							<td>김현우</td>
+							<td>2017/04/28/09:33</td>
+							<td>358</td>
+							<td>247</td>
+							<td>918</td>
+							<td>1523</td>
+							<td>30</td>
+							<td><button class="btn_show"></button></td>
+						</tr>
+					</tbody>
+				</table>
+				<div class="pagination">
+					<ol>
+						<li class="btn_first"><button>처음</button></li>
+						<li class="btn_prev"><button>이전</button></li>
+						<li class="num on"><button>1</button></li>
+						<li class="num"><button>2</button></li>
+						<li class="num"><button>3</button></li>
+						<li class="num"><button>4</button></li>
+						<li class="num"><button>5</button></li>
+						<li class="btn_next"><button>다음</button></li>
+						<li class="btn_last"><button>마지막</button></li>
+					</ol>
+				</div>
+			</div>
+		</div>
+		<div class="btn_wrap">
+			<button class="g_btn01">등록</button>
+			<button class="g_btn01">메일 전송 후 등록</button>
+			<button class="g_btn02" onclick="hidePopupLayer(); return false">취소</button>
+		</div>
+	</div>
+	<script>
+		setPopup(2);
+	</script>
+</body>
+</html>

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.nextlab.bmt.mapper.BoardMapper">
+
+	<select id="selectBoardList" resultType="boardVo" parameterType="String">
+		SELECT	a.board_seq
+				, a.pid
+				, a.subject
+				, a.content
+				, b.user_nm
+				, a.reg_id
+				, (SELECT user_group_nm FROM tb_user_group WHERE user_group_id = b.user_group_id) AS user_group_nm
+				, a.reg_dtm
+				, (SELECT count(1) FROM tb_bmt_board_file WHERE board_seq = a.board_seq) isYn 
+		FROM tb_bmt_board a
+		INNER JOIN tb_user b ON (b.user_id = a.reg_id)
+		WHERE a.pid = #{pid}
+		ORDER BY a.reg_dtm DESC
+	</select>
+
+	<select id="selectBoardView" resultType="boardVo" parameterType="String">
+		SELECT	a.board_seq
+				, a.subject
+				, a.content
+				, a.reg_id
+				, b.user_nm
+				, (SELECT user_group_nm FROM tb_user_group c WHERE b.user_group_id = c.user_group_id) userGroupNm
+		FROM tb_bmt_board a
+		JOIN tb_user b ON (a.reg_id = b.user_id)
+		WHERE board_seq = #{boardSeq}
+	</select>
+	
+	<select id="selectBoardFileList" resultType="boardAttachVo" parameterType="String">
+		SELECT	a.board_seq
+				, a.file_nm
+				, a.file_path
+				, a.org_file_nm
+		FROM tb_bmt_board_file a
+		WHERE board_seq = #{boardSeq}
+	</select>
+	
+	<select id="selectBoardSeqNum" resultType="boardVo" parameterType="boardCriteriaVo">
+		SELECT TOP 1 a.board_seq FROM dbo.TB_BMT_BOARD a
+		WHERE a.pid = #{pid} 
+			AND a.subject = #{subject} 
+			AND a.reg_id = #{regId}
+		ORDER BY a.reg_dtm desc
+	</select>
+	
+	<insert id="insertBoard" parameterType="boardVo" >
+		INSERT	INTO tb_bmt_board
+				(
+					pid
+					, subject
+					, content
+					, reg_id
+				)
+		VALUES	(
+					#{pid}
+					, #{subject}
+					, #{content}
+					, #{regId}
+				)
+	</insert>
+	
+	<insert id="insertBoardFile" parameterType="boardAttachVo">
+				INSERT	INTO tb_bmt_board_file
+				(
+					board_seq
+					, seq
+					, file_nm
+					, file_path
+					, org_file_nm
+				)
+		VALUES	(
+					#{boardSeq}
+					, #{seq}
+					, #{fileNm}
+					, #{filePath}
+					, #{orgFileNm}
+				)
+	</insert>
+	
+	<update id="updateBoard" parameterType="boardVo">
+		UPDATE tb_bmt_board
+		SET
+			subject = #{subject}
+			, content = #{content}
+		WHERE board_seq = #{boardSeq}
+	</update>
+	
+	<delete id="deleteBoard" parameterType="String">
+		DELETE
+		FROM tb_bmt_board
+		WHERE board_seq = #{boardSeq}
+	</delete>
+	<delete id="deleteBoardFile" parameterType="String">
+		DELETE
+		FROM tb_bmt_board_file
+		WHERE board_seq = #{boardSeq}
+	</delete>
+</mapper>

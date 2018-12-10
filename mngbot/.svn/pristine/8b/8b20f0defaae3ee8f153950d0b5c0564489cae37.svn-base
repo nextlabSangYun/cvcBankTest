@@ -1,0 +1,95 @@
+/**
+ * @title	: bmt요청 관련 Service
+ * @package	: kr.co.nextlab.bmt.service
+ * @file	: RequestService.java
+ * @author	: winolonam
+ * @date	: 2018. 04. 18.
+ * @desc	: 
+ */
+package kr.co.nextlab.bmt.service;
+
+import java.util.List;
+
+import kr.co.nextlab.bmt.model.BmtRequestVo;
+import kr.co.nextlab.bmt.model.ReqCommentVo;
+import kr.co.nextlab.bmt.model.ReqFileVo;
+import kr.co.nextlab.bmt.model.ReqManagerVo;
+import kr.co.nextlab.bmt.model.RequestCriteria;
+
+public interface RequestService {
+	
+	/**
+	 * bmt 요청 등록
+	 * @param bmtRequestVo
+	 * @return
+	 */
+	public int insertRequest(BmtRequestVo bmtRequestVo);
+	
+	/**
+	 * bmt 요청 수정
+	 * @param bmtRequestVo
+	 * @return
+	 */
+	public int updateRequest(BmtRequestVo bmtRequestVo);
+	
+	/**
+	 * bmt 요청 리스트 조회
+	 * @return
+	 */
+	public List<BmtRequestVo> selectRequestList(RequestCriteria requestCriteria);
+	
+	/**
+	 * bmt 요청 파일 리스트 조회
+	 * @return
+	 */
+	public List<ReqFileVo> selectReqFileList(String reqId);
+	
+	/**
+	 * bmt 요청 상세 조회
+	 * @param reqId
+	 * @return
+	 */
+	public BmtRequestVo selectBmtRequestDetail(String reqId);
+	
+	/**
+	 * bmt 승인시 정보 조회
+	 * @param reqId
+	 * @return
+	 */
+	public BmtRequestVo selectReqView(String reqId);
+	
+	/**
+	 * bmt 요청 담당자 조회
+	 * @param reqId
+	 * @return
+	 */
+	public List<ReqManagerVo> selectReqManagerList(String reqId);
+	
+	/**
+	 * bmt 요청 상태값 변경
+	 * @param bmtRequestVo
+	 * @return
+	 */
+	public int updateReqProgrssStat(BmtRequestVo bmtRequestVo);
+	
+	/**
+	 * bmt 요청 코멘트 리스트 조회
+	 * @param reqId
+	 * @return
+	 */
+	public List<ReqCommentVo> selectReqCommentList(String reqId);
+	
+	/**
+	 * btm 요청 코멘트 등록
+	 * @param reqCommentVo
+	 * @return
+	 */
+	public List<ReqCommentVo> insertReqComment(ReqCommentVo reqCommentVo);
+	
+	/**
+	 * btm 요청 코멘트 수정
+	 * @param reqCommentVo
+	 * @return
+	 */
+	public List<ReqCommentVo> updateReqComment(ReqCommentVo reqCommentVo);
+}

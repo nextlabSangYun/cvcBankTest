@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Delete 7 resources" deleteContents="false" description="Delete 7 resources" element1="/mngbot/src/main/java/kr/co/nextlab/qa/controller/QaIssueController.java" element2="/mngbot/src/main/java/kr/co/nextlab/qa/mapper/QaIssueMapper.java" element3="/mngbot/src/main/java/kr/co/nextlab/qa/model/QaIssueCriteria.java" element4="/mngbot/src/main/java/kr/co/nextlab/qa/service/QaIssueService.java" element5="/mngbot/src/main/java/kr/co/nextlab/qa/service/impl/QaIssueServiceImpl.java" element6="/mngbot/src/main/resources/mapper/qa/qaIssueMapper.xml" element7="/mngbot/src/main/webapp/WEB-INF/views/qa/issue" flags="7" id="org.eclipse.ltk.core.refactoring.delete.resources" resources="7" stamp="1537257341830"/>
+</session>

@@ -1,0 +1,56 @@
+<%@ page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://www.nextlab.co.kr/tags/nextlab" prefix="nl"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<div class="pop_wrap win_pop">
+	<div class="pop_tit">
+		<p>변경이력 상세</p>
+	</div>
+	<div class="pop_cont">
+		<div class="g_table">
+			<table>
+				<caption>Test Case 변경 이력을 비교해서 보여주는 표 입니다.</caption>
+				<colgroup>
+					<col style="width:10%;">
+					<col>
+					<col>
+				</colgroup>
+				<tbody>
+					<tr>
+						<th></th>
+						<th>선택 데이터</th>
+						<th>현재 데이터</th>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		
+	</div>
+	<div class="btn_wrap">
+		<button class="g_btn02" onclick="hidePopupLayer(); return false">닫기</button>
+	</div>
+</div>
+<script>
+var view = new Vue(
+		{
+			el : '.pop_wrap',
+			data : {
+				tcId: '<c:out value="${tcId}"/>'
+			},
+			mounted : function() {
+				this.$nextTick(function(){
+					this.getTcChangeHistDetail(view.tcId);
+				});
+			},
+			updated : function() {
+			},
+			methods : {
+				getTcChangeHistDetail: function(tcId) {
+					$.get("/hded/tc/getTcChangeHistDetail?tcId="+tcId, function(data){
+						view.tcChangeHistList = data.tcChangeHistList;
+						//TODO 쿼리 확인 및 노출 개발
+					});
+				}
+			}
+		});
+</script>
+

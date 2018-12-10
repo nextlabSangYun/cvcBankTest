@@ -1,0 +1,42 @@
+/**
+ * @title	: 의사결정이슈관리 vo
+ * @package	: kr.co.nextlab.bmt.model
+ * @file	: VoteIssueVo.java
+ * @author	: winolonam
+ * @date	: 2018. 6. 11.
+ * @desc	: 
+ */
+package kr.co.nextlab.bmt.model;
+
+import java.util.Date;
+import java.util.List;
+
+import lombok.Data;
+
+@Data
+public class VoteIssueVo {
+	
+	/**
+	 * 기본정보
+	 */
+	private String pid;
+	private Integer voteSeq;
+	private String issueId;
+	private String useYn;
+	private String regId;
+	private Date regDtm;
+	
+	/**
+	 * 의사결정 조회
+	 */
+	private String issueSubject;
+	private String importance;
+	private String issueCate;
+	private String issueModel;
+	private Integer totalVoterCnt;
+	private Integer passCnt;
+	private Integer failCnt;
+	private List<IssueFileVo> issueFileList;
+	private List<VoteManagementVo> voteManagementList;
+	private String issueLcateCd;
+}

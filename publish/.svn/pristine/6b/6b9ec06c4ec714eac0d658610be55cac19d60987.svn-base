@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>CVCBank</title>
+	<link rel="shortcut icon" href="../../images/favicon.ico" type="image/x-icon">
+	<link rel="stylesheet" href="../../css/common.css">
+	<link rel="stylesheet" href="../../css/hded.css">
+	<script src="../../js/jquery-3.2.1.min.js"></script>
+	<script src="../../js/jquery-ui.min.js"></script>
+	<script src="../../js/jquery.form.min.js"></script>
+	<script src="../../js/vue.min.js"></script>
+	<script src="../../js/lodash.min.js"></script>
+	<script src="../../js/calendar.js"></script>
+	<script src="../../js/common.js"></script>
+</head>
+<body>
+	<div class="pop_wrap win_pop" style="width:900px;">
+		<div class="pop_tit">
+			<p>Test Case 추가 (Step 1)</p>
+		</div>
+		<div class="pop_cont">
+			<div class="g_table02">
+				<table>
+					<colgroup>
+						<col style="width:120px;">
+						<col>
+					</colgroup>
+					<tbody>
+						<tr>
+							<th>분류</th>
+							<td class="sel_cate">
+								<div class="column3">
+									<input type="text" placeholder="대분류를 입력하세요.">
+									<input type="text" placeholder="중분류를 입력하세요.">
+									<input type="text" placeholder="소분류를 입력하세요.">
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<th>T.C명</th>
+							<td>
+								<input type="text" class="full" placeholder="Test Case 명을 입력하세요.">
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="tb_desc r_align">
+				<button class="btn_default">조회</button>
+			</div>
+			<div class="g_table tc_list">
+				<table>
+					<colgroup>
+						<col style="width:40px">
+						<col style="width:120px">
+						<col style="width:120px">
+						<col style="width:120px">
+						<col>
+						<col style="width:67px">
+					</colgroup>
+					<thead>
+						<tr>
+							<th><input type="checkbox"></th>
+							<th>대분류</th>
+							<th>중분류</th>
+							<th>소분류</th>
+							<th>T.C명</th>
+							<th>변경이력</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td colspan="6">검색조건 입력 후 ‘조회’버튼을 눌러주세요.</td>
+						</tr>
+						<tr>
+							<td><input type="checkbox"></td>
+							<td>EAG-GW</td>
+							<td>API 정의</td>
+							<td>Validation Check</td>
+							<td>if 정보 없음(필수 값)</td>
+							<td><button class="smbtn_view"></button></td>
+						</tr>
+						<tr>
+							<td><input type="checkbox"></td>
+							<td>EAG-GW</td>
+							<td>API 정의</td>
+							<td>Validation Check</td>
+							<td>if 정보 없음(필수 값)</td>
+							<td><button class="smbtn_view"></button></td>
+						</tr>
+						<tr>
+							<td><input type="checkbox"></td>
+							<td>EAG-GW</td>
+							<td>API 정의</td>
+							<td>Validation Check</td>
+							<td>if 정보 없음(필수 값)</td>
+							<td><button class="smbtn_view"></button></td>
+						</tr>
+						<tr>
+							<td><input type="checkbox"></td>
+							<td>EAG-GW</td>
+							<td>API 정의</td>
+							<td>Validation Check</td>
+							<td>if 정보 없음(필수 값)</td>
+							<td><button class="smbtn_view"></button></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<div class="btn_wrap">
+			<button class="btn_default">다음</button>
+			<button class="btn_cancel" onclick="hidePopupLayer(); return false">닫기</button>
+		</div>
+	</div>
+</body>
+</html>

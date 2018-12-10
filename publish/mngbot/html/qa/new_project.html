@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>CVCBank</title>
+	<link rel="shortcut icon" href="../../images/favicon.ico" type="image/x-icon">
+	<link rel="stylesheet" href="../../css/common.css">
+	<link rel="stylesheet" href="../../css/qa.css">
+	<script src="../../js/jquery-3.2.1.min.js"></script>
+	<script src="../../js/jquery-ui.min.js"></script>
+	<script src="../../js/jquery.form.min.js"></script>
+	<script src="../../js/vue.min.js"></script>
+	<script src="../../js/lodash.min.js"></script>
+	<script src="../../js/calendar.js"></script>
+	<script src="../../js/common.js"></script>
+</head>
+<body>
+	<div class="pop_wrap">
+		<div class="pop_tit">
+			<p>새 프로젝트</p>
+		</div>
+		<div class="pop_cont pop_new_prj">
+			<div class="g_table02">
+				<table>
+					<caption>프로젝트 이름. 기간, checklist 등의 정보를 입력하는 표 입니다.</caption>
+					<colgroup>
+						<col style="width:120px;">
+						<col>
+					</colgroup>
+					<tbody>
+						<tr>
+							<th>프로젝트 이름<strong>*</strong></th>
+							<td>
+								<input type="text" class="full" id="" maxlength="50" placeholder="프로젝트명을 입력하세요.">
+							</td>
+						</tr>
+						<tr>
+							<th>프로젝트 태그<strong>*</strong></th>
+							<td>
+								<input class="filter" type="text" id="" maxlength="" placeholder="프로젝트태그를 입력하세요. (영문, 숫자 최대 10자)">
+								<button class="btn_default">
+									<span>중복확인</span>
+								</button>
+							</td>
+						</tr>
+						<tr class="period">
+							<th>기간<strong>*</strong></th>
+							<td>
+								<input type="text" class="input_date" id="projectStDt" name="projectStDt" readonly>
+								<span class="bar">~</span>
+								<input type="text" class="input_date" id="projectEndDt" name="projectEndDt" readonly>
+							</td>
+						</tr>
+						<tr>
+							<th>예상 M/M<strong>*</strong></th>
+							<td>
+								<span class="sub_list">QA : </span>
+								<input type="text" placeholder="예상 M/M를 입력하세요." maxlength="30">
+								<span class="sub_list">BP : </span>
+								<input type="text" placeholder="예상 M/M를 입력하세요." maxlength="30">
+							</td>
+						</tr>
+						<tr>
+							<th>측정모델 등록<strong>*</strong></th>
+							<td class="reg">
+								<span>
+									<select name="" id="">
+										<option>분류선택</option>
+										<option></option>
+									</select>
+									<select name="" id="">
+										<option>모델선택</option>
+										<option></option>
+									</select>
+									<input type="text" placeholder="버전입력" maxlength="30">
+									<button class="btn_default">추가</button>
+								</span>
+								<div class="reg_list">
+									<ul>
+										<li>
+											<span>BUE-BT07(1234)</span>
+											<button class="del"></button>
+										</li>
+									</ul>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<th>참여인력 등록<strong>*</strong></th>
+							<td class="reg">
+								<div>
+									<select name="" id="">
+										<option>그룹선택</option>
+										<option>내용이 길어지면 어떻게 되나요</option>
+										<option>선택</option>
+										<option>선택</option>
+									</select>
+									<select name="" id="">
+										<option>사용자선택</option>
+										<option>내용이</option>
+										<option>선택</option>
+										<option>선택</option>
+									</select>
+									<button class="btn_default">추가</button>
+								</div>
+								<div class="reg_list">
+									<ul>
+										<li>
+											<span>구성원04(그룹1)</span>
+											<button class="del"></button>
+										</li>
+										<li>
+											<span>구성원04(그룹1)</span>
+											<button class="del"></button>
+										</li>
+										<li>
+											<span>구성원이 바로 나요(그룹1)</span>
+											<button class="del"></button>
+										</li>
+										<li>
+											<span>구성원04(그룹123456)</span>
+											<button class="del"></button>
+										</li>
+
+										<li>
+											<span>구성원04(그룹명이 길어지면 어떻게 되나요)</span>
+											<button class="del"></button>
+										</li>
+									</ul>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<th>비고</th>
+							<td>
+								<input type="text" class="full" placeholder="선택입력항목" maxlength="300">
+								<br/>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<div class="btn_wrap">
+			<button v-else class="btn_proc">등록</button>
+			<button class="btn_cancel">닫기</button>
+		</div>
+	</div>
+</body>
+</html>

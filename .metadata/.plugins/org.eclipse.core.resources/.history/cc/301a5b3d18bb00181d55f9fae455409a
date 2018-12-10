@@ -1,0 +1,65 @@
+<%@ page contentType="text/html" pageEncoding="UTF-8" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://www.nextlab.co.kr/tags/nextlab" prefix="nl"%>
+<div class="content">
+	<div class="sub_layout has_snb">
+		<div class="cont_wrap">
+			<div class="sort_area">
+				<div class="sel_item">
+					<span class="sort_tit">기간</span>
+					<div class="period">
+						<input type="text" class="input_date" readonly name="startDt" >
+						<span class="bar">~</span>
+						<input type="text" class="input_date" readonly name="endDt">
+					</div>
+				</div>
+				<div class="sel_item no_tit">
+					<input type="checkbox" id="chkMyIssue"><label for="chkMyIssue">내 이슈만 보기</label>
+				</div>
+				<div class="sel_item full" style="left:-18px;right:18px">
+					<span class="sort_tit">중요도</span>
+					<nl:gubunCheckboxes gubunKey="importanceCheck" />
+				</div>
+				<div class="sel_item full" style="left:-18px;right:18px">
+					<span class="sort_tit">진행상황</span>
+					<nl:gubunCheckboxes gubunKey="progressStatCheck" />
+				</div>
+				<div class="sel_item full">
+					<span class="sort_tit">이슈 제목+내용</span>
+					<input type="text"/>
+				</div>
+				<button class="btn_default">조회</button>
+			</div>
+			<div class="tb_desc">
+				<p>조회결과 : 0건</p>
+				<div class="btn_wrap">
+					<button class="btn_down"><span>다운로드</span></button>
+					<button class="btn_default"> 이슈 등록</button>
+					<button class="btn_cancel"><span>삭제</span></button>	
+				</div>
+			</div>
+			<div class="g_table issue">
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+	var list = new Vue({
+		el: '.sub_layout'
+		, data: {
+		}
+		, beforeMount: function() {
+
+		}
+		, mounted: function() {
+
+		}
+		, computed: {
+
+		}
+		, methods: {
+			
+		}
+			
+	});
+</script>

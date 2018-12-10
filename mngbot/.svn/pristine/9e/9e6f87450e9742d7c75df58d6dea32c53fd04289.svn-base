@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.nextlab.stats.mapper.ReportMapper">
+	<select id="selectReportList" resultType="ReportVo" parameterType="ReportCriteria">
+		SELECT a.report_id
+			, a.report_nm
+			, a.report_cd
+			, a.color
+			, a.report_url
+			, a.reg_dtm
+			, a.reg_id
+			, a.bigo
+			, a.mod_dtm
+			, a.mod_id
+			, ISNULL(b.report_id, '') AS favorite
+		FROM tb_report a
+				LEFT OUTER JOIN tb_report_favorites b ON (a.report_id = b.report_id AND b.user_id = #{userId})
+		WHERE 1=1
+		<if test="reportNm != null and reportNm != '' ">
+			AND report_nm LIKE '%' + REPLACE(REPLACE(REPLACE(#{reportNm},'[','\['), ']','\]'),'_','\_') + '%' ESCAPE '\'
+		</if>
+		ORDER BY report_id desc	
+	</select>
+		
+	<select id="selectReportFavList" resultType="ReportVo" parameterType="ReportCriteria">
+		SELECT a.report_id
+			, a.report_nm
+			, a.report_cd
+			, a.color
+			, a.report_url
+			, a.reg_dtm
+			, a.reg_id
+			, a.bigo
+			, a.mod_dtm
+			, a.mod_id
+			, ISNULL(b.report_id, '') AS favorite
+			, b.seq
+		FROM tb_report a
+				LEFT OUTER JOIN tb_report_favorites b ON (a.report_id = b.report_id AND b.user_id = #{userId})
+		WHERE 1=1
+		AND b.report_id != 0
+		ORDER BY seq desc	
+	</select>
+	
+	<select id="selectReportView" resultType="ReportVo" parameterType="String">
+		SELECT report_id
+			, report_nm
+			, report_cd
+			, color
+			, report_url
+			, reg_dtm
+			, reg_id
+			, bigo
+			, mod_dtm
+			, mod_id
+		FROM tb_report
+		WHERE report_id = #{reportId}
+	</select>
+
+	<delete id="deleteReport" parameterType="Integer">
+		DELETE
+		FROM tb_report
+		WHERE report_id = #{reportId}
+	</delete>
+	
+	<delete id="deleteAllUserFavReport" parameterType="Integer">
+		DELETE FROM tb_report_favorites
+		FROM tb_report_favorites a
+		INNER JOIN tb_report b
+		ON a.report_id = b.report_id
+		WHERE a.report_id = #{reportId}
+	</delete>
+	
+	<insert id="insertFavoritesReport" parameterType="ReportFavoritesVo">
+		INSERT INTO tb_report_favorites
+			(
+				report_id
+				, user_id
+			)
+		VALUES
+			(
+				#{reportId}
+				,#{userId}
+			)
+	</insert>
+	
+	<delete id="deleteFavoritesReport" parameterType="ReportFavoritesVo">
+		DELETE
+		FROM tb_report_favorites
+		WHERE report_id = #{reportId}
+		AND user_id = #{userId}
+	</delete>
+
+	<select id="selectFavoritesReportList" parameterType="String" resultType="ReportVo">
+		SELECT b.report_nm
+			, b.report_cd
+			, b.color
+			, b.report_url
+		FROM tb_report_favorites a
+		JOIN tb_report b ON (a.report_id = b.report_id)
+		WHERE user_id = #{userId}
+		ORDER BY seq desc
+	</select>
+	
+	<update id="updateReport" parameterType="reportVo">
+		UPDATE tb_report
+		SET
+			report_nm = #{reportNm}
+			, report_cd = #{reportCd}
+			, color = #{color}
+			, report_url = #{reportUrl}
+			, bigo = #{bigo}
+			, mod_dtm = GETDATE()
+			, mod_id = #{modId}
+		WHERE
+			report_id = #{reportId}
+	</update>
+	
+	<insert id="insertReport" parameterType="reportVo">
+		INSERT INTO tb_report
+			(
+				report_nm
+				, report_cd
+				, color
+				, report_url
+				, reg_dtm
+				, reg_id
+				, bigo
+				)
+		VALUES
+			(
+				#{reportNm}
+				, #{reportCd}
+				, #{color}
+				, #{reportUrl}
+				, GETDATE()
+				, #{regId}
+				, #{bigo}
+			)
+	</insert>
+	
+	<select id="selectReportInfoForName" parameterType="String" resultType="ReportVo">
+		SELECT report_id
+			, report_nm
+			, report_cd
+			, color
+			, report_url
+			, reg_dtm
+			, reg_id
+			, bigo
+			, mod_dtm
+			, mod_id
+		FROM tb_report
+		WHERE report_nm = #{reportNm}
+	</select>
+</mapper>

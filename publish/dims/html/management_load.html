@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>DIMS</title>    
+    <link href="../css/style.css" rel="stylesheet">    
+</head>
+<body class="sub">
+	
+	<div class="wrapper">
+		
+		<div class="right_box">
+			<div class="content_top">
+				<h2><img src="../images/bullet_title.png" alt=""><span>적재관리</span></h2>
+				<ul class="path_list">
+					<li><a href="#"><img src="../images/icon_home.png" alt="home"></a></li>
+					<li><a href="#">물류센터</a></li>
+					<li><a href="#">입고관리</a></li>
+					<li><a href="#">적재관리</a></li>
+				</ul>
+			</div><!-- end content_top -->
+			<div class="content_middle">
+				<div class="height20"></div>
+				<section>
+					<div class="detailsearch_wrap table">	
+						<div class="detailsearch">
+							<table>
+								<colgroup>
+									<col width="15%">
+									<col width="35%">
+									<col width="15%">
+									<col width="35%">
+								</colgroup>
+								<tr>
+									<th>스크린일자</th>                                
+									<td colspan="3">
+										<div class="datepicker_wrap"><input type="text" class="datepicker"></div>
+										<div class="width5"></div>
+										<input type="checkbox" class="dims_checkbox" id="checkbox1_1" name="" checked>
+										<label for="checkbox1_1">미적재 건만 조회</label>
+									</td>
+								</tr>
+								<tr>
+									<th>분류</th>
+									<td>
+										<div class="select_wrap full">
+											<select>
+												<option value="hide">선택</option>
+												<option value="">분류1</option>
+												<option value="">분류2</option>
+											</select>
+										</div>
+									</td>
+									<th>제조사</th>
+									<td>
+										<div class="select_wrap full">
+											<select>
+												<option value="hide">선택</option>
+												<option value="">분류1</option>
+												<option value="">분류2</option>
+											</select>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<th>모델명</th>
+									<td>
+										<div class="select_wrap full">
+											<select>
+												<option value="hide">선택</option>
+												<option value="">분류1</option>
+												<option value="">분류2</option>
+											</select>
+										</div>
+									</td>								
+									<th>랙 번호</th>
+									<td><input type="text" class="dims_input" id="" name="" placeholder="랙 번호를 입력하세요"></td>										
+								</tr>
+								
+								<tr>
+									<th>팔레트 번호</th>
+									<td><input type="text" class="dims_input" id="" name="" placeholder="팔레트 번호를 입력하세요"></td>										
+									<th>박스 번호</th>
+									<td><input type="text" class="dims_input" id="" name="" placeholder="박스 번호를 입력하세요"></td>										
+								</tr>
+								
+								<tr>
+									<th>자산관리번호</th>								 
+									<td>
+										<input type="text" class="dims_input" id="" name="" placeholder="부속물자산관리번호를 입력하세요">																		
+									</td> 
+									<th class="temp"></th>
+									<td class="temp"></td>
+								</tr>										
+							</table>
+						</div>						
+						<!-- end.detailsearch -->
+						<div class="btn_wrap">							
+							<button type="submit" class="search btn_search">검색</button>						
+							<button type="button" class="reset btn_reset">초기화</button>
+						</div>					
+					</div><!-- end .detailsearch_wrap -->
+
+
+				</section>
+				<div class="height20"></div>
+				<section>
+					<div class="table_top_wrap">
+						<div class="count">Total <span>5</span> 건</div>								
+					</div><!-- end .table_option_wrap -->		
+					
+					<div class="table_vertical">
+						<table summary="검색결과">
+							<caption>검색결과</caption>
+							<colgroup>                        
+								<col width="55">
+								<col width="55">
+								<col width="150">
+								<col style="width: calc(100% - 650px)/3;">
+								<col width="150">
+								<col style="width: calc(100% - 650px)/3;">
+								<col style="width: calc(100% - 650px)/3;">
+								<col width="80">
+								<col width="80">
+								<col width="80">
+							</colgroup>
+							<thead>
+								<tr>				
+									<th scope="col">
+										<input type="checkbox" class="dims_checkbox all" id="checkbox_all" name="">
+										<label for="checkbox_all" class="nolabel"></label>
+									</th>
+									<th scope="col">No.</th>
+									<th scope="col">스크린완료일자</th>
+									<th scope="col">부속물자산관리번호</th>	
+									<th scope="col">분류</th>	
+									<th scope="col">제조사</th>	
+									<th scope="col">모델명</th>	
+									<th scope="col">랙 번호</th>	
+									<th scope="col">팔레트 번호</th>	
+									<th scope="col">박스 번호</th>	
+								</tr>
+							</thead> 
+							<tbody> 
+								<tr>
+									<td>
+										<input type="checkbox" class="dims_checkbox" id="checkbox_10" name="">
+										<label for="checkbox_10" class="nolabel"></label>
+									</td>
+									<td>1811</td>
+									<td>2018-03-12</td>
+									<td>803000001AA00001</td>
+									<td>리모컨</td>
+									<td>(주)넥스트랩</td>
+									<td>UHD용 리모컨</td>
+									<td>12-34-56</td>
+									<td>1234</td>
+									<td>12</td>									
+								</tr>
+								<tr>
+									<td>
+										<input type="checkbox" class="dims_checkbox" id="checkbox_9" name="">
+										<label for="checkbox_9" class="nolabel"></label>
+									</td>
+									<td>1811</td>
+									<td>2018-03-12</td>
+									<td>803000001AA00001</td>
+									<td>리모컨</td>
+									<td>(주)넥스트랩</td>
+									<td>UHD용 리모컨</td>
+									<td>12-34-56</td>
+									<td>1234</td>
+									<td>12</td>		
+								</tr>	
+								<tr>
+									<td>
+										<input type="checkbox" class="dims_checkbox" id="checkbox_8" name="">
+										<label for="checkbox_8" class="nolabel"></label>
+									</td>
+									<td>1811</td>
+									<td>2018-03-12</td>
+									<td>803000001AA00001</td>
+									<td>리모컨</td>
+									<td>(주)넥스트랩</td>
+									<td>UHD용 리모컨</td>
+									<td>12-34-56</td>
+									<td>1234</td>
+									<td>12</td>											
+								</tr>
+								<tr>
+									<td>
+										<input type="checkbox" class="dims_checkbox" id="checkbox_7" name="">
+										<label for="checkbox_7" class="nolabel"></label>
+									</td>
+									<td>1811</td>
+									<td>2018-03-12</td>
+									<td>803000001AA00001</td>
+									<td>리모컨</td>
+									<td>(주)넥스트랩</td>
+									<td>UHD용 리모컨</td>
+									<td>12-34-56</td>
+									<td>1234</td>
+									<td>12</td>		
+								</tr>
+								<tr>
+									<td>
+										<input type="checkbox" class="dims_checkbox" id="checkbox_6" name="">
+										<label for="checkbox_6" class="nolabel"></label>
+									</td>
+									<td>1811</td>
+									<td>2018-03-12</td>
+									<td>803000001AA00001</td>
+									<td>리모컨</td>
+									<td>(주)넥스트랩</td>
+									<td>UHD용 리모컨</td>
+									<td>12-34-56</td>
+									<td>1234</td>
+									<td>12</td>									
+								</tr>								
+							</tbody> 
+						</table>						
+					</div><!-- end table_wrap -->
+					<div class="table_bottom_wrap">	
+						<div class="button_wrap left">					
+							<button type="button" class="btn_tbl white exceldownload">엑셀 다운로드</button>							
+						</div>					
+						<div class="button_wrap right">					
+							<button type="button" class="btn_tbl white btn_popup" data-popup="popup1">적재 정보 입력</button>							
+						</div>
+					</div>
+					<!-- end.table_bottom_wrap -->
+				</section>			
+					
+            </div><!-- end.content_middle -->
+            
+			
+		</div><!-- end right_box -->
+	</div><!-- end .wrapper -->	
+    
+	<div class="dims_popup_wrap" data-popup-target="popup1">
+		<div class="dims_popup">
+			<div class="dims_popup_header">
+				<div class="dims_popup_title"><img src="../images/bullet_title.png" alt=""> <span>적재등록</span></div>
+				<button type="button" class="btn_popup_close"><img src="../images/icon_popup_close.png" alt=""></button>
+			</div>			
+			
+			<section>
+				<div class="table_top_wrap">
+					<div class="count">
+						<input type="text" class="dims_input" id="" name="" placeholder="부속물 자산관리번호 바코드를 인식하거나 직접 입력해주세요" style="width:350px;">			
+						<button type="button" class="btn_tbl white thin plus"><span>추가</span></button>
+						<button type="button" class="btn_tbl white thin minus"><span>선택삭제</span></button>
+					</div>					
+				</div><!-- end .table_option_wrap -->		
+				
+				<div class="table_vertical">
+					<table summary="검색결과">
+						<caption>검색결과</caption>
+						<colgroup>                        
+							<col width="55">
+							<col width="55">
+							<col width="120">
+							<col style="width: calc(100% - 650px)/3;">
+							<col width="150">
+							<col style="width: calc(100% - 650px)/3;">
+							<col style="width: calc(100% - 650px)/3;">
+							<col width="80">
+							<col width="80">
+							<col width="80">
+						</colgroup>
+						<thead>
+							<tr>				
+								<th scope="col">
+									<input type="checkbox" class="dims_checkbox all" id="checkbox_all" name="">
+									<label for="checkbox_all" class="nolabel"></label>
+								</th>
+								<th scope="col">No.</th>
+								<th scope="col">스크린완료일자</th>
+								<th scope="col">부속물자산관리번호</th>	
+								<th scope="col">분류</th>	
+								<th scope="col">제조사</th>	
+								<th scope="col">모델명</th>	
+								<th scope="col">랙 번호</th>	
+								<th scope="col">팔레트 번호</th>	
+								<th scope="col">박스 번호</th>	
+							</tr>
+						</thead> 
+						<tbody> 
+							<tr>
+								<td>
+									<input type="checkbox" class="dims_checkbox" id="checkbox1_10" name="">
+									<label for="checkbox1_10" class="nolabel"></label>
+								</td>
+								<td>1811</td>
+								<td>2018-03-12</td>
+								<td>803000001AA00001</td>
+								<td>리모컨</td>
+								<td>(주)넥스트랩</td>
+								<td>UHD용 리모컨</td>
+								<td>12-34-56</td>
+								<td>1234</td>
+								<td>12</td>									
+							</tr>
+							<tr>
+								<td>
+									<input type="checkbox" class="dims_checkbox" id="checkbox1_9" name="">
+									<label for="checkbox1_9" class="nolabel"></label>
+								</td>
+								<td>1811</td>
+								<td>2018-03-12</td>
+								<td>803000001AA00001</td>
+								<td>리모컨</td>
+								<td>(주)넥스트랩</td>
+								<td>UHD용 리모컨</td>
+								<td>12-34-56</td>
+								<td>1234</td>
+								<td>12</td>		
+							</tr>	
+							<tr>
+								<td>
+									<input type="checkbox" class="dims_checkbox" id="checkbox1_8" name="">
+									<label for="checkbox1_8" class="nolabel"></label>
+								</td>
+								<td>1811</td>
+								<td>2018-03-12</td>
+								<td>803000001AA00001</td>
+								<td>리모컨</td>
+								<td>(주)넥스트랩</td>
+								<td>UHD용 리모컨</td>
+								<td>12-34-56</td>
+								<td>1234</td>
+								<td>12</td>											
+							</tr>
+							<tr>
+								<td>
+									<input type="checkbox" class="dims_checkbox" id="checkbox1_7" name="">
+									<label for="checkbox1_7" class="nolabel"></label>
+								</td>
+								<td>1811</td>
+								<td>2018-03-12</td>
+								<td>803000001AA00001</td>
+								<td>리모컨</td>
+								<td>(주)넥스트랩</td>
+								<td>UHD용 리모컨</td>
+								<td>12-34-56</td>
+								<td>1234</td>
+								<td>12</td>		
+							</tr>
+							<tr>
+								<td>
+									<input type="checkbox" class="dims_checkbox" id="checkbox1_6" name="">
+									<label for="checkbox1_6" class="nolabel"></label>
+								</td>
+								<td>1811</td>
+								<td>2018-03-12</td>
+								<td>803000001AA00001</td>
+								<td>리모컨</td>
+								<td>(주)넥스트랩</td>
+								<td>UHD용 리모컨</td>
+								<td>12-34-56</td>
+								<td>1234</td>
+								<td>12</td>									
+							</tr>
+							<tr>
+								<td>
+									<input type="checkbox" class="dims_checkbox" id="checkbox1_5" name="">
+									<label for="checkbox1_5" class="nolabel"></label>
+								</td>
+								<td>1811</td>
+								<td>2018-03-12</td>
+								<td>803000001AA00001</td>
+								<td>리모컨</td>
+								<td>(주)넥스트랩</td>
+								<td>UHD용 리모컨</td>
+								<td>12-34-56</td>
+								<td>1234</td>
+								<td>12</td>									
+							</tr>
+							<tr>
+								<td>
+									<input type="checkbox" class="dims_checkbox" id="checkbox1_4" name="">
+									<label for="checkbox1_4" class="nolabel"></label>
+								</td>
+								<td>1811</td>
+								<td>2018-03-12</td>
+								<td>803000001AA00001</td>
+								<td>리모컨</td>
+								<td>(주)넥스트랩</td>
+								<td>UHD용 리모컨</td>
+								<td>12-34-56</td>
+								<td>1234</td>
+								<td>12</td>		
+							</tr>	
+							<tr>
+								<td>
+									<input type="checkbox" class="dims_checkbox" id="checkbox1_3" name="">
+									<label for="checkbox1_3" class="nolabel"></label>
+								</td>
+								<td>1811</td>
+								<td>2018-03-12</td>
+								<td>803000001AA00001</td>
+								<td>리모컨</td>
+								<td>(주)넥스트랩</td>
+								<td>UHD용 리모컨</td>
+								<td>12-34-56</td>
+								<td>1234</td>
+								<td>12</td>											
+							</tr>
+							<tr>
+								<td>
+									<input type="checkbox" class="dims_checkbox" id="checkbox1_2" name="">
+									<label for="checkbox1_2" class="nolabel"></label>
+								</td>
+								<td>1811</td>
+								<td>2018-03-12</td>
+								<td>803000001AA00001</td>
+								<td>리모컨</td>
+								<td>(주)넥스트랩</td>
+								<td>UHD용 리모컨</td>
+								<td>12-34-56</td>
+								<td>1234</td>
+								<td>12</td>		
+							</tr>
+							<tr>
+								<td>
+									<input type="checkbox" class="dims_checkbox" id="checkbox1_1" name="">
+									<label for="checkbox1_1" class="nolabel"></label>
+								</td>
+								<td>1811</td>
+								<td>2018-03-12</td>
+								<td>803000001AA00001</td>
+								<td>리모컨</td>
+								<td>(주)넥스트랩</td>
+								<td>UHD용 리모컨</td>
+								<td>12-34-56</td>
+								<td>1234</td>
+								<td>12</td>									
+							</tr>								
+						</tbody> 
+					</table>						
+				</div><!-- end table_wrap -->
+				<div class="table_top_wrap">
+					<div class="count">선택된 부속물을 아래 위치에 적재 등록합니다.</div>					
+				</div>
+				<div class="table_horizon_white">
+					<table>
+						<tr>
+							<th>랙 번호</th>
+							<td><input type="text" class="dims_input" name="" placeholder="랙 번호를 입력하세요"></td>
+							<th>팔레트 번호</th>
+							<td><input type="text" class="dims_input" name="" placeholder="팔레트 번호를 입력하세요"></td>
+							<th>박스 번호</th>
+							<td><input type="text" class="dims_input" name="" placeholder="박스 번호를 입력하세요"></td>
+						</tr>
+					</table>
+				</div><!-- end table_wrap -->
+				<div class="line"></div>	
+				<div class="table_bottom_wrap">	
+					<div class="button_wrap left">					
+						<button type="button" class="btn_tbl white exceldownload">엑셀 다운로드</button>							
+					</div>					
+					<div class="button_wrap right">					
+						<button type="button" class="btn_tbl black">적재 등록</button>							
+					</div>
+				</div>
+				<!-- end.table_bottom_wrap -->
+			</section>			
+		</div>
+	</div>
+    <script src="../js/lib/jquery-3.2.1.min.js"></script>
+    <script src="../js/lib/jquery-ui.min.js"></script>	
+	<script src="../js/ui.js"></script>
+	<script src="../js/lib/prefixfree.min.js"></script>		
+	<script src="../js/lib/jquery.form.min.js"></script>
+	<script src="../js/lib/calendar.js"></script>
+</body>
+</html>

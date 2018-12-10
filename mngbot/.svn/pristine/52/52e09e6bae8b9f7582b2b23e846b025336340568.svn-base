@@ -1,0 +1,106 @@
+/**
+ * @title	: 코드 처리 컴포넌트
+ * @package	: kr.co.nextlab.component
+ * @file	: CodeComponent.java
+ * @author	: jnlee
+ * @date	: 2017. 11. 7.
+ * @desc	: 
+ */
+package kr.co.nextlab.component;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.PostConstruct;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import kr.co.nextlab.comm.model.CodeVo;
+import kr.co.nextlab.comm.service.CodeService;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Component
+public class CodeComponent {
+	
+	private static List<CodeVo> codeList;
+	
+	private static Map<String,List<CodeVo>> codeMap;
+	
+	@Autowired
+	private CodeService codeService;
+	
+	@PostConstruct
+	private void init() {
+		log.debug("code init...");
+		if (codeList==null) {
+			load();
+		}
+	}
+	
+	private void load() {
+		log.debug("code load...");
+		codeList = codeService.selectList();
+		setCodeMap();
+	}
+	
+	private void setCodeMap() {
+		codeMap = new HashMap<String,List<CodeVo>>();
+		List<CodeVo> tmpCodeList = new ArrayList<CodeVo>();
+		String tmpCodeType = "";
+		for (CodeVo code : codeList) 
+		{
+			if (!StringUtils.equals(tmpCodeType, code.getCodeType()))
+			{
+				if (!StringUtils.isEmpty(tmpCodeType)) {
+					codeMap.put(tmpCodeType, tmpCodeList);
+				}
+				
+				tmpCodeType = code.getCodeType();
+				tmpCodeList = new ArrayList<CodeVo>();
+			}
+			tmpCodeList.add(code);
+		}
+		if (!StringUtils.isEmpty(tmpCodeType)) codeMap.put(tmpCodeType, tmpCodeList);
+	}
+	
+	public void reload() {
+		log.debug("code reload...");
+		load();
+	}
+	
+	public void setCodeList(List<CodeVo> codeList) {
+		CodeComponent.codeList = codeList;
+		setCodeMap();
+	}
+	
+	public List<CodeVo> getCodeList() {
+		return codeList;
+	}
+	
+	public List<CodeVo> getCodeList(String codeType) {
+		return codeMap.get(codeType);
+	}
+	
+	public CodeVo getCode(String codeType, String codeId) {
+		List<CodeVo> tmpCodeList = codeMap.get(codeType);
+		for (CodeVo code : tmpCodeList) {
+			return code;
+		}
+		return null;
+	}
+	
+	public String getCodeName(String codeType, String codeId) {
+		List<CodeVo> tmpCodeList = codeMap.get(codeType);
+		for (CodeVo code : tmpCodeList) {
+			if (code.getCodeId().equals(codeId))
+				return code.getCodeNm();
+		}
+		return "";
+	}
+	
+}

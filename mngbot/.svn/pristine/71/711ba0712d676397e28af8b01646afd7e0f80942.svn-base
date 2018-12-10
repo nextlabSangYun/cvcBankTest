@@ -1,0 +1,795 @@
+<%@ page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://www.nextlab.co.kr/tags/nextlab" prefix="nl"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<div class="pop_wrap win_pop" id="vueApp">
+	<div class="pop_tit">
+		<p>테스트 케이스 상세 정보</p>
+	</div>
+	<div class="pop_cont">
+		<p class="info_tit">기본정보</p>
+		<div class="g_table02">
+			<table>
+				<caption>분류, 중요도 차수 등의 정보를 입력하는 표 입니다.</caption>
+				<colgroup>
+					<col style="width: 120px;">
+					<col>
+				</colgroup>
+				<tbody>
+					<tr>
+						<th>구분</th>
+						<td v-if="prjVo.projectStat != 'C304'"><nl:select
+								v-model="tc.tcDivision">
+								<nl:options codeType="B900" />
+							</nl:select></td>
+						<td v-else>{{tc.tcDivision | code(tcDivisionCodeNm)}}</td>
+					</tr>
+					<tr>
+						<th>분류</th>
+						<td v-if="prjVo.projectStat != 'C304' && cateChk == false">
+							<div class="cli">{{tc.bigCateId | tcCategory(tcCategoryList)}}</div>
+							<div class="cli"> > </div>
+							<div class="cli">{{tc.middleCateId| tcCategory(tcCategoryList)}} </div>
+							<div class="cli"> > </div> 
+							<div class="cli">{{tc.smallCateId| tcCategory(tcCategoryList)}}</div>
+							<button class="g_btn06" style="margin-left: 5px;" v-on:click="changeCate"> 수정 </button>
+						</td>
+						<td v-if="prjVo.projectStat != 'C304' && cateChk == true">
+							<p class="pb5"><select v-model="tc.bigCateId" @change="caseList = getCate(tc.bigCateId);tc.middleCateId=''; tc.smallCateId='';addCateCheck(tc);">
+							<option value="">대분류</option>
+								<option value="Add">---추가---</option>
+								<option v-for="_cate in suiteList" :value="_cate.tcCateId" >{{_cate.tcCateNm}}</option>
+							</select>
+							<select v-model="tc.middleCateId" @change="cateList = getCate(tc.middleCateId);tc.smallCateId='';addCateCheck(tc);">
+								<option value="">중분류</option>
+								<option v-show="tc.bigCateId != '' && tc.bigCateId != 'Add'" value="Add">---추가---</option>
+								<option v-for="_cate in caseList" :value="_cate.tcCateId" >{{_cate.tcCateNm}}</option>
+							</select>
+							<select v-model="tc.smallCateId" @change="addCateCheck(tc);">
+								<option value="">소분류</option>
+								<option v-show="tc.middleCateId != '' && tc.middleCateId != 'Add'" value="Add">---추가---</option>
+								<option v-for="_cate in cateList" :value="_cate.tcCateId" >{{_cate.tcCateNm}}</option>
+							</select>
+							<button  class="g_btn06" style="margin-left: 5px;"  v-on:click="changeCate"> 취소 </button></p>						
+							<input v-show="addTcCateShow" v-model="addTcCateNm" type="text">
+							<button v-show="addTcCateShow" class="tb_btn01"  v-on:click="addCategory">{{addTcCateType}} 추가</button>
+							
+						</td>
+						<td v-if ="prjVo.projectStat == 'C304' ">							
+							<div class="cli">{{tc.bigCateId | tcCategory(tcCategoryList)}}</div>
+							<div class="cli"> > </div>
+							<div class="cli">{{tc.middleCateId| tcCategory(tcCategoryList)}} </div>
+							<div class="cli"> > </div> 
+							<div class="cli">{{tc.smallCateId| tcCategory(tcCategoryList)}}</div></td>
+					</tr>
+					<tr>
+						<th>중요도</th>
+						<td v-if="prjVo.projectStat != 'C304'"><nl:select
+								v-model="tc.importance" id="importance">
+								<nl:options codeType="B100" itemValue="codeId"
+									itemLabel="codeNm" />
+							</nl:select></td>
+						<td v-else>{{tc.importance | code(importanceCodeNm)}}</td>
+					</tr>
+					<tr>
+						<th>Test Case 이름</th>
+						<td v-if="prjVo.projectStat != 'C304'"><input type="text"
+							v-model="tc.tc" class="full" id="newTcContents"></td>
+						<td v-else>{{tc.tc}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<p class="info_tit">비고 등록</p>
+		<div class="g_table02">
+			<table>
+				<caption>비고 파일첨 등의 정보를 등록하는 표 입니다.</caption>
+				<colgroup>
+					<col style="width: 120px;">
+					<col>
+				</colgroup>
+				<tbody>
+					<tr>
+						<th>비고</th>
+						<td><textarea v-model="tc.bigo" class="full"></textarea></td>
+					</tr>
+					<tr>
+						<th>파일첨부</th>
+						<td>
+							<p v-if="prjVo.projectStat != 'C304'" class="note">최대 10MB까지
+								첨부 가능합니다</p> <input v-if="prjVo.projectStat != 'C304'" type="file"
+							class="ir" id="file" name="file" @change="regFile"> <label
+							v-if="prjVo.projectStat != 'C304'" for="file" class="sch_file">파일찾기</label>
+							<ul class="file_list" v-show="tc.orgFileNm">
+								<li><a @click="getFileDown">{{tc.orgFileNm}}</a>
+								<button v-if="prjVo.projectStat != 'C304'" class="del"
+										@click="delFile"></button></li>
+							</ul>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div class="btn_wrap">
+			<button v-if="prjVo.projectStat != 'C304'" class="g_btn01"
+				v-on:click="apply">적용</button>
+			<button class="g_btn02" onclick="self.close();">닫기</button>
+		</div>
+		<p class="info_tit">결과이력</p>
+	</div>
+	<div class="tab_wrap">
+		<ul class="g_tab">
+			<li><a href="#" @click="getProjectXqmsBmtList">TESTCASE</a></li>
+			<li><a href="#" @click="getProjectXqmsChannelList">채널변경시간</a></li>
+			<li><a href="#" @click="getProjectXqmsUiReactionList" >UI 반응시간</a></li>
+			<li><a href="#" @click="getProjectXqmsLkfsList">LKFS</a></li>
+			<!-- <li><a href="#" @click="getProjectXqmsRemoconRobotList">리모컨 로봇 테스트</a></li> -->
+		</ul>
+		<div class="tab_con_wrap">
+			<div class="tab_con">
+				<div class="tb_desc">
+					<p>조회결과 : {{ projectXqmsBmtList.length | number(0) }}건</p>
+					<button class="g_btn04" @click="btnExcelDown"><span>다운로드</span></button>
+				</div>
+				<div class="g_table">
+					<table>
+						<caption>츨정일시, 구분, Test Case 이름 등으로 구성된 표 입니다.</caption>
+						<colgroup>
+							<col style="width:6%;">
+							<col style="width:10%;">
+							<col style="width:8%;">
+							<col style="width:7%;">
+							<col style="width:12%;">
+							<col style="width:7.5%;">
+							<col style="width:4.5%;">
+						</colgroup>
+						<thead>
+							<tr>
+								<th>차수</th>
+								<th>측정모델</th>
+								<th>리모컨</th>
+								<th>담당자</th>
+								<th>측정일시</th>
+								<th>측정 결과</th>
+								<th>XQMS 리포트 </th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr v-for="list in bmtPagingList">
+								<td>{{ list.prjChasu }}차</td>
+								<td>{{ list.modelNm }}({{ list.modelVer }})</td>
+								<td>{{ list.remocon }}</td>
+								<td>{{ list.person }}</td>
+								<td>{{ list.xqmsDtm | dateTimeFormat }}</td>
+								<td><span :class="{state01:list.bmtResult === 'B302', state02:list.bmtResult === 'B301' , state04:list.bmtResult === 'B303' || list.bmtResult === 'B304'}">{{ list.bmtResult | code(resultCodeNm) }}</span></td>
+								<td><button v-if="list.isYn" class="btn_show" @click="showPopupLayer('/bmt/xqms/xqmsAttachList?xqmsSeq=' + list.xqmsSeq); return false;"></button></td>
+							</tr>
+							<tr v-if="bmtPagingList.length == 0">
+								<td colspan="7">조회된 데이터가 없습니다.</td>
+							</tr>
+						</tbody>
+					</table>
+					<paginator ref="bmtPaginator" :go-fn="getBmtPagingList"></paginator>
+				</div>
+			</div>
+			<div class="tab_con">
+				<div class="tb_desc">
+					<p>조회결과 : {{ projectXqmsChannelList.length | number(0) }}건 <span class="unit">단위 : ms</span></p>
+					<button class="g_btn04" @click="btnExcelDown(event)"><span>다운로드</span></button>
+				</div>
+				<div class="g_table">
+					<table>
+						<caption>대상 프로젝트, 측정일시, 측정모델 등 정보로 구성된 표 입니다.</caption>
+						<colgroup>
+							<col style="width:4%;">
+							<col style="width:8%;">
+							<col style="width:7.5%;">
+							<col style="width:6%;">
+							<col style="width:10%;">
+							<col style="width:6%;">
+							<col style="width:6%;">
+							<col style="width:6%;">
+							<col style="width:6%;">
+							<col style="width:5%;">
+							<col style="width:5%;">
+							<col style="width:4.5%;">
+						</colgroup>
+						<thead>
+							<tr>
+								<th rowspan="2">차수</th>
+								<th rowspan="2">측정모델</th>
+								<th rowspan="2">리모컨</th>
+								<th rowspan="2">담당자</th>
+								<th rowspan="2">측정일시</th>
+								<th colspan="6">측정 결과</th>
+								<th rowspan="2">XQMS 리포트</th>
+							</tr>
+							<tr>
+								<th>A구간</th>
+								<th>B구간</th>
+								<th>C구간</th>
+								<th>총소요</th>
+								<th>네트워크</th>
+								<th>결과</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr v-for="list in channelPagingList">
+								<td>{{ list.prjChasu }}차</td>
+								<td>{{ list.modelNm }}({{ list.modelVer }})</td>
+								<td>{{ list.remocon }}</td>
+								<td>{{ list.person }}</td>
+								<td>{{ list.xqmsDtm | dateTimeFormat }}</td>
+								<td class="r_align">{{ list.remoconReactTime | number(0) }}</td>
+								<td class="r_align">{{ list.firstStopTime | number(0) }}</td>
+								<td class="r_align">{{ list.secondStopTime | number(0) }}</td>
+								<td class="r_align">{{ list.totTime | number(0) }}</td>
+								<td class="r_align">{{ list.ntwTime | number(0) }}</td>
+								<td><span :class="{state01:list.channelResult==='B302' , state02:list.channelResult==='B301' , state04:list.channelResult==='B303' || list.channelResult==='B304'}">{{ list.channelResult | code(resultCodeNm) }}</span></td>
+								<td><button v-if="list.isYn" class="btn_show" @click="showPopupLayer('/bmt/xqms/xqmsAttachList?xqmsSeq=' + list.xqmsSeq); return false;"></button></td>
+							</tr>
+							<tr v-if="channelPagingList == 0">
+								<td colspan="12">조회된 데이터가 없습니다.</td>
+							</tr>
+						</tbody>
+					</table>
+					<paginator ref="channelPaginator" :go-fn="getChannelPagingList"></paginator>
+				</div>
+			</div>
+			<div class="tab_con">
+				<div class="tb_desc">
+					<p>조회결과 : {{ projectXqmsUiReactionList.length | number(0) }}건 <span class="unit">단위 : ms</span></p>
+					<button class="g_btn04" @click="btnExcelDown(event)"><span>다운로드</span></button>
+				</div>
+				<div class="g_table">
+					<table>
+						<caption>대상 프로젝트, 측정일시, 측정모델 등 정보로 구성된 표 입니다.</caption>
+						<colgroup>
+							<col style="width:4%;">
+							<col style="width:8%;">
+							<col style="width:8%;">
+							<col style="width:7%;">
+							<col style="width:12%;">
+							<col style="width:6%;">
+							<col style="width:6%;">
+							<col style="width:6%;">
+							<col style="width:5%;">
+							<col style="width:4.5%;">
+						</colgroup>
+						<thead>
+							<tr>
+								<th rowspan="2">차수</th>
+								<th rowspan="2">측정모델</th>
+								<th rowspan="2">리모컨</th>
+								<th rowspan="2">담당자</th>
+								<th rowspan="2">측정일시</th>
+								<th colspan="4">측정 결과</th>
+								<th rowspan="2">XQMS 리포트</th>
+							</tr>
+							<tr>
+								<th>매칭</th>
+								<th>커서</th>
+								<th>변화율</th>
+								<th>결과</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr v-for="list in uiReactionPagingList">
+								<td>{{ list.prjChasu }}차</td>
+								<td>{{ list.modelNm }}({{ list.modelVer }})</td>
+								<td>{{ list.remocon }}</td>
+								<td>{{ list.person }}</td>
+								<td>{{ list.xqmsDtm | dateTimeFormat }}</td>
+								<td class="r_align">{{ list.matchTime | number(0) }}</td>
+								<td class="r_align">{{ list.reactTime | number(0) }}</td>
+								<td class="r_align">{{ list.diffTime | number(0) }}</td>
+								<td><span :class="{state01:list.coldResetResult==='B302', state02:list.coldResetResult==='B301' , state04:list.coldResetResult==='B303' || list.coldResetResult==='B304'}">{{ list.coldResetResult | code(resultCodeNm) }}</span></td>
+								<td><button v-if="list.isYn" class="btn_show" @click="showPopupLayer('/bmt/xqms/xqmsAttachList?xqmsSeq=' + list.xqmsSeq); return false;"></button></td>
+							</tr>
+							<tr v-if="uiReactionPagingList == 0">
+								<td colspan="10">조회된 데이터가 없습니다.</td>
+							</tr>
+						</tbody>
+					</table>
+					<paginator ref="uiReactionPaginator" :go-fn="getUiReactionPagingList"></paginator>
+				</div>
+			</div>
+		<!-- LKFS -->
+		<div class="tab_con">
+				<div class="tb_desc">
+					<p>조회결과 : {{ projectXqmsLkfsList.length | number(0) }}건<span class="unit">단위 : lkfs</span></p>
+					<button class="g_btn04" @click="btnExcelDown(event)"><span>다운로드</span></button>
+				</div>				
+				<div class="g_table">
+					<table>
+						<caption>츨정일시, 구분, Test Case 이름 등으로 구성된 표 입니다.</caption>
+						<colgroup>
+							<col>
+							<col style="width:10%;">
+							<col style="width:7%;">
+							<col style="width:8%;">
+							<col style="width:6%;">
+							<col style="width:6%;">
+							<col style="width:8%;">
+							<col style="width:7%;">
+							<col style="width:12%;">
+							<col style="width:7.5%;">
+							<col style="width:4.5%;">
+						</colgroup>
+						<thead>
+							<tr>
+								<th rowspan="2">Test Case 이름</th>
+								<th rowspan="2">측정모델</th>
+								<th rowspan="2">중요도</th>
+								<th rowspan="2">대분류</th>
+								<th rowspan="2">차수</th>
+								<th rowspan="2">리모컨</th>
+								<th rowspan="2">담당자</th>
+								<th rowspan="2">측정일시</th>
+								<th rowspan="2">측정 결과(l-lkfs)</th>
+								<th rowspan="2">측정결과 상세보기</th>
+								<th rowspan="2">XQMS 리포트 </th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr v-for="list in lkfsPagingList">
+								<td class="l_align">{{list.testcase}}</td>
+								<td>{{ list.modelNm }}({{ list.modelVer }})</td>
+								<td>{{ list.importance | code(importanceCodeNm) }}</td>
+								<td>{{ list.bigCateNm }}</td>
+								<td>{{ list.prjChasu }}차</td>
+								<td>{{ list.remocon }}</td>
+								<td>{{ list.person }}</td>
+								<td>{{ list.xqmsDtm | dateTimeFormat }}</td>
+								<td>{{list.lastILkfs}}</td>		
+								<td><button class="btn_show"></button></td>
+								<td><button v-if="list.isYn" class="btn_show" @click="showPopupLayer('/bmt/xqms/xqmsAttachList?xqmsSeq=' + list.xqmsSeq); return false;"></button></td>
+							</tr>
+							<tr v-if="lkfsPagingList == 0">
+								<td colspan="11">조회된 데이터가 없습니다.</td>
+							</tr>							
+						</tbody>
+					</table>
+					<paginator ref="lkfsPaginator" :go-fn="getLkfsPagingList"></paginator>
+				</div>
+			</div>	
+			<!-- 리모컨 로봇 테스트 -->	
+			<div class="tab_con">
+				<div class="tb_desc">
+					<p>조회결과 : {{ projectXqmsRemoconRobotList.length | number(0) }}건 <span class="unit">단위 : ms</span></p>
+					<button class="g_btn04" @click="btnExcelDown"><span>다운로드</span></button>
+				</div>
+				<div class="g_table">
+					<table>
+						<caption>대상 프로젝트, 측정일시, 측정모델 등 정보로 구성된 표 입니다.</caption>
+						<colgroup>
+							<col style="width:6%;">
+							<col style="width:10%;">
+							<col style="width:7.5%;">
+							<col style="width:10%;">
+							<col style="width:12%;">
+							<col style="width:10%;">
+							<col style="width:10%;">
+							<col style="width:10%;">
+							<col style="width:10%;">
+							<col style="width:8%;">
+							<col>
+						</colgroup>
+						<thead>
+							<tr>
+								<th rowspan="2">차수</th>
+								<th rowspan="2">측정모델</th>
+								<th rowspan="2">리모컨</th>
+								<th rowspan="2">담당자</th>
+								<th rowspan="2">측정일시</th>
+								<th colspan="5">측정 결과</th>
+								<th rowspan="2">XQMS 리포트</th>
+							</tr>
+							<tr>
+								<th>측정모델 요청</th>
+								<th>측정모델 이동</th>
+								<th>리모컨 요청</th>
+								<th>리모컨 이동</th>
+								<th>결과</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr v-for="list in remoconRobotPagingList">
+								<td>{{ list.prjChasu }}차</td>
+								<td>{{ list.modelNm }}({{ list.modelVer }})</td>
+								<td>{{ list.remocon }}</td>
+								<td>{{ list.person }}</td>
+								<td>{{ list.xqmsDtm | dateTimeFormat }}</td>
+								<td class="r_align">{{ list.targetRepeat | number(0) }}</td>
+								<td class="r_align">{{ list.resultRepeat | number(0) }}</td>
+								<td class="r_align">{{ list.targetDaq | number(0) }}</td>
+								<td class="r_align">{{ list.resultDaq | number(0) }}</td>
+								<td><span :class="{state01:list.repeatResult==='B302', state02:list.repeatResult==='B301' , state04:list.repeatResult==='B303' || list.repeatResult==='B304'}">{{ list.repeatResult | code(resultCodeNm) }}</span></td>
+								<td><button v-if="list.isYn" class="btn_show" @click="showPopupLayer('/bmt/xqms/xqmsAttachList?xqmsSeq=' + list.xqmsSeq); return false;"></button></td>
+							</tr>
+							<tr v-if="remoconRobotPagingList == 0">
+								<td colspan="11">조회된 데이터가 없습니다.</td>
+							</tr>
+						</tbody>
+					</table>
+					<paginator ref="remoconRobotPaginator" :go-fn="getRemoconRobotPagingList"></paginator>
+				</div>
+			</div>	
+		</div>
+	</div>
+</div>
+<script>
+var vueApp = new Vue(
+		{
+			el : '#vueApp',
+			data : {
+				pid:'<c:out value="${param.pid}"/>'
+				, tcCriteria : {
+					pid : '<c:out value="${param.pid}"/>',
+					seq : '<c:out value="${param.seq}"/>'
+				},
+				tcCategoryList : getListFromJsonStr('<nl:tcCateListJson pid="${param.pid}" />'),
+				tc : {},
+				importanceCodeNm : '<nl:codeListJson codeType="B100" />',
+				tcDivisionCodeNm : '<nl:codeListJson codeType="B900" />',
+				procChk : false,
+				prjVo : {
+					projectChasu : '<c:out value="${projectView.projectChasu}"/>',
+					projectStat : '<c:out value="${projectView.projectStat}"/>'
+				},
+				newTestCase : {
+					bigCate : "",
+					middleCate : "",
+					smallCate : "",
+					importance : "",
+					importanceNm : "",
+					tc : "",
+					pid : '<c:out value="${param.pid}"/>',
+					tcDivision : ""
+				},
+				tcCategoryListBackUp : "",
+				tcCateParId : "",
+				addTcCateShow : false,
+				addTcCateNm : "",
+				addTcCateType : "",
+				addTcCateParId : "",
+				suiteList : "",
+				caseList : "",
+				cateList : "",
+				cateChk : false,
+				// 측정이력 정보
+				currTab: 'bmt',
+				projectXqmsBmtList: [],
+				projectXqmsChannelList: [],
+				projectXqmsUiReactionList: [],
+				projectXqmsRemoconRobotList: [],
+				projectXqmsLkfsList: [],		
+				bmtPagingList:[],
+				channelPagingList: [],
+				uiReactionPagingList: [],
+				remoconRobotPagingList: [],
+				lkfsPagingList: [],
+				searchChk: true,
+				criteriaExcel: {},
+				resultCodeNm: '<nl:codeListJson codeType="B300" />',
+				criteria: {
+					startDt: '<c:out value="${projectView.projectStDt}"/>'
+					, endDt: '<c:out value="${projectView.projectEndDt}"/>'
+					, pid: '<c:out value="${param.pid}"/>'
+					, seqArray: '<c:out value="${param.seq}"/>'
+				}
+			},
+			mounted : function() {
+				setPopup(2);
+				this.setup();
+			},
+			updated : function() {
+				setPopup(2);
+			},
+			methods : {
+				setup : function() {
+					jQuery.ajaxSettings.traditional = true;
+					$.post("/bmt/tc/getTc", this.tcCriteria, function(data) {
+						vueApp.tc = data.tc;
+					});
+					var param = {
+						pid : this.pid,
+						useYn : 'Y'
+					};
+					$.post('/bmt/tc/getTcCategoryList', param, function(data) {
+						vueApp.tcCategoryListBackUp = data.tcCategoryList;
+						vueApp.suiteList = vueApp.getCate('000000000000000000000000000000000000');
+						vueApp.caseList = vueApp.getCate(vueApp.tc.bigCateId);
+						vueApp.cateList = vueApp.getCate(vueApp.tc.middleCateId);
+					});
+					this.getProjectXqmsBmtList();
+				},
+				changeCate: function(){
+					if(this.cateChk == false){
+						this.cateChk = true;	
+					} else{
+						this.cateChk = false;
+					}
+					this.setup();
+					
+				},
+				addCateSetup : function() {
+					jQuery.ajaxSettings.traditional = true;
+					var param = {
+							pid : this.pid,
+							useYn : 'Y'
+						}
+						$.post('/bmt/tc/getTcCategoryList', param, function(data) {
+							vueApp.tcCategoryListBackUp = data.tcCategoryList;
+							vueApp.suiteList = vueApp.getCate('000000000000000000000000000000000000');
+							vueApp.caseList = vueApp.getCate(vueApp.tc.bigCateId);
+							vueApp.cateList = vueApp.getCate(vueApp.tc.middleCateId);
+						});
+				},
+				setCateId : function(obj) {
+					var newTc = this.newTestCase;
+					newTc.bigCateId = obj.bigCateId;
+					newTc.bigCateNm = obj.bigCateNm;
+					newTc.middleCateId = obj.middleCateId;
+					newTc.middleCateNm = obj.middleCateNm;
+					newTc.smallCateId = obj.smallCateId;
+					newTc.smallCateNm = obj.smallCateNm;
+				},
+				regFile : function() {
+					fileUpload($("#file"), {
+						saveFilePath : "bmt/tc"
+					}, function(data) {
+						if (data.saveFileNm) {
+							vueApp.tc.fileNm = data.saveFileNm;
+							vueApp.tc.orgFileNm = data.realFileNm;
+							vueApp.tc.filePath = data.saveFilePath;
+						}
+					});
+				},
+				delFile : function() {
+					this.tc.fileNm = "";
+					this.tc.orgFileNm = "";
+					this.tc.filePath = "";
+				},
+				getFileDown : function() {
+					fileDown(this.tc.filePath, this.tc.fileNm,
+							this.tc.orgFileNm);
+				},
+				addCateCheck : function(obj) {
+					if (obj.bigCateId == 'Add' && obj.middleCateId == ''
+							&& obj.smallCateId == '') {
+						this.addTcCateType = "대분류";
+						this.addTcCateParId = '000000000000000000000000000000000000';
+						this.addTcCateShow = true;
+					} else if (obj.bigCateId != '' && obj.bigCateId != 'Add'
+							&& obj.middleCateId == 'Add'
+							&& obj.smallCateId == '') {
+						this.addTcCateType = "중분류";
+						this.addTcCateParId = obj.bigCateId;
+						this.addTcCateShow = true;
+					} else if (obj.bigCateId != '' && obj.bigCateId != 'Add'
+							&& obj.middleCateId != ''
+							&& obj.middleCateId != 'Add'
+							&& obj.smallCateId == 'Add') {
+						this.addTcCateType = "소분류";
+						this.addTcCateParId = obj.middleCateId;
+						this.addTcCateShow = true;
+					} else {
+						this.addTcCateShow = false;
+					}
+				},
+				addCategory : function() {
+					var tcNm = this.tc.tc
+					var newSubCate = {};
+					newSubCate.tcCateParId = this.addTcCateParId;
+					newSubCate.tcCateNm = this.addTcCateNm;
+					newSubCate.pid = this.pid;
+					if (newSubCate.tcCateNm == "") {
+						alert("분류 이름을 입력하세요.");
+						return;
+					}
+					$.ajax({
+						type : "post",
+						url : "/bmt/tc/regTcCategory",
+						contentType : "application/json",
+						data : JSON.stringify(newSubCate),
+						success : function(data) {
+							if (data.result) {
+								alert("카테고리가 등록 되었습니다.");
+								vueApp.addCateSetup();
+								vueApp.addTcCateNm = "";
+								vueApp.newTestCase.bigCate = "";
+								vueApp.newTestCase.middleCate = "";
+								vueApp.newTestCase.smallCate = "";
+
+							} else if (data.message) {
+								alert(data.message);
+							}
+						},
+						error : function(xhr, status, error) {
+							alert($(xhr.responseText).text());
+						}
+					});
+				},
+				getCate : function(tcCateParId) {
+					return this.tcCategoryListBackUp.filter(function(v) {
+						return v.tcCateParId === tcCateParId;
+					});
+				},
+				apply : function() {
+					if(this.tc.tc == ""){
+						alert("Text Case 이름을 입력하세요.");
+						return;
+					}
+					if(this.tc.bigCateId == "" || this.tc.bigCateId == "Add"){
+						alert("대분류를 선택하세요.");
+						return;
+					}
+					if(this.tc.middleCateId == "" || this.tc.middleCateId == "Add"){
+						alert("중분류를 선택하세요.");
+						return;
+					}
+					if(this.tc.smallCateId == "" || this.tc.smallCateId == "Add"){
+						alert("소분류를 선택하세요.");
+						return;
+					}
+
+					$.ajax({
+						type : "post",
+						url : "/bmt/tc/modTc",
+						contentType : "application/json",
+						data : JSON.stringify(this.tc),
+						beforeSend : function() {
+							vueApp.procChk = true;
+							parent.startLoading();
+						},
+						success : function(data) {
+							if (data.result) {
+								alert("테스트 케이스 상세정보가  수정 되었습니다.");
+								opener.parent.list.setup();
+								self.close();
+							} else if (data.message) {
+								alert(data.message);
+							}
+						},
+						error : function(xhr, status, error) {
+							alert($(xhr.responseText).text());
+						},
+						complete : function() {
+							vueApp.procChk = false;
+							parent.endLoading();
+						}
+					});
+				}
+				
+				// 결과이력
+				// testcase
+				, getProjectXqmsBmtList: function() {
+					if (this.searchChk) {
+						this.currTab = "bmt"
+						jQuery.ajaxSettings.traditional = true;
+						$.post("/bmt/xqms/getProjectXqmsBmtList", this.criteria, function(data){
+							vueApp.projectXqmsBmtList = data.projectXqmsBmtList;
+							for (var i=0; i < data.projectXqmsBmtList.length; i++) {
+								if (data.projectXqmsBmtList[i].isYn > 0) {
+									vueApp.projectXqmsBmtList[i].isYn = true;
+								}
+							}
+							vueApp.getBmtPagingList();
+							vueApp.$refs.bmtPaginator.goPage(1);
+							vueApp.criteriaExcel = $.extend(true, {}, vueApp.criteria);
+						});
+					}
+				}
+				, getBmtPagingList: function(){
+					this.bmtPagingList = this.$refs.bmtPaginator.pagingList(this.projectXqmsBmtList);
+				}
+				// LKFS 테스트
+				, getProjectXqmsLkfsList: function(){
+					if (xqmsList.searchChk){
+						xqmsList.currTab = "lkfs";
+						jQuery.ajaxSettings.traditional = true;	
+						$.post("/bmt/xqms/getProjectXqmsLkfsList", xqmsList.criteria,function(data){
+							xqmsList.projectXqmsLkfsList = data.projectXqmsLkfsList;
+							for(var i=0; i<data.projectXqmsLkfsList.length; i++){
+								if(data.projectXqmsLkfsList[i].isYn > 0){
+									xqmsList.projectXqmsLkfsList[i].isYn = true;
+								}
+							}
+							xqmsList.getLkfsPagingList();
+							xqmsList.$refs.lkfsPaginator.goPage(1);
+							xqmsList.criteriaExcel = $.extend(true, {}, xqmsList.criteria);
+						});
+					}
+				}, getLkfsPagingList: function(){
+					this.lkfsPagingList = this.$refs.lkfsPaginator.pagingList(this.projectXqmsLkfsList);
+				}
+				//리모콘 로봇 테스트
+				, getProjectXqmsRemoconRobotList: function(){
+					if (this.searchChk){
+						this.currTab = "remoconRobot";
+						jQuery.ajaxSettings.traditional = true;	
+						$.post("/bmt/xqms/getProjectXqmsRemoconRobotList", this.criteria,function(data){
+							vueApp.projectXqmsRemoconRobotList = data.projectXqmsRemoconRobotList;
+							for(var i=0; i<data.projectXqmsRemoconRobotList.length; i++){
+								if(data.projectXqmsRemoconRobotList[i].isYn > 0){
+									vueApp.projectXqmsRemoconRobotList[i].isYn = true;
+								}
+							}
+							vueApp.getRemoconRobotPagingList();
+							vueApp.$refs.remoconRobotPaginator.goPage(1);
+							vueApp.criteriaExcel = $.extend(true, {}, vueApp.criteria);
+						});
+					}
+				}
+				, getRemoconRobotPagingList: function(){
+					this.remoconRobotPagingList = this.$refs.remoconRobotPaginator.pagingList(this.projectXqmsRemoconRobotList);
+				}
+				// 채널변경시간
+				, getProjectXqmsChannelList: function(){
+					if (this.searchChk) {
+						this.currTab = "channel"
+						jQuery.ajaxSettings.traditional = true;
+						$.post("/bmt/xqms/getProjectXqmsChannelList", this.criteria, function(data){
+							vueApp.projectXqmsChannelList = data.projectXqmsChannelList;
+							for (var i=0; i < data.projectXqmsChannelList.length; i++) {
+								if (data.projectXqmsChannelList[i].filePath != null) {
+									vueApp.projectXqmsChannelList[i].reportChk = true;
+								}
+							}
+							vueApp.getChannelPagingList();
+							vueApp.$refs.channelPaginator.goPage(1);
+							vueApp.criteriaExcel = $.extend(true, {}, vueApp.criteria);
+						});
+					}
+				}
+				, getChannelPagingList: function(){
+					this.channelPagingList = this.$refs.channelPaginator.pagingList(this.projectXqmsChannelList);
+				}
+				
+				// Ui반응시간
+				, getProjectXqmsUiReactionList: function(){
+					if (this.searchChk) {
+						this.currTab = "uiReacion"
+						jQuery.ajaxSettings.traditional = true;
+						$.post("/bmt/xqms/getProjectXqmsUiReactionList", this.criteria, function(data){
+							vueApp.projectXqmsUiReactionList = data.projectXqmsUiReactionList;
+							for (var i=0; i < data.projectXqmsUiReactionList.length; i++) {
+								if (data.projectXqmsUiReactionList[i].filePath != null) {
+									vueApp.projectXqmsUiReactionList[i].reportChk = true;
+								}
+							}
+							vueApp.getUiReactionPagingList();
+							vueApp.$refs.uiReactionPaginator.goPage(1);
+							vueApp.criteriaExcel = $.extend(true, {}, vueApp.criteria);
+						});
+					}
+				}
+				, getUiReactionPagingList: function(){
+					this.uiReactionPagingList = this.$refs.uiReactionPaginator.pagingList(this.projectXqmsUiReactionList);
+				}
+				
+				, changeTab: function(currTab){
+					this.currTab = currTab;
+				}
+				
+				//엑셀다운로드
+				, btnExcelDown: function(){
+					var url = '';
+					
+					if (this.currTab == 'bmt') {
+						url = '/bmt/xqms/getProjectXqmsBmtExcel';
+					} else if (this.currTab == 'channel') {
+						url = '/bmt/xqms/getProjectXqmsChannelExcel';
+					} else if(this.currTab == 'uiReacion'){
+						url = '/bmt/xqms/getProjectXqmsUiReationExcel';
+					} else if(this.currTab == 'remoconRobot'){
+						url = '/bmt/xqms/getProjectXqmsRemoconRobotExcel';
+					} else if(xqmsList.currTab == 'lkfs'){
+						url = '/bmt/xqms/getProjectXqmsLkfsExcel';
+					}
+					excelFileDown(url, this.criteriaExcel);
+				}
+			}
+		});
+</script>
+

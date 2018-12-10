@@ -1,0 +1,305 @@
+<%@ page contentType="text/html" pageEncoding="UTF-8" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+
+<link href="/css/bootstrap.css" rel="stylesheet">
+<script type="text/javascript" src="/js/bootstrap.js"></script>
+
+<link href="/css/summernote.css" rel="stylesheet">
+<script type="text/javascript" src="/js/summernote.min.js"></script>
+
+<div class="pop_wrap" style="width:780px;">
+	<form name="editForm" method="post" enctype="multipart/form-data" onsubmit="return false;">
+		<input type="hidden" name="boardSeq" v-model="boardSeq" />
+		<input type="hidden" name="pid" v-model="view.pid" />
+		<input type="hidden" name="regId" v-model="view.regId" />
+		<input type="hidden" name="fileList" v-model="view.fileList" />
+	<div class="pop_tit">
+		<p>{{ mod ? '게시글 조회' : '새글쓰기' }}</p>
+	</div>
+	<div class="pop_cont">
+		<div class="g_table02">
+			<table>
+				<caption>제목, 내용, 첨부파일 등을 입력하는 표 입니다.</caption>
+				<colgroup>
+					<col style="width:120px;">
+					<col>
+				</colgroup>
+				<tbody>
+					<tr>
+						<th>제목</th>				
+						<td v-if="((mod && idChk) || !mod) && prjVo.projectStat != 'C304'">
+							<input type="text" class="full" name="subject" v-model="view.subject" placeholder="최소 5글자 이상">
+						</td>
+						<td v-if="mod && !idChk && prjVo.projectStat != 'C304'">
+							{{ view.subject }}
+						</td>
+						<td v-if="prjVo.projectStat == 'C304'">
+							{{ view.subject }}
+						</td>
+					</tr>
+					<tr>
+						<th>작성자</th>
+						<td v-if="!mod">
+							{{user.loginUserNm}}({{user.loginUserGroupNm}})
+						</td>
+						<td v-if="mod">
+							{{view.userNm}}({{view.userGroupNm}})
+						</td>
+					</tr>
+					<tr>
+						<th>내용</th>
+						<td class="notice_txt" v-if="((mod && idChk) || !mod) && prjVo.projectStat != 'C304'">
+<!-- 							<textarea name="content" v-model="view.content" class="full"></textarea> -->
+							<textarea id="summernote" name="content" class="full"></textarea>
+						</td>
+						<td class="notice_txt" v-if="mod && !idChk && prjVo.projectStat != 'C304'">
+							<div class="txt" v-html="view.content">
+								
+							</div>
+						</td>
+						<td v-if="prjVo.projectStat == 'C304'" class="notice_txt">
+							<div class="txt" v-html="view.content">
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<th>첨부파일 </th>
+						<td class="file" v-if="((mod && idChk) || !mod ) && prjVo.projectStat != 'C304'">
+							<input type="file" class="ir" id="upLoadFile" name="uploadFile" @change="btnFileUpload" :disabled="mod && !idChk">
+							<label for="upLoadFile" class="sch_file" >파일찾기</label>
+							<p class="file_txt">최대 10MB 까지 첨부 가능합니다.</p>
+							<ul class="file_list" v-show="view.fileList.length>0">
+								<li class="full" v-for="(fn,index) in view.fileList"><a @click="getFileDown(index)">{{fn.orgFileNm}}</a><button class="del"  @click="btnFileDelete(index)"> </button></li>
+							</ul>
+						</td>
+						<td v-if="mod && !idChk && orgFileNm=='' && prjVo.projectStat != 'C304' ">
+							<ul class="file_list" v-show="view.fileList.length>0">
+								<li class="full" v-for="(fn,index) in view.fileList"><a @click="getFileDown(index)">{{fn.orgFileNm}}</a></li>
+							</ul>
+						</td>
+						<td v-if="prjVo.projectStat == 'C304'">
+							<ul class="file_list">
+								<li class="full" v-for="(fn,index) in view.fileList"><a style="padding-left: 5px;" @click="getFileDown(index)">{{fn.orgFileNm}}</a><button class="del"  @click="btnFileDelete(index)"> </button></li>
+							</ul>						
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	
+	<div class="btn_wrap">
+		<button v-if="mod && idChk && prjVo.projectStat != 'C304'" class="g_btn01" @click="btnModify">수정</button>
+		<button v-if="mod && idChk && prjVo.projectStat != 'C304'" class="g_btn01" @click="btnDelete">삭제</button>
+		<button class="g_btn01" v-if="!mod && prjVo.projectStat != 'C304'" @click="btnSave">등록</button>
+		<button class="g_btn02" onclick="hidePopupLayer(); return false">닫기</button>
+	</div>
+	</form>
+</div>
+<script>
+	var boardView = new Vue({
+		el: ".pop_wrap"
+		, data: {
+			view: {
+				subject: ""
+				, content: ""
+				, fileList:[]
+				, pid : "<c:out value='${param.pid}'/>"
+			}
+			, boardSeq: "<c:out value='${param.boardSeq}'/>"
+			/* , regUserNm: '<c:out value="${param.userNm}"/>'
+			, regUserGroupNm: '<c:out value="${param.userGroupNm}"/>' */
+			, mod: false
+			, idChk: false
+			, fileNm: ''
+			, filePath: ''
+			, orgFileNm: ''
+			, uploadFileNm: ''
+			, user: {
+				userId: '<c:out value="${user.userId}"/>'
+				, loginUserNm: '<c:out value="${user.userNm}"/>'
+				, loginUserGroupNm: '<c:out value="${user.userGroupNm}"/>'				
+			}
+			, prjVo:{
+				projectStat: '<c:out value="${projectView.projectStat}"/>'
+			}			
+			
+		}
+		, updated: function(){
+			setPopup(2);
+			this.setContents();
+		}
+		, mounted: function(){
+			var paramBoardSeq = "<c:out value='${param.boardSeq}'/>";
+			this.$nextTick(function(){
+				if(!isEmpty(paramBoardSeq)){
+					this.getView(paramBoardSeq);
+					boardView.mod = true;
+				} else {
+					this.setContents();
+				}
+			});
+			setPopup(2);
+		}
+		, methods: {
+			setContents: function() {
+				$('#summernote').summernote({
+					height: 200
+					, width: 300
+					, maxwidth: 300
+					, disableResizeEditor: true
+					, toolbar: [
+						['style', ['style', 'fontsize', 'color']],
+						['fontsize', ['bold', 'italic', 'underline', 'strikethrough']],
+						['para', ['paragraph', 'height', 'hr']],
+						['picture', ['table', 'picture', 'link']]
+					]
+				});
+				if (!($('#summernote').summernote('isEmpty'))) {
+					$('#summernote').summernote('code', $('#summernote').summernote('code'));
+				} else {
+					$('#summernote').summernote('code', boardView.view.content);
+				}
+			}
+			, getView: function(paramBoardSeq){
+				$.get("/bmt/board/getBoardView?boardSeq=" + paramBoardSeq,function(data){
+					boardView.view = data.view;
+					boardView.view.pid = "<c:out value='${param.pid}'/>";
+					boardView.view.fileList = data.fileList;
+					// 로그인 ID 와 게시글 등록ID 일치여부 확인
+					if (boardView.user.userId == data.view.regId){
+						boardView.idChk = true;
+					}
+					//줄바꿈 적용
+					boardView.view.content = data.view.content.replace(/(?:\n)/g, '<br>');
+					boardView.view.content.split('\n').join('<br>');
+ 					
+ 					if (boardView.mod && boardView.idChk && boardView.prjVo.projectStat != 'C304') {
+						//줄바꿈 미적용
+						boardView.view.content = data.view.content.replace(/(?:<br>)/g, '\n');
+					}
+				});
+			}
+			, btnFileUpload: function(){
+				fileUpload($("#upLoadFile"), {saveFilePath: "bmt/board"}, function(data){
+					var fileData = {
+							fileNm: data.saveFileNm
+							, filePath: data.saveFilePath
+							, orgFileNm: data.realFileNm
+							, fileUrl: "/file/download?savePath=" + data.saveFilePath + "&saveName=" + data.saveFileNm + "&realName=" + data.realFileNm
+							, uploadFileNm: '' 
+					}
+					var chNm = null;
+					if (fileData.orgFileNm.length > 25){
+						chNm = fileData.orgFileNm.substring(0,25);
+						fileData.uploadFileNm = chNm + ".....  ";
+					}else {
+						chNm = fileData.orgFileNm;
+						fileData.uploadFileNm = chNm + "  ";
+					}
+					
+					var fChk = boardView.view.fileList.some(function(t) {
+						return t.orgFileNm == data.realFileNm;
+					});
+					if(!fChk){
+						boardView.view.fileList.push(fileData);
+					}else {
+						alert("이미 추가된 파일입니다.");
+					}
+		
+				});
+			}
+			, getFileDown: function(index) {
+				var i = index;
+				fileDown(boardView.view.fileList[i].filePath, boardView.view.fileList[i].fileNm, boardView.view.fileList[i].orgFileNm);
+			}
+			, btnFileDelete: function(index){
+		
+				if (confirm("파일을 삭제 하시겠습니까?")){
+					boardView.view.fileList.splice(index, 1);
+				}	
+					
+			}
+			, btnSave: function(){
+				var param = boardView.view;
+				if (boardView.view.subject.length < 5){
+					alert("제목을 최소 5글자 이상 입력해주세요.");
+					return false;
+				}
+				
+				boardView.view.content = $('#summernote').summernote('code');
+				if (boardView.view.content.length < 1){
+					alert("내용을 작성해주세요.");
+					return false;
+				}
+				
+				var cmsg = "등록하시겠습니까?";
+				if (confirm(cmsg)){
+					$.ajax({
+						type: "post"
+						, url: "/bmt/board/regBoardPrc"
+						, contentType: "application/json"
+						, data : JSON.stringify(param)
+						, success: function(data){
+							if (data.save){
+								alert("저장되었습니다.");
+								parent.boardList.getBoardList(boardView.view.pid);
+								hidePopupLayer();
+							}
+						}
+						, error: function(xhr, status, error){
+							alert($(xhr.responseText).text());
+						}					
+					});
+				}
+			}
+			, btnModify: function(){
+				boardView.view.boardSeq = "<c:out value='${param.boardSeq}'/>";
+				var param = boardView.view;
+				if (boardView.view.subject.length < 5){
+					alert("제목을 최소 5글자 이상 입력해주세요.");
+					return false;
+				}
+				
+				if (boardView.view.content.length < 1){
+					alert("내용을 작성해주세요.");
+					return false;
+				}
+				var cmsg = "수정하시겠습니까?";
+				if (confirm(cmsg)){
+					$.ajax({
+						type: "post"
+						, url: "/bmt/board/modBoardPrc"
+						, contentType: "application/json"
+						, data : JSON.stringify(param)
+						, success: function(data){
+							if (data.save){
+								alert("수정되었습니다.");
+								parent.boardList.getBoardList(boardView.view.pid);
+								hidePopupLayer();
+							}
+						}
+						, error: function(xhr, status, error){
+							alert($(xhr.responseText).text());
+						}					
+					});
+				}
+			}
+			, btnDelete: function(){
+				var cmsg = "게시글을 삭제하시겠습니까?";
+				console.log(boardView.view.pid);
+				if (confirm(cmsg)){
+					$.post('/bmt/board/delBoardPrc', {boardSeq:boardView.boardSeq}, function(data){
+						if (data.del){
+							alert("삭제되었습니다.");
+							parent.boardList.getBoardList(boardView.view.pid);
+							hidePopupLayer();
+						}
+					});
+				}
+			}
+		}
+	});
+	
+	
+</script>

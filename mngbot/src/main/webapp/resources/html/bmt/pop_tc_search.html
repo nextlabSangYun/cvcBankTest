@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>Management Bot</title>
+	<link rel="stylesheet" href="../css/common.css">
+	<link rel="stylesheet" href="../css/bmt.css">
+	<script src="../js/jquery-3.2.1.min.js"></script>
+	<script src="../js/jquery-ui.min.js"></script>
+	<script src="../js/jquery.form.min.js"></script>
+	<script src="../js/vue.min.js"></script>
+	<script src="../js/lodash.min.js"></script>
+	<script src="../js/calendar.js"></script>
+	<script src="../js/common.js"></script>
+</head>
+<body>
+	<div class="pop_wrap win_pop">
+		<div class="pop_tit">
+			<p>Test Case 검색</p>
+		</div>
+		<div class="pop_cont">
+			<div class="sort_area full">
+				<div class="sel_item">
+					<span class="sort_tit pad">대분류</span>
+					<select name="" id="">
+						<option value="">선택</option>
+					</select>
+				</div>
+				<div class="sel_item">
+					<span class="sort_tit pad">중요도</span>
+					<input type="checkbox" id="chk1"><label for="chk1">Major</label>
+					<input type="checkbox" id="chk2"><label for="chk2">Minor</label>
+					<input type="checkbox" id="chk3"><label for="chk3">Critical</label>
+				</div>
+				<div class="sel_item full">
+					<span class="sort_tit">Test Case</span>
+					<div class="case">
+						<input type="text" class="full">
+						<button class="g_btn01">조회</button>
+					</div>
+				</div>
+			</div>
+			<div class="sort_btn">
+				<button class="g_btn01">선택</button>
+			</div>
+			<div class="g_table">
+				<table>
+					<colgroup>
+						<col style="width:5%">
+						<col style="width:12%">
+						<col style="width:13%">
+						<col style="width:15%">
+						<col style="width:8%;">
+						<col>
+					</colgroup>
+					<thead>
+						<tr>
+							<th>선택</th>
+							<th>대분류</th>
+							<th>중분류</th>
+							<th>소분류</th>
+							<th>중요도</th>
+							<th>Test Case</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td><input type="checkbox"></td>
+							<td>무비파인더</td>
+							<td>영화조건검색</td>
+							<td>검색리스트 선택</td>
+							<td>Minor</td>
+							<td>선택</td>
+						</tr>
+						<tr>
+							<td><input type="checkbox"></td>
+							<td>무비파인더</td>
+							<td>영화조건검색</td>
+							<td>검색리스트 선택</td>
+							<td>Minor</td>
+							<td>선택</td>
+						</tr>
+						<tr>
+							<td><input type="checkbox"></td>
+							<td>무비파인더</td>
+							<td>영화조건검색</td>
+							<td>검색리스트 선택</td>
+							<td>Minor</td>
+							<td>선택</td>
+						</tr>
+						<tr>
+							<td><input type="checkbox"></td>
+							<td>무비파인더</td>
+							<td>영화조건검색</td>
+							<td>검색리스트 선택</td>
+							<td>Minor</td>
+							<td>선택</td>
+						</tr>
+						<tr>
+							<td><input type="checkbox"></td>
+							<td>무비파인더</td>
+							<td>영화조건검색</td>
+							<td>검색리스트 선택</td>
+							<td>Minor</td>
+							<td>선택</td>
+						</tr>
+						<tr>
+							<td><input type="checkbox"></td>
+							<td>무비파인더</td>
+							<td>영화조건검색</td>
+							<td>검색리스트 선택</td>
+							<td>Minor</td>
+							<td>선택</td>
+						</tr>
+						<tr>
+							<td><input type="checkbox"></td>
+							<td>무비파인더</td>
+							<td>영화조건검색</td>
+							<td>검색리스트 선택</td>
+							<td>Minor</td>
+							<td>선택</td>
+						</tr>
+						<tr>
+							<td><input type="checkbox"></td>
+							<td>무비파인더</td>
+							<td>영화조건검색</td>
+							<td>검색리스트 선택</td>
+							<td>Minor</td>
+							<td>선택</td>
+						</tr>
+						<tr>
+							<td><input type="checkbox"></td>
+							<td>무비파인더</td>
+							<td>영화조건검색</td>
+							<td>검색리스트 선택</td>
+							<td>Minor</td>
+							<td>선택</td>
+						</tr>
+						<tr>
+							<td><input type="checkbox"></td>
+							<td>무비파인더</td>
+							<td>영화조건검색</td>
+							<td>검색리스트 선택</td>
+							<td>Minor</td>
+							<td>선택</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="pagination">
+				<ol>
+					<li class="btn_first"><button>처음</button></li>
+					<li class="btn_prev"><button>이전</button></li>
+					<li class="num on"><button>1</button></li>
+					<li class="num"><button>2</button></li>
+					<li class="num"><button>3</button></li>
+					<li class="num"><button>4</button></li>
+					<li class="num"><button>5</button></li>
+					<li class="btn_next"><button>다음</button></li>
+					<li class="btn_last"><button>마지막</button></li>
+				</ol>
+			</div>
+			<div class="btn_wrap">
+				<button class="g_btn02">닫기</button>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

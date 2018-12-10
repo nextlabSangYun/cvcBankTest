@@ -1,0 +1,118 @@
+/**
+ * @title	: 테스트 케이스 서비스 
+ * @package	: kr.co.nextlab.bmt.service
+ * @file	: TcService.java
+ * @author	: minmax(이세용)
+ * @date	: 2018. 1. 8.
+ * @desc	: 
+ */
+package kr.co.nextlab.bmt.service;
+
+import java.util.List;
+
+import kr.co.nextlab.bmt.model.ProjectBmtModelCriteria;
+import kr.co.nextlab.bmt.model.ProjectBmtModelVo;
+import kr.co.nextlab.bmt.model.TcCategoryVo;
+import kr.co.nextlab.bmt.model.TcCriteria;
+import kr.co.nextlab.bmt.model.TcVo;
+import kr.co.nextlab.bmt.model.XqmsVo;
+
+public interface TcService {
+	
+	/**
+	 * 테스트케이스 리스트
+	 * @param criteria 검색조건
+	 * @return 테스트케이스 리스트
+	 */
+	public List<TcVo> selectTcList(TcCriteria criteria);
+	
+	/**
+	 * 카테고리 리스트
+	 * @param tcCategoryVo 카테고리정보
+	 * @return 카테고리 리스트
+	 */
+	public List<TcCategoryVo> selectTcCategoryList(TcCategoryVo tcCategoryVo);
+
+	/**
+	 * 테스트 케이스 추가 
+	 * @param tcVo
+	 * @return
+	 */
+	boolean insertTcList(List<TcVo> tcVo);
+
+
+	/**
+	 * 테스트 케이스 조회(단일 테스트 케이스)
+	 * @param testCaseVo
+	 * @return
+	 */
+	TcVo selectTc(TcCriteria tcCriteria);
+	/**
+	 * 테스트 케이스 업데이트(비고, 파일)
+	 * @param tcVo
+	 * @return
+	 */
+	boolean updateTc(TcVo tcVo);
+	/**
+	 * 테스트 케이스 모델 리스트 조회(셋톱박스등)
+	 * @param projectBmtModelCriteria
+	 * @return
+	 */
+	List<ProjectBmtModelVo> selectBmtModelList(ProjectBmtModelCriteria projectBmtModelCriteria);
+
+	/**
+	 * 카테고리 삭제(실제로는 업데이트)
+	 * @param categoryVo
+	 * @return
+	 */
+	boolean updateDelTcCategory(TcCategoryVo categoryVo);
+
+	/**
+	 * 카테고리 추가
+	 * @param categoryVo
+	 * @return
+	 */
+	boolean insertTcCategory(TcCategoryVo categoryVo);
+	/**
+	 * 카테고리 수정 
+	 * @param categoryVo
+	 * @return
+	 */
+	boolean updateModTcCategory(TcCategoryVo categoryVo);
+
+	/**
+	 * 리포트 등록
+	 * @param xqmsVo
+	 * @return
+	 */
+	boolean insertRegReport(XqmsVo xqmsVo);
+	
+	/**
+	 * BMT 테스트 현황 조회
+	 * @param vo
+	 * @return
+	 */
+	List<TcVo> selectBmtTcStatList(TcVo vo);
+	
+	/**
+	 * 해당 프로젝트 차수 별 이슈 개수 조회
+	 * @param vo
+	 * @return
+	 */
+	List<TcVo> selectIssueCntList(TcVo vo);
+
+	/**
+	 * 해당 프로젝트의 카테고리별 이슈건수 리스트 조회
+	 * @param model
+	 * @param pid 프로젝트 아이디
+	 * @return 해당 프로젝트의 카테고리별 이슈건수 리스트
+	 */
+	public List<TcVo> selectIssueCateCntList(String pid);
+
+	/**
+	 * 리포트 일괄 등록
+	 * @param xqmsVo
+	 * @return
+	 */
+	public boolean insertRegReportBatch(XqmsVo xqmsVo);
+}

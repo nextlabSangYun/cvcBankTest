@@ -1,0 +1,363 @@
+<%@ page contentType="text/html" pageEncoding="UTF-8" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://www.nextlab.co.kr/tags/nextlab" prefix="nl"%>
+<div class="content">
+	<div class="sub_layout has_snb">
+		<div class="cont_wrap">
+			<div class="sort_area">
+				<div class="sel_item">
+					<span class="sort_tit">기간</span>
+					<div class="period">
+						<input type="text" class="input_date" readonly name="startDt" v-model="criteria.startDt">
+						<span class="bar">~</span>
+						<input type="text" class="input_date" readonly name="endDt" v-model="criteria.endDt">
+					</div>
+				</div>
+				<div class="sel_item no_tit">
+					<input type="checkbox" id="chkMyIssue" v-model="criteria.chkMyIssue"><label for="chkMyIssue">내 이슈만 보기</label>
+				</div>
+				<div class="sel_item full" style="left:-18px;right:18px">
+					<span class="sort_tit">중요도</span>
+					<nl:checkboxes codeType="B100" v-model="criteria.importanceArray"/>
+				</div>
+				<div class="sel_item full" style="left:-18px;right:18px">
+					<span class="sort_tit">진행상황</span>
+					<nl:checkboxes codeType="B200" v-model="criteria.progressStatArray"/>
+				</div>
+				<div class="sel_item">
+					<span class="sort_tit">대분류</span>
+					<nl:select v-model = "criteria.issueLcateCd">
+						<nl:option value="">- 전체 -</nl:option>
+						<nl:options codeType="D500"/>
+					</nl:select>
+				</div>
+				<div class="sel_item">
+					<span class="sort_tit">이슈 제목+내용</span>
+					<input type="text" v-model="criteria.issueSubject" @keypress.enter="getList(1)"/>
+				</div>
+				<div class="sel_item full" style="left:-18px;right:18px">
+					<span class="sort_tit">측정모델</span>	
+					<div class="sel_model">
+						<project-model-select ref="modelSelect" :change-fn="addModelList" :pid="criteria.pid"></project-model-select>
+						<div class="reg_list" v-if="criteria.modelList.length > 0">
+							<ul>
+								<li v-for="(list, index) in criteria.modelList">
+									<span>{{list.modelNm}}({{list.modelVer}})</span>
+									<button class="del" @click="delModelList(index)"></button>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+				<button class="g_btn01" @click="getList(1)">조회</button>
+			</div>
+			<div class="tb_desc">
+				<p>조회결과 : {{ issueList.length | number(0) }}건</p>
+				<div class="btn_wrap">
+					<button class="g_btn04" @click="getExcelDown"><span>다운로드</span></button>
+					<button class="g_btn03" @click="addIssue"> 이슈 등록</button>
+					<button class="g_btn01" @click="delIssue"><span>삭제</span></button>	
+				</div>
+			</div>
+			<div class="g_table">
+				<table>
+					<caption>중요도, 진행사황, 이슈제목 등으로 구성된 표입니다.</caption>
+					<colgroup>
+						<col style="width:4%;">
+						<col style="width:4%;">
+						<col style="width:4%;">
+						<col style="width:6%;">
+						<col style="width:8%;">
+						<col style="width:8%;">
+						<col style="width:13%;">
+						<col style="width:14%;">
+						<col>
+						<col style="width:6%;">
+						<col style="width:8%;">
+						<col style="width:8%;">
+					</colgroup>
+					<thead>
+						<tr>
+							<th>선택</th>
+							<th>No</th>
+							<th>상태</th>
+							<th>중요도</th>
+							<th>진행상황</th>
+							<th>대분류</th>
+							<th>측정모델</th>
+							<th>이슈제목</th>
+							<th>이슈내용</th>
+							<th>등록자</th>
+							<th>등록일시</th>
+							<th>관리</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr v-for="(listIssue, idx) in pagingList">
+							<td><input type="checkbox" v-model="listIssue.check"></td>
+							<td>{{ listIssue.issueIdx }} </td>
+							<td class="icb" v-if="listIssue.condition<=24 && listIssue.condition!=-1">New</td>
+							<td v-else></td>
+							<td><span :class="[listIssue.importance=='B101' ? 'state05' : listIssue.importance=='B103' ? 'state01' : listIssue.importance=='B102' ? 'state07' : 'state04']">{{ listIssue.importance | code(codeImportance) }}</span></td>
+							<td><span :class="[listIssue.progressStat == 'B201'? 'state01' : listIssue.progressStat=='B202' ? 'state05' : listIssue.progressStat == 'B203'? 'state04' : listIssue.progressStat == 'B204'? 'state03' : listIssue.progressStat == 'B205'? 'state08' : 'state06']">{{ listIssue.progressStat | code(codeProgressStat) }}</span></td>
+							<td><span>{{listIssue.issueLcateCd | code(lCateNm)}}</span></td>
+							<td class="l_align">
+								<span v-for="modelList in listIssue.modelList" style="line-height: 18px;">{{modelList.modelNm}}({{modelList.modelVer}})<br></span>
+							</td>
+							<td class="l_align"><a href="javascript://" class="link" @click="goView(listIssue.issueId)"><p class="ellips">{{ listIssue.issueSubject }}</p></a></td>
+							<td class="l_align"><a href="javascript://" class="link" @click="goView(listIssue.issueId)"><span v-html="listIssue.issueCont"></span> </a></td>
+							<td>{{ listIssue.regNm }}</td>
+							<td>{{ listIssue.regDtm | dateTimeFormat }}</td>
+							<td>
+								<div class="tb_fixed_btns" v-if="authId == 'AU002'">
+									<button class="tb_btn01" v-if="(listIssue.progressStat =='B201' || listIssue.progressStat =='B202' || listIssue.progressStat == 'B204' || listIssue.progressStat == 'B205' || listIssue.progressStat == 'B206') && projectStat!='C304'" @click="setComplete(listIssue.issueId)">완료처리</button>										
+									<button class="tb_btn04" v-if="listIssue.progressStat =='B203' && projectStat!='C304'" @click="setRecall(listIssue.issueId, listIssue.condition)">다시열기</button>
+								</div>
+							</td>
+						</tr>
+						<tr v-if="pagingList.length==0">
+							<td colspan="12">검색된 이슈가 없습니다.</td>
+						</tr>
+					</tbody>
+				</table>
+				<paginator ref="paginator" :go-fn="getPagingList"></paginator>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+	var list = new Vue({
+		el: '.sub_layout'
+		, data: {
+			issueList: []
+			, isIssueListIdx: false
+			, issueFullList: new Map()
+			, issueListCnt: 0
+			, pagingList: []
+			, criteria: {
+				startDt: '<c:out value="${projectView.projectStDt}"/>'
+				, endDt: '<c:out value="${projectView.projectEndDt}"/>'
+				, pid: '<c:out value="${param.pid}"/>'
+				, importanceArray: []
+				, progressStatArray: []
+				, chkMyIssue: false
+				, bigCateId: ''
+				, modelSeqArray: []
+				, modelList: []
+				, modelIdArray: []
+				, modelVerArray: []
+				, issueLcateCd: ''
+			}
+			, progressStat: '<c:out value="${param.progressStat}"/>'
+			, criteriaExcel: {
+				modelArray: []
+			}
+			, codeImportance: '<nl:codeListJson codeType="B100" />'
+			, codeProgressStat: '<nl:codeListJson codeType="B200" />'
+			, lCateNm: '<nl:codeListJson codeType="D500" />'
+			, pid: '<c:out value="${param.pid}"/>'
+			, projectStat: '<c:out value="${projectView.projectStat}"/>'
+			, bigCateId: '<c:out value="${param.bigCateId}"/>'
+			, issueId: '<c:out value="${param.issueId}"/>'
+			, isIssueLoad: true
+			, chkArray: []
+			, issueLcateCd: '<c:out value="${param.issueLcateCd}"/>'
+			, authId: '<c:out value="${authId}"/>'
+			, currentPage: 1
+		}
+		, beforeMount: function() {
+			this.$nextTick(function() {
+				this.criteria.issueLcateCd = this.issueLcateCd;
+				this.getList(1);
+			});
+		}
+		, mounted: function() {
+			$('.input_date').datepicker().on('change', function() {
+				list["criteria"][this.name] = $(this).val();
+			});
+		}
+		, computed: {
+			getFirstPage: function(){
+				return this.$refs.paginator.pageNumDesc;
+			}
+		}
+		, methods: {
+			getList: function(page) {
+				var param = this.criteria;
+				if (list.criteria.startDt > list.criteria.endDt) {
+					alert("시작일자와 종료일자를 확인해 주세요.");
+					return;
+				}
+				if (list.progressStat != ''){
+					list.criteria.progressStatArray.push(list.progressStat);
+				}
+				$.ajax({
+					type: "post"
+					, url : "/bmt/issue/getIssueList"
+					, contentType: "application/json"
+					, data : JSON.stringify(param)
+					, success: function(data) {
+						if (!list.isIssueListIdx) {
+							list.isIssueListIdx = true;
+							list.issueListCnt = data.issueList.length;
+							for (var i = 0; i < data.issueList.length; i++) {
+								list.issueFullList.set(data.issueList[i].issueId, data.issueList.length - i);
+							}
+						}
+						list.issueList = data.issueList;
+						for (var i = list.issueList.length - 1; i >= 0; i--) {
+							list.issueList[i].issueIdx = list.getIssueIdx(list.issueList[i].issueId);
+						}
+						list.getPagingList();
+						list.goPage(page);
+						list.criteriaExcel = $.extend(true, {}, list.criteria);
+						//list.criteriaExcel = list.criteria;
+						if(!isEmpty(list.issueId) && list.isIssueLoad){
+							list.isIssueLoad = false;
+							list.goView(list.issueId);
+						}
+					}
+					, error: function(xhr, status, error) {
+						alert($(xhr.responseText).text());
+					}
+				});
+			}
+			, getIssueIdx: function(data) {
+				var issueIdx = 0;
+				if (this.issueFullList.has(data)) {
+					issueIdx = this.issueFullList.get(data);
+				} else {
+					this.issueListCnt = this.issueListCnt + 1;
+					this.issueFullList.set(data, this.issueListCnt);
+					issueIdx = this.issueListCnt;
+				}
+				return issueIdx;
+			}
+			, addModelList: function(data){
+				var chk = true;
+				var modelList = list.criteria.modelList;
+				for (var i=0; i < modelList.length; i++){
+					if (modelList[i].modelId === data.modelId && modelList[i].modelVer === data.modelVer){
+						chk = false;
+						break;
+					}
+				}
+				if (chk) {
+					list.criteria.modelList.push({modelId: data.modelId, modelVer: data.modelVer, modelNm: data.modelNm});
+				} else {
+					alert("이미 추가된 측정모델입니다.");
+				}
+			}
+			, delModelList: function(index){
+				list.criteria.modelList.splice(index, 1);
+			}
+			, getChkTc: function() {
+				return this.chkArray;
+			}
+			, getPagingList: function(page) {
+				// 줄바꿈
+				this.currentPage = page;
+				var tempList = [];
+				tempList = this.$refs.paginator.pagingList(this.issueList);
+				
+				tempList.forEach(function(o,i){
+					tempList[i].issueCont = o.issueCont.replace(/(?:\n)/g, '<br>');
+					tempList[i].issueCont.split('\n').join('<br>');
+				});
+				
+				this.pagingList = tempList;
+			}
+			, goPage: function(page) {
+				this.$refs.paginator.goPage(page);
+			}
+			, goView: function(issueId) {
+				var url = "/bmt/issue/issueView?issueId=" + issueId + "&pid=" + pid;
+				showPopupLayer(url);
+			}
+			, setComplete: function(issueId) {
+				var currentPage = this.currentPage;
+				var param = {
+					issueId: issueId
+				};
+				$.post('/bmt/issue/modIssueCompletePrc', param, function(data){
+					if (data.save) {
+						alert("완료처리 되었습니다.");
+						list.getList(currentPage);
+					} else if (data.message) {
+						alert(data.message);
+					}
+				});
+			}
+			, setRecall: function(issueId, condition) {
+				var currentPage = this.currentPage;
+				var param = {
+						issueId: ''
+						, progressStat:''
+				};
+				if(condition == -1){
+					param.issueId=issueId;
+					param.setProgressStat = 'B201';
+				}
+				else{
+					param.issueId=issueId;
+					param.setProgressStat = 'B202';
+				}
+				$.post('/bmt/issue/modIssueRecallPrc', {issueId:param.issueId, progressStat:param.setProgressStat}, function(data){
+					if (data.save) {
+						alert("이슈가 재오픈 되었습니다.");
+						list.getList(currentPage);
+					} else if (data.message) {
+						alert(data.message);
+					}
+				});
+			}
+			, getExcelDown: function() {
+				var param = [];
+				if(list.criteriaExcel.modelList.length > 0){
+					for(var i=0; i<list.criteriaExcel.modelList.length; i++){
+						param.push(list.criteriaExcel.modelList[i].modelId+";"+list.criteriaExcel.modelList[i].modelVer);
+					}
+					list.criteriaExcel.modelArray = param;	
+					list.criteriaExcel.modelList = [];
+				}
+				excelFileDown("/bmt/issue/getIssueExcel", list.criteriaExcel, "issueExcelDown");
+			}
+			, addIssue: function(){
+				var parentChk = 2;
+				var url = "/bmt/issue/issueForm?pid=" + this.criteria.pid+ "&parentChk="+parentChk;
+				showPopupLayer(url);
+			}
+			, delIssue: function(){
+				var currentPage = this.currentPage;
+				var selectedIssue = list.issueList.filter(function(listIssue){return listIssue.check == true;});
+				var param = [];
+				var paramStr = '';
+				for(var i=0; i<list.issueList.length; i++){
+					if(list.issueList[i].check == true){
+						param.push(list.issueList[i].issueId);
+						paramStr += list.issueList[i].issueId + ";";
+					}
+				}
+				if(selectedIssue.length < 1)
+				{
+					alert("이슈 삭제을 위해 선택된 이슈가 없습니다. ");
+					return;
+				}
+				
+				var cmsg = "삭제하시겠습니까?";
+				if (confirm(cmsg)){
+					$.post('/bmt/issue/delIssuePrc',{param:paramStr} , function(data){
+						if(data.del){
+							//issueList초기화
+							list.getList(currentPage);
+						}
+					})
+				}	
+			}
+			, goCurrentPageList: function() {
+				var currentPage = this.currentPage;
+				list.getList(currentPage);
+			}
+		}
+	});
+</script>

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>DIMS</title>    
+    <link href="../css/style.css" rel="stylesheet">    
+</head>
+<body>
+	<div class="dims_popup window" style="width:540px;">
+		<div class="dims_popup_header">
+			<div class="dims_popup_title"><img src="../images/bullet_title.png" alt=""> <span>HOME센터명 조회</span></div>
+			<button type="button" class="btn_popup_close" onclick="self.close();"><img src="../images/icon_popup_close.png" alt="close"></button>
+		</div>			
+		<section>					
+			<div class="detailsearch_wrap popup">	
+				<div class="detailsearch">
+					<div class="item">
+						<div class="title">관할본부</div>
+						<div class="select_wrap">
+							<select>
+								<option value="hide">선택</option>
+								<option value="">분류1</option>
+								<option value="">분류2</option>
+							</select>
+						</div>
+					</div>
+					<div class="item">
+						<div class="title">관할팀</div>
+						<div class="select_wrap">
+							<select>
+								<option value="hide">선택</option>
+								<option value="">분류1</option>
+								<option value="">분류2</option>
+							</select>
+						</div>
+					</div>						
+				</div>
+				<!-- end.detailsearch -->
+				<div class="btn_wrap">
+					<button type="submit" class="search btn_search">검색</button>												
+				</div>					
+			</div><!-- end .detailsearch_wrap -->
+		</section>
+		<section>
+			<div class="table_top_wrap">
+				<div class="count">Total <span>120</span> 건</div>					
+			</div><!-- end .table_option_wrap -->		
+			
+			<div class="table_vertical scroll">
+				<div class="header_wrap">
+					<table summary="검색결과">
+						<caption>검색결과</caption>
+						<colgroup>                        
+							<col width="55">
+							<col style="width: calc(100% - 55px)/3;">
+							<col style="width: calc(100% - 55px)/3;">
+							<col style="width: calc(100% - 55px)/3;">
+						</colgroup>
+						<thead>
+							<tr>								
+								<th scope="col">No.</th>
+								<th scope="col">본부</th>
+								<th scope="col">팀</th>
+								<th scope="col">상세분류명</th>										
+							</tr>
+						</thead>
+					</table>
+				</div>
+				<!-- end.header_wrap -->
+				<div class="scroll_wrap">
+					<table>
+						<colgroup>                        
+							<col width="55">
+							<col style="width: calc(100% - 55px)/3;">
+							<col style="width: calc(100% - 55px)/3;">
+							<col style="width: calc(100% - 55px)/3;">
+						</colgroup>
+						<tbody> 
+							<tr>
+								<td>10</td>
+								<td>수도권</td>
+								<td>강남품질솔루션팀</td>
+								<td><a href="#">Home클리닉_안양</a></td>
+							</tr>
+							<tr>
+								<td>9</td>
+								<td>수도권</td>
+								<td>강남품질솔루션팀</td>
+								<td><a href="#">Home클리닉_안양</a></td>
+							</tr>
+							<tr>
+								<td>8</td>
+								<td>수도권</td>
+								<td>강남품질솔루션팀</td>
+								<td><a href="#">Home클리닉_안양</a></td>
+							</tr>
+							<tr>
+								<td>7</td>
+								<td>수도권</td>
+								<td>강남품질솔루션팀</td>
+								<td><a href="#">Home클리닉_안양</a></td>
+							</tr>
+							<tr>
+								<td>6</td>
+								<td>수도권</td>
+								<td>강남품질솔루션팀</td>
+								<td><a href="#">Home클리닉_안양</a></td>
+							</tr>
+							<tr>
+								<td>5</td>
+								<td>수도권</td>
+								<td>강남품질솔루션팀</td>
+								<td><a href="#">Home클리닉_안양</a></td>
+							</tr>
+							<tr>
+								<td>4</td>
+								<td>수도권</td>
+								<td>강남품질솔루션팀</td>
+								<td><a href="#">Home클리닉_안양</a></td>
+							</tr>
+							<tr>
+								<td>3</td>
+								<td>수도권</td>
+								<td>강남품질솔루션팀</td>
+								<td><a href="#">Home클리닉_안양</a></td>
+							</tr>
+							<tr>
+								<td>2</td>
+								<td>수도권</td>
+								<td>강남품질솔루션팀</td>
+								<td><a href="#">Home클리닉_안양</a></td>
+							</tr>
+							<tr>
+								<td>1</td>
+								<td>수도권</td>
+								<td>강남품질솔루션팀</td>
+								<td><a href="#">Home클리닉_안양</a></td>
+							</tr>
+						</tbody> 
+					</table>
+				</div>
+				<!-- end.scroll_wrap -->
+			</div><!-- end .table_vertical.scroll -->
+	
+			
+			
+			<div class="table_bottom_wrap">	
+				<div class="button_wrap right">					
+					<button type="button" class="btn_tbl white" onclick="self.close();">닫기</button>							
+				</div>
+			</div>
+			<!-- end.table_bottom_wrap -->
+		</section>			
+	</div>
+	
+    <script src="../js/lib/jquery-3.2.1.min.js"></script>
+    <script src="../js/lib/jquery-ui.min.js"></script>	
+	<script src="../js/ui.js"></script>
+	<script src="../js/lib/prefixfree.min.js"></script>   
+</body>
+</html>

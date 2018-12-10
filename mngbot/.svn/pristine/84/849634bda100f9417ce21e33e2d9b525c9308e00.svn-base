@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.nextlab.hded.mapper.HdedProjectMapper">
+	<select id="selectMyProjectList" parameterType="heProjectVo" resultType="heProjectVo">
+		SELECT a.pid
+			   , a.project_nm
+			   , a.project_stat
+			   , a.proejct_result_cd
+			   , a.project_st_dt
+			   , a.project_end_dt
+			   , a.bigo
+			   , a.reg_id
+			   , (SELECT e.user_nm FROM tb_user e where e.user_id = a.reg_id) AS reg_nm
+			   , a.reg_dtm
+			   , a.mod_id
+			   , (SELECT f.user_nm FROM tb_user f where f.user_id = a.mod_id) AS mod_nm
+			   , a.mod_dtm
+			   , b.sys_seq
+			   , b.system_id
+			   , b.system_stat
+			   , b.system_result_cd
+			   , b.chasu
+			   , c.chasu_st_dtm
+			   , c.chasu_ed_dtm
+			   , d.system_nm
+		FROM   tb_he_project a
+		JOIN   tb_project_system b
+		ON     a.pid = b.pid
+		JOIN   tb_system_chasu_hst c
+		ON     a.pid     = c.pid
+		AND    b.sys_seq = c.sys_seq
+		AND    b.chasu   = c.chasu
+		JOIN   tb_he_system d
+		ON     b.system_id = d.system_id
+		WHERE a.use_yn = 'Y'
+		<if test=" !mngYn ">
+			AND EXISTS (SELECT 1 FROM tb_project_member e WHERE e.pid = a.pid AND e.parti_id = #{partiId})
+		</if>
+		<if test=" progressYn ">
+			AND a.project_stat IN ('C301','C302','C303')
+		</if>
+		ORDER BY a.reg_dtm DESC
+	</select>
+	
+	<select id="selectMyProjectChasuList" parameterType="projectVo" resultType="projectVo">
+		SELECT a.pid
+			   , a.project_nm
+			   , a.project_stat
+			   , a.proejct_result_cd
+			   , a.project_st_dt
+			   , a.project_end_dt
+			   , a.bigo
+			   , a.reg_id
+			   , a.reg_dtm
+			   , a.mod_id
+			   , a.mod_dtm
+			   , b.sys_seq
+			   , b.system_id
+			   , b.system_stat
+			   , b.system_result_cd
+			   , b.chasu
+			   , c.chasu_st_dtm
+			   , c.chasu_ed_dtm
+			   , d.system_nm
+		FROM   tb_he_project a
+		JOIN   tb_project_system b
+		ON     a.pid = b.pid
+		JOIN   tb_system_chasu_hst c
+		ON     a.pid     = c.pid
+		AND    b.sys_seq = c.sys_seq
+		JOIN   tb_he_system d
+		ON     b.system_id = d.system_id
+		WHERE a.use_yn = 'Y'
+		<if test=" !mngYn ">
+			AND EXISTS (SELECT 1 FROM tb_project_member e WHERE e.pid = a.pid AND e.parti_id = #{partiId})
+		</if>
+		<if test=" progressYn ">
+			AND a.project_stat in ('C301','C302','C303')
+		</if>
+		ORDER BY a.reg_dtm DESC
+	</select>
+	
+	<select id="selectProjectList" parameterType="heProjectCriteria" resultType="heProjectVo">
+		SELECT a.pid
+			   , a.project_nm
+			   , a.project_stat
+			   , a.proejct_result_cd
+			   , a.project_st_dt
+			   , a.project_end_dt
+			   , a.bigo
+			   , a.reg_id
+			   , (SELECT e.user_nm FROM tb_user e where e.user_id = a.reg_id) AS reg_nm
+			   , a.reg_dtm
+			   , a.mod_id
+			   , (SELECT f.user_nm FROM tb_user f where f.user_id = a.mod_id) AS mod_nm
+			   , a.mod_dtm
+			   , b.sys_seq
+			   , b.system_id
+			   , b.system_stat
+			   , b.system_result_cd
+			   , b.chasu
+			   , c.chasu_st_dtm
+			   , c.chasu_ed_dtm
+			   , d.system_nm
+		FROM   tb_he_project a
+		JOIN   tb_project_system b
+		ON     a.pid = b.pid
+		JOIN   tb_system_chasu_hst c
+		ON     a.pid     = c.pid
+		AND    b.sys_seq = c.sys_seq
+		AND    b.chasu   = c.chasu
+		JOIN   tb_he_system d
+		ON     b.system_id = d.system_id
+		WHERE a.use_yn = 'Y'
+		AND <![CDATA[ a.project_st_dt <= #{endDt} AND a.project_end_dt >= #{startDt} ]]>
+		<if test=" chkIng ">
+			AND a.project_stat IN ('C301','C302','C303')
+		</if>
+		<if test="systemNm != null and systemNm != ''">
+			AND d.system_nm = #{systemNm}
+		</if>
+		<if test="projectNm != null and projectNm != ''">
+			AND a.project_nm LIKE '%' + #{projectNm} + '%'
+		</if>
+		ORDER BY a.reg_dtm DESC
+	</select>
+	
+</mapper>

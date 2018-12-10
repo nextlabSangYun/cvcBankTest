@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>CVCBank</title>
+	<link rel="shortcut icon" href="../../images/favicon.ico" type="image/x-icon">
+	<link rel="stylesheet" href="../../css/common.css">
+	<link rel="stylesheet" href="../../css/hded.css">
+	<script src="../../js/jquery-3.2.1.min.js"></script>
+	<script src="../../js/jquery-ui.min.js"></script>
+	<script src="../../js/jquery.form.min.js"></script>
+	<script src="../../js/vue.min.js"></script>
+	<script src="../../js/lodash.min.js"></script>
+	<script src="../../js/calendar.js"></script>
+	<script src="../../js/common.js"></script>
+</head>
+<body>
+<div class="wrap">
+	<!-- 내용 -->
+	<div class="content">
+		<div class="sub_layout has_snb">
+			<div class="cont_wrap">
+				<div class="sort_area">
+					<div class="sel_item">
+						<span class="sort_tit">기간</span>
+						<div class="period">
+							<input type="text" class="input_date" readonly>
+							<span class="bar">~</span>
+							<input type="text" class="input_date" readonly>
+						</div>
+					</div>
+					<div class="sel_item no_tit">
+						<input type="checkbox" id="chkMyIssue"><label for="chkMyIssue">내 이슈만 보기</label>
+					</div>
+					<div class="sel_item">
+						<span class="sort_tit">중요도</span>
+						<div class="period">
+							<input type="checkbox" id="Critical"><label for="Critical">Critical</label>
+							<input type="checkbox" id="Major"><label for="Major">Major</label>
+							<input type="checkbox" id="Minor"><label for="Minor">Minor</label>
+						</div>
+					</div>
+					<div class="sel_item">
+						<span class="sort_tit">진행상황</span>
+						<div class="period">
+							<input type="checkbox" id="open"><label for="open">오픈</label>
+							<input type="checkbox" id="edit"><label for="edit">수정중</label>
+							<input type="checkbox" id="fin"><label for="fin">수정완료</label>
+						</div>
+					</div>
+					<div class="sel_item">
+						<span class="sort_tit">대분류</span>
+						<select class="full" name="tcCateId">
+							<option value="">- 전체 -</option>
+							<option>정상 STB</option>
+							<option>네트워크 H/E</option>
+							<option>네트워크</option>
+							<option>편성</option>
+							<option>정상시나리오</option>
+							<option>시나리오검토</option>
+							<option>기타</option>
+						</select>
+					</div>
+					<div class="sel_item">
+						<span class="sort_tit">이슈 제목+내용</span>
+						<input type="text">
+					</div>
+					<div class="sel_item full" style="left:-18px;right:18px">
+						<span class="sort_tit">측정모델</span>
+						<div class="sel_model">
+							<span>
+								<select name="modelSeq">
+									<option value="">- 전체 -</option>
+									<option>여러가지</option>
+								</select>
+							</span>
+							<div class="reg_list">
+								<ul>
+									<li>
+										<span>BHX-UH200(10.10.10)</span>
+										<button class="del"></button>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</div>
+					<button class="btn_default">조회</button>
+				</div>
+				<div class="tb_desc">
+					<p>조회결과 : 2건</p>
+					<div class="btn_wrap">
+						<button class="btn_down"><span>다운로드</span></button>
+						<button class="btn_default">이슈 추가</button>
+						<button class="btn_cancel"><span>삭제</span></button>	
+					</div>
+				</div>
+				<div class="g_table">
+					<table>
+						<caption>중요도, 진행사황, 이슈제목 등으로 구성된 표입니다.</caption>
+						<colgroup>
+							<col style="width:4%;">
+							<col style="width:8%;">
+							<col style="width:10%;">
+							<col style="width:15%;">
+							<col style="width:15%;">
+							<col>
+							<col style="width:6%;">
+							<col style="width:10%;">
+							<col style="width:8%;">
+						</colgroup>
+						<thead>
+							<tr>
+								<th>선택</th>
+								<th>중요도</th>
+								<th>진행상황</th>
+								<th>Test Case</th>
+								<th>이슈제목</th>
+								<th>이슈내용</th>
+								<th>등록자</th>
+								<th>등록일시</th>
+								<th>관리</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td><input type="checkbox"></td>
+								<td>Critical</td>
+								<td><span class="newlabel"></span>오픈</td>
+								<td class="l_align"></td>
+								<td class="l_align">
+									<a href="#" class="link"><p class="ellips">이슈 테스트 입니다.</p></a>
+								</td>
+								<td class="l_align">
+									<a href="#" class="link"><p class="ellips">테스트내용 어쩌고 저쩌고</p></a>
+								</td>
+								<td>이경훈</td>
+								<td>2018-02-01 17:05</td>
+								<td>
+									<div class="tb_fixed_btns">
+										<button class="smbtn_proc">완료처리</button>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td><input type="checkbox"></td>
+								<td>Critical</td>
+								<td><span class="newlabel"></span>오픈</td>
+								<td class="l_align"></td>
+								<td class="l_align">
+									<a href="#" class="link"><p class="ellips">이슈 테스트 입니다.</p></a>
+								</td>
+								<td class="l_align">
+									<a href="#" class="link"><p class="ellips">테스트내용 어쩌고 저쩌고</p></a>
+								</td>
+								<td>이경훈</td>
+								<td>2018-02-01 17:05</td>
+								<td>
+									<div class="tb_fixed_btns">
+										<button class="smbtn_proc">완료처리</button>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td><input type="checkbox"></td>
+								<td>Critical</td>
+								<td>오픈</td>
+								<td class="l_align"></td>
+								<td class="l_align">
+									<a href="#" class="link"><p class="ellips">이슈 테스트 입니다.</p></a>
+								</td>
+								<td class="l_align">
+									<a href="#" class="link"><p class="ellips">테스트내용 어쩌고 저쩌고</p></a>
+								</td>
+								<td>이경훈</td>
+								<td>2018-02-01 17:05</td>
+								<td>
+									<div class="tb_fixed_btns">
+										<button class="smbtn_proc">완료처리</button>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td><input type="checkbox"></td>
+								<td>Critical</td>
+								<td>진행중</td>
+								<td class="l_align"></td>
+								<td class="l_align">
+									<a href="#" class="link"><p class="ellips">이슈 테스트 입니다.</p></a>
+								</td>
+								<td class="l_align">
+									<a href="#" class="link"><p class="ellips">테스트내용 어쩌고 저쩌고</p></a>
+								</td>
+								<td>이경훈</td>
+								<td>2018-02-01 17:05</td>
+								<td>
+									<div class="tb_fixed_btns">
+										<button class="smbtn_proc">완료처리</button>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td><input type="checkbox"></td>
+								<td>Critical</td>
+								<td><span class="newlabel"></span>진행완료</td>
+								<td class="l_align"></td>
+								<td class="l_align">
+									<a href="#" class="link"><p class="ellips">이슈 테스트 입니다.</p></a>
+								</td>
+								<td class="l_align">
+									<a href="#" class="link"><p class="ellips">테스트내용 어쩌고 저쩌고</p></a>
+								</td>
+								<td>이경훈</td>
+								<td>2018-02-01 17:05</td>
+								<td>
+									<div class="tb_fixed_btns">
+										<button class="smbtn_proc">완료처리</button>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td><input type="checkbox"></td>
+								<td>Critical</td>
+								<td>진행완료</td>
+								<td class="l_align"></td>
+								<td class="l_align">
+									<a href="#" class="link"><p class="ellips">이슈 테스트 입니다.</p></a>
+								</td>
+								<td class="l_align">
+									<a href="#" class="link"><p class="ellips">테스트내용 어쩌고 저쩌고</p></a>
+								</td>
+								<td>이경훈</td>
+								<td>2018-02-01 17:05</td>
+								<td>
+									<div class="tb_fixed_btns">
+										<button class="smbtn_proc">완료처리</button>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td colspan="9">검색된 이슈가 없습니다.</td>
+							</tr>
+						</tbody>
+					</table>
+					<paginator ref="paginator" :go-fn="getPagingList"></paginator>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+</html>

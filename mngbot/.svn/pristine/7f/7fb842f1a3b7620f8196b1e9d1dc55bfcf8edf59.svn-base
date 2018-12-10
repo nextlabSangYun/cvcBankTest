@@ -1,0 +1,142 @@
+/**
+ * @title	: 이슈 service
+ * @package	: kr.co.nextlab.bmt.service
+ * @file	: IssueService.java
+ * @author	: jnlee
+ * @date	: 2018. 1. 4.
+ * @desc	: 
+ */
+package kr.co.nextlab.bmt.service;
+
+import java.util.List;
+
+import kr.co.nextlab.bmt.model.IssueCateVo;
+import kr.co.nextlab.bmt.model.IssueCommentVo;
+import kr.co.nextlab.bmt.model.IssueCriteria;
+import kr.co.nextlab.bmt.model.IssueFileVo;
+import kr.co.nextlab.bmt.model.IssueModelVo;
+import kr.co.nextlab.bmt.model.IssuePartiVo;
+import kr.co.nextlab.bmt.model.IssueTcVo;
+import kr.co.nextlab.bmt.model.IssueVo;
+
+public interface IssueService {
+
+	/**
+	 * 이슈 리스트
+	 * @param criteria
+	 * @return
+	 */
+	public List<IssueVo> selectIssueList(IssueCriteria criteria);
+	
+	
+	/**
+	 * 이슈 상세조회
+	 * @param issueId 이슈아이디
+	 * @return 이슈 상세정보
+	 */
+	public IssueVo selectIssueView(String issueId);
+	
+	/**
+	 * 이슈 테스트케이스리스트
+	 * @param issueId 이슈아이디
+	 * @return 이슈 테스트케이스리스트
+	 */
+	public List<IssueTcVo> selectIssueTcList(String issueId);
+	
+	/**
+	 * 이슈 대상자 리스트
+	 * @param issueId 이슈아이디
+	 * @return 이슈 대상자 리스트
+	 */
+	public List<IssuePartiVo> selectIssuePartiList(String issueId);
+	
+	/**
+	 * 이슈 파일 리스트
+	 * @param issueId 이슈아이디
+	 * @return 이슈 파일 리스트
+	 */
+	public List<IssueFileVo> selectIssueFileList(String issueId);
+	
+	/**
+	 * 이슈 코멘트 리스트
+	 * @param issueId 이슈아이디
+	 * @return 이슈 코멘트 리스트
+	 */
+	public List<IssueCommentVo> selectIssueCommentList(String issueId);
+	
+	/**
+	 * 이슈 카테고리 리스트
+	 * @param issueId 이슈아이디
+	 * @return 이슈 카테고리 리스트
+	 */
+	public List<IssueCateVo> selectIssueCateList(String issueId);
+	
+	/**
+	 * 이슈 카테고리 리스트
+	 * @param issueId 이슈아이디
+	 * @return 이슈 카테고리 리스트
+	 */
+	public List<IssueCateVo> selectIssueCategoryList(String pid);
+	
+	/**
+	 * 이슈 측정모델 리스트
+	 * @param issueId 이슈아이디
+	 * @return 이슈 측정모델 리스트
+	 */
+	public List<IssueModelVo> selectIssueModelList(String issueId);
+	
+	/**
+	 * 이슈 등록
+	 * @param issueVo 이슈 정보
+	 * @return 등록 결과
+	 */
+	public boolean insertIssue(IssueVo issueVo);
+	
+	/**
+	 * 이슈 할당대상 수정
+	 * @param issueVo 이슈 정보 (issueId, partiList)
+	 * @return 수정 결과
+	 */
+	public boolean updateIssuePartiList(IssueVo issueVo);
+	
+	/**
+	 * 이슈 코멘트 등록
+	 * @param issueCommentVo 이슈 코멘트 정보
+	 * @return 등록 결과
+	 */
+	public boolean insertIssueComment(IssueCommentVo issueCommentVo, IssueVo issueVo);
+	
+	/**
+	 * 이슈 코멘트 수정
+	 * @param issueCommentVo 이슈 코멘트 정보
+	 * @return 등록결과
+	 */
+	public boolean updateIssueComment(IssueCommentVo issueCommentVo);
+	/**
+	 * 이슈 진행상태 변경
+	 * @param issueVo 이슈 정보
+	 * @return 처리 결과
+	 */
+	public boolean updateIssueProgressStat(IssueVo issueVo);
+	
+	/**
+	 * 코멘트 등록시 이슈 진행상태 변경
+	 * @param issueVo 이슈 정보
+	 * @return 처리 결과
+	 */
+	public boolean updateIssueProgressStatComment(IssueVo issueVo);
+	
+	/**
+	 * 이슈 삭제하기
+	 * @param issueId
+	 * @return
+	 */
+	public boolean deleteIssuePrc(String[] param);
+	
+	/**
+	 * 이슈 수정하기
+	 * @param issueVo
+	 * @return
+	 */
+	public boolean updateIssuePrc(IssueVo issueVo);
+}

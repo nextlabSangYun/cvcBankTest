@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>Management Bot</title>
+	<link rel="stylesheet" href="../css/common.css">
+	<link rel="stylesheet" href="../css/bmt.css">
+	<script src="../js/jquery-3.2.1.min.js"></script>
+	<script src="../js/jquery-ui.min.js"></script>
+	<script src="../js/jquery.form.min.js"></script>
+	<script src="../js/vue.min.js"></script>
+	<script src="../js/lodash.min.js"></script>
+	<script src="../js/calendar.js"></script>
+	<script src="../js/common.js"></script>
+</head>
+<body>
+	<div class="pop_wrap win_pop">
+		<div class="pop_tit">
+			<p>2/2 – 측정결과 선택 : 선택 시 전체화면으로 제공 </p>
+		</div>
+		<div class="pop_cont">
+			<div class="g_table">
+				<table>
+					<caption>측정일시, 측정모델 등 확인 하는 표 입니다.</caption>
+					<colgroup>
+						<col style="width:5%;">
+						<col>
+						<col style="width:13%;">
+						<col style="width:8%;">
+						<col style="width:14%;">
+						<col style="width:6%;">
+						<col style="width:6%;">
+						<col style="width:10%;">
+						<col style="width:10%;">
+						<col style="width:10%;">
+					</colgroup>
+					<thead>
+						<tr>
+							<th><input type="checkbox"></th>
+							<th>측정일시</th>
+							<th>측정 모델</th>
+							<th>S/W 버전</th>
+							<th>Mac</th>
+							<th>차수</th>
+							<th>리모컨</th>
+							<th>담당자</th>
+							<th>측정 결과</th>
+							<th>XQMS 리포트</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td><input type="checkbox"></td>
+							<td>2017년 4월 28일<br> 09:33:23</td>
+							<td>BHX-UH200</td>
+							<td>5.4.2</td>
+							<td>15:78:10:f1:y5:36</td>
+							<td>1차</td>
+							<td>IR</td>
+							<td>김현우<br>(넥스트랩)</td>
+							<td><span class="state04">PASS</span></td>
+							<td><button class="btn_show"></button></td>
+						</tr>
+						<tr>
+							<td><input type="checkbox"></td>
+							<td>2017년 4월 28일<br> 09:33:23</td>
+							<td>BHX-UH200</td>
+							<td>5.4.2</td>
+							<td>15:78:10:f1:y5:36</td>
+							<td>1차</td>
+							<td>IR</td>
+							<td>김현우<br>(넥스트랩)</td>
+							<td><span class="state04">PASS</span></td>
+							<td><button class="btn_show"></button></td>
+						</tr>
+						<tr>
+							<td><input type="checkbox"></td>
+							<td>2017년 4월 28일<br> 09:33:23</td>
+							<td>BHX-UH200</td>
+							<td>5.4.2</td>
+							<td>15:78:10:f1:y5:36</td>
+							<td>1차</td>
+							<td>IR</td>
+							<td>김현우<br>(넥스트랩)</td>
+							<td><span class="state04">PASS</span></td>
+							<td><button class="btn_show"></button></td>
+						</tr>
+						<tr>
+							<td><input type="checkbox"></td>
+							<td>2017년 4월 28일<br> 09:33:23</td>
+							<td>BHX-UH200</td>
+							<td>5.4.2</td>
+							<td>15:78:10:f1:y5:36</td>
+							<td>1차</td>
+							<td>IR</td>
+							<td>김현우<br>(넥스트랩)</td>
+							<td><span class="state01">FAIL</span></td>
+							<td><button class="btn_show"></button></td>
+						</tr>
+						<tr>
+							<td><input type="checkbox"></td>
+							<td>2017년 4월 28일<br> 09:33:23</td>
+							<td>BHX-UH200</td>
+							<td>5.4.2</td>
+							<td>15:78:10:f1:y5:36</td>
+							<td>1차</td>
+							<td>IR</td>
+							<td>김현우<br>(넥스트랩)</td>
+							<td><span class="state01">FAIL</span></td>
+							<td><button class="btn_show"></button></td>
+						</tr>
+						<tr>
+							<td><input type="checkbox"></td>
+							<td>2017년 4월 28일<br> 09:33:23</td>
+							<td>BHX-UH200</td>
+							<td>5.4.2</td>
+							<td>15:78:10:f1:y5:36</td>
+							<td>1차</td>
+							<td>IR</td>
+							<td>김현우<br>(넥스트랩)</td>
+							<td><span class="state01">FAIL</span></td>
+							<td><button class="btn_show"></button></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<div class="btn_wrap02">
+			<button class="g_btn01">완료</button>
+			<button class="g_btn02" onclick="self.close();">닫기</button>
+		</div>
+		<a href="pop_tc_add.html" class="btn_back"></a>
+	</div>
+	<script>
+		setPopup(2);
+	</script>
+</body>
+</html>

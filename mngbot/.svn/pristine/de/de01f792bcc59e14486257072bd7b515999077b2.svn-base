@@ -1,0 +1,149 @@
+/**
+ * @title	: 공지사항 컨트롤러
+ * @package	: kr.co.nextlab.bot.controller
+ * @file	: NoticeController.java
+ * @author	: owl16
+ * @date	: 2017. 12. 14.
+ * @desc	: 
+ */
+package kr.co.nextlab.bot.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.View;
+import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
+
+import kr.co.nextlab.annotation.security.Auth;
+import kr.co.nextlab.bot.model.NoticeCriteria;
+import kr.co.nextlab.bot.model.NoticeVo;
+import kr.co.nextlab.bot.service.NoticeService;
+import kr.co.nextlab.comm.controller.BaseController;
+
+@Controller
+public class NoticeController extends BaseController {
+
+	@Autowired
+	private NoticeService noticeService;
+	
+	/**
+	 * 사용자공지사항 팝업 목록
+	 * @param model
+	 */
+	@Auth(url={"/bot/main"})
+	@RequestMapping("/bot/notice/noticeList")
+	public void noticeList(Model model){
+	}
+
+	
+	/**
+	 * 사용자 공지사항 리스트 data
+	 * @param model
+	 * @param criteria
+	 * @return
+	 */
+	@RequestMapping("/bot/notice/getNoticeList")
+	public View getnoticeList(Model model, NoticeCriteria criteria){
+
+		model.addAttribute("noticeList",noticeService.selectNoticeList(criteria));
+		
+		return new MappingJackson2JsonView(); 
+	}
+	
+	/**
+	 * 사용자공지사항 팝업 상세보기 폼
+	 * @param model
+	 */
+	@Auth(url={"/bot/main"})
+	@RequestMapping("/bot/notice/noticeForm")
+	public void noticeForm(Model model){
+		
+	}
+	
+	/**
+	 * 사용자공지사항 팝업 상세보기 Json data
+	 * @param model
+	 * @param noticeVo
+	 */
+	@RequestMapping("/bot/notice/getNoticeView")
+	public View getNoticeViewForm(Model model, String noticeSeq){
+		
+		model.addAttribute("noticeView", noticeService.selectNoticeView(noticeSeq));
+		
+		return new MappingJackson2JsonView(); 
+	}
+	
+	/**
+	 * 관리자화면 공지사항 목록
+	 * @param model
+	 */
+	@RequestMapping("/bot/notice/noticeMngList")
+	public void noticeMngList(Model model){
+	}
+	
+	/**
+	 * 공지사항 관리 리스트 Json data
+	 * @param model
+	 * @param criteria
+	 * @return
+	 */
+	@RequestMapping("/bot/notice/getNoticeMngList")
+	public View getNoticeMngList(Model model, NoticeCriteria criteria){
+
+		model.addAttribute("noticeList",noticeService.selectNoticeMngList(criteria));
+		return new MappingJackson2JsonView(); 
+	}
+	/**
+	 * 공지사항 등록,수정 폼
+	 * @param model
+	 */
+	@Auth(url={"/bot/notice/noticeMngList"})
+	@RequestMapping("/bot/notice/noticeMngForm")
+	public void noticeMngForm(Model model){
+
+	}
+	
+	/**
+	 * 공지사항 등록처리 프로세스
+	 * @param model
+	 * @param noticeVo
+	 * @return
+	 */
+	@Auth(url={"/bot/notice/noticeMngList"})
+	@RequestMapping("/bot/notice/regNoticePrc")
+	public View regNoticePrc(Model model, NoticeVo noticeVo){
+		
+		boolean save = false;
+		int result = 0;
+		
+		noticeVo.setRegId(super.getUser().getUserId());	
+		result = noticeService.insertNotice(noticeVo);
+		
+		if (result == 1){
+			save=true;
+		}
+		model.addAttribute("save",save);
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 공지사항 수정처리 프로세스
+	 * @param model
+	 * @param noticeVo
+	 * @return
+	 */
+	@Auth(url={"/bot/notice/noticeMngList"})
+	@RequestMapping("/bot/notice/modNoticePrc")
+	public View modNoticePrc(Model model, NoticeVo noticeVo){
+		
+		boolean save = false;
+
+		if (noticeService.updateNotice(noticeVo) == 1){
+			save=true;
+		}
+		model.addAttribute("save",save);
+		return new MappingJackson2JsonView();
+	}
+	
+}

@@ -1,0 +1,458 @@
+/**
+ * @title	: 테스트 케이스 컨트롤러 
+ * @package	: kr.co.nextlab.hded.controller
+ * @file	: HdedTcController.java
+ * @author	: winolonam
+ * @date	: 2018. 4. 25.
+ * @desc	: 
+ */
+package kr.co.nextlab.hded.controller;
+
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.View;
+import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
+
+import kr.co.nextlab.annotation.security.Auth;
+import kr.co.nextlab.comm.controller.BaseController;
+import kr.co.nextlab.comm.model.FileVo;
+import kr.co.nextlab.excel.ExcelDownloadView;
+import kr.co.nextlab.excel.ExcelHeader;
+import kr.co.nextlab.excel.ExcelResource;
+import kr.co.nextlab.hded.model.HeProjectTcVo;
+import kr.co.nextlab.hded.model.HeTcResultVo;
+import kr.co.nextlab.hded.model.HeTcTmplCriteria;
+import kr.co.nextlab.hded.model.HeTcTmplVo;
+import kr.co.nextlab.hded.service.HdedProjectService;
+import kr.co.nextlab.hded.service.HdedTcService;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Controller
+public class HdedTcController extends BaseController {
+	
+	@Autowired
+	private HdedTcService hdedTcService;
+	
+	@Autowired
+	private HdedProjectService hdedProjectService;
+	
+	/**
+	 * 테스트 케이스 변경 이력 최근 30건
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping("/hded/tc/getTcChangeHistList")
+	public View getTcChangeHistList(Model model) {
+		model.addAttribute("tcChangeHistList", hdedTcService.selectTcChangeHistList());
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 해당 그룹 아이디에 속하는 이력 리스트 페이지
+	 * @param model
+	 * @param groupId
+	 */
+	@Auth(url={"/hded/main"})
+	@RequestMapping("/hded/tc/tcChangeHistByGroupId")
+	public void tcChangeHistByGroupId(Model model, String groupId) {
+		model.addAttribute("groupId", groupId);
+	}
+	
+	/**
+	 * 해당 그룹 아이디에 속하는 이력 리스트 조회
+	 * @param model
+	 * @param groupId
+	 * @return
+	 */
+	@RequestMapping("/hded/tc/getTcChangeHistByGroupIdList")
+	public View getTcChangeHistByGroupIdList(Model model, String groupId) {
+		model.addAttribute("tcChangeHistByGroupIdList", hdedTcService.selectTcChangeHistByGroupIdList(groupId));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 선택데이터 와 현재데이터 비교 페이지
+	 * @param model
+	 * @param tcId
+	 */
+	@Auth(url={"/hded/main"})
+	@RequestMapping("/hded/tc/tcChangeHistDetail")
+	public void tcChangeHistDetail(Model model, String tcId) {
+		model.addAttribute("tcId", tcId);
+	}
+	
+	/**
+	 * 선택데이터 와 현재데이터 비교 리스트
+	 * @param model
+	 * @param tcId
+	 * @return
+	 */
+	@RequestMapping("/hded/tc/getTcChangeHistDetail")
+	public View getTcChangeHistDetail(Model model, String tcId) {
+		model.addAttribute("tcChangeHistDetailList", hdedTcService.selectTcChangeHistDetail(tcId));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 테스트 케이스 변경 이력 페이지
+	 * @param model
+	 */
+	@RequestMapping("/hded/tc/tcChangeHist")
+	public void tcChangeHist(Model model) {
+	}
+	
+	/**
+	 * 테스트 케이스 변경 이력 전체 리스트 조회
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping("/hded/tc/getTcChangeHistAllList")
+	public View getTcChangeHistAllList(Model model, HeTcTmplCriteria heTcTmplCriteria) {
+		model.addAttribute("tcChangeHistList", hdedTcService.selectTcChangeHistAllList(heTcTmplCriteria));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 테스트 케이스 버킷 관리 페이지 
+	 * @param model
+	 */
+	@RequestMapping("/hded/tc/tcBucketList")
+	public void tcBucketList(Model model) {
+	}
+
+	/**
+	 * 테스트 케이스 리스트 페이지 
+	 * @param model
+	 */
+	@RequestMapping("/hded/tc/tcList")
+	public void tcList(Model model, String pid) {
+		model.addAttribute("heProjectVo", hdedProjectService.selectHeProjectView(pid));
+	}
+	
+	/**
+	 * 버킷리스트 리스트 화면
+	 * @param model
+	 */
+	@RequestMapping("/hded/tc/getBucketList")
+	public View issueList(Model model, @RequestBody HeTcTmplCriteria criteria) {
+		List<HeTcTmplVo> bucketList = hdedTcService.selectBucketList(criteria);
+		model.addAttribute("bucketList", bucketList);
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 버킷 TC 등록  페이지
+	 * @param model
+	 */
+	@Auth(url={"/hded/tc/tcBucketList"})
+	@RequestMapping("/hded/tc/tcBucketAddForm")
+	public void tcBucketAddForm(Model model) {
+	}
+	
+	/**
+	 * 버킷 TC 등록
+	 * @param model
+	 * @param heTcTmplVo
+	 * @return
+	 */
+	@RequestMapping(value="/hded/tc/regBucketTcPrc")
+	public View regBucketTctPrc(Model model, @RequestBody HeTcTmplVo heTcTmplVo)
+	{
+		boolean save = true;
+		heTcTmplVo.setRegId(super.getUser().getUserId());
+		heTcTmplVo.setModId(super.getUser().getUserId());
+		save = hdedTcService.insertTsetCase(heTcTmplVo);
+		model.addAttribute("save", save);
+		return new MappingJackson2JsonView();
+	}
+	/**
+	 * 버킷 Tc 상세조회
+	 * @param model
+	 * @param tcId
+	 * @return
+	 */
+	@RequestMapping(value="/hded/tc/getTcView")
+	public View getTcView(Model model, String tcId) {
+		//tc 상세 조회
+		HeTcTmplVo heTcTmplVo = hdedTcService.selectTcView(tcId);
+		model.addAttribute("tcView", heTcTmplVo);
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 버킷 TC 수정
+	 * @param model
+	 * @param heTcTmplVo
+	 * @return
+	 */
+	@RequestMapping(value="/hded/tc/modBucketTcPrc")
+	public View modBucketTctPrc(Model model, @RequestBody HeTcTmplVo heTcTmplVo)
+	{
+		boolean save = false;
+		heTcTmplVo.setModId(super.getUser().getUserId());
+		save = hdedTcService.updateBucketTestCase(heTcTmplVo);
+		model.addAttribute("save", save);
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 테스트 케이스 대량 업로드 페이지
+	 * @param model
+	 */
+	@Auth(url={"/hded/tc/tcList"})
+	@RequestMapping("/hded/tc/tcLargeAddForm")
+	public void tcLargeAddForm(Model model, String pid, String systemId, String sysSeq) {
+		model.addAttribute("pid", pid);
+		model.addAttribute("systemId", systemId);
+		model.addAttribute("sysSeq", sysSeq);
+	}
+	
+	/**
+	 * 테스트 케이스 대량 업르도
+	 * @param model
+	 */
+	@Auth(url={"/hded/tc/tcList"})
+	@RequestMapping("/hded/tc/regLargeAddFile")
+	public View regLargeAddFile(Model model, FileVo fileVo, HeTcTmplVo heTcTmplVo) {
+		boolean save = false;
+		
+		try {
+			heTcTmplVo.setRegId(super.getUser().getUserId());
+			fileVo = hdedTcService.insertLargeTcList(fileVo, heTcTmplVo);
+			if (StringUtils.isNotEmpty(fileVo.getMessage())) {
+				model.addAttribute("message", fileVo.getMessage());
+			} else {
+				save = true;
+			}
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			if (e.getCause() != null) {
+				model.addAttribute("message", "저장 실패");
+			} else {
+				model.addAttribute("message", e.getMessage());
+			}
+		}
+		
+		model.addAttribute("save", save);
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 프로젝트 Tc 리스트 조회
+	 * @param model
+	 * @param criteria
+	 * @return
+	 */
+	@RequestMapping("/hded/tc/getProjectTcList")
+	public View getProjectTcList(Model model, @RequestBody HeTcTmplCriteria criteria){
+		List<HeProjectTcVo> projectTcList = hdedTcService.selectProjectTcList(criteria);
+		model.addAttribute("projectTcList", projectTcList);
+		return new MappingJackson2JsonView();
+	}
+
+	/**
+	 * 프로젝트 폼
+	 * @param model
+	 */
+	@Auth(url={"/hded/tc/tcList"})
+	@RequestMapping("/hded/tc/tcAddForm")
+	public void tcAddForm(Model model, String pid) {
+		model.addAttribute("pid", pid);
+	}
+	/**
+	 * 프로젝트 Tc 등록
+	 * @param model
+	 * @param heProjectTcVo
+	 * @return
+	 */
+	@Auth(url={"/hded/tc/tcList"})
+	@RequestMapping("/hded/tc/regProjectTcPrc")
+	public View regProjectTcPrc(Model model, @RequestBody HeProjectTcVo heProjectTcVo){
+		boolean save = false;
+		try {
+			heProjectTcVo.setRegId(super.getUser().getUserId());
+			save = hdedTcService.insertProjectTc(heProjectTcVo);
+			if (!save) {
+				model.addAttribute("message", "저장 실패");
+			}
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			if (e.getCause() != null) {
+				model.addAttribute("message", "저장 실패");
+			} else {
+				model.addAttribute("message", e.getMessage());
+			}
+		}
+		model.addAttribute("save", save);
+		return new MappingJackson2JsonView();
+	}
+	/**
+	 * tc 수정 폼 
+	 * @param model
+	 */
+	@Auth(url={"/hded/tc/tcList"})
+	@RequestMapping("/hded/tc/tcEditForm")
+	public void tcEditForm(Model model, String pid, String tcId){
+		model.addAttribute("pid", pid);
+		model.addAttribute("tcId", tcId);
+	}
+	
+	/**
+	 * 프로젝트 TC 수정
+	 * @param model
+	 * @param heTcTmplVo
+	 * @return
+	 */
+	@RequestMapping(value="/hded/tc/modProjectTcPrc")
+	public View modProjectTcPrc(Model model, @RequestBody HeTcTmplVo heTcTmplVo)
+	{
+		boolean save = false;
+		heTcTmplVo.setModId(super.getUser().getUserId());
+		HeTcTmplVo editTc = hdedTcService.updateProjectTestCase(heTcTmplVo);
+		if(editTc != null){
+			save = true;
+		}
+		model.addAttribute("save", save);
+		model.addAttribute("editTc", editTc);
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * projectTc 삭제
+	 * @param model
+	 * @param param
+	 * @return
+	 */
+	@RequestMapping("/hded/tc/delProjectTcPrc")
+	public View delProjectTcPrc(Model model, String param){
+		boolean del = false;
+		String[] params = param.split(";");
+		del = hdedTcService.deleteProjectTcPrc(params);
+		model.addAttribute("del", del);
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 테스트 결과 등록폼
+	 * @param model
+	 */
+	@Auth(url={"/hded/tc/tcList"})
+	@RequestMapping("/hded/tc/tcResultAddForm")
+	public void tcResultAddForm(Model model, String pid) {
+		model.addAttribute("pid", pid);
+		model.addAttribute("heProjectVo", hdedProjectService.selectHeProjectView(pid));
+	}
+	
+	/**
+	 * 테스트 결과 등록하기위한 기본정보 조회
+	 * @param model
+	 * @param projectTcSeq
+	 * @return
+	 */
+	@RequestMapping("/hded/tc/getProjectTc")
+	public View getProjectTc(Model model, String projectTcSeq){
+		HeProjectTcVo heProjectTcVo = hdedTcService.selectProjectTc(projectTcSeq);
+		heProjectTcVo.setHeTcResultFile(hdedTcService.selectProjectTcFileList(heProjectTcVo.getTcResultSeq()));
+		model.addAttribute("projectTcView", heProjectTcVo);
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 테스트 결과 등록하기위한 결과이력 조회
+	 * @param model
+	 * @param projectTcSeq
+	 * @return
+	 */
+	@RequestMapping("/hded/tc/getProjectTcResult")
+	public View getProjectTcResult(Model model, String projectTcSeq){
+		List<HeTcResultVo> heTcResultVo  = hdedTcService.selectProjectTcResult(projectTcSeq);
+		model.addAttribute("projectTcResultView", heTcResultVo);
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 테스트 결과 등록
+	 * @param model
+	 * @param heProjectTcVo
+	 * @return
+	 */
+	@RequestMapping("/hded/tc/regResult")
+	public View regResult(Model model, @RequestBody HeProjectTcVo heProjectTcVo){
+		boolean save = false;
+		try
+		{
+			heProjectTcVo.setResultRegId(super.getUser().getUserId());
+			save = hdedTcService.insertRegResult(heProjectTcVo);
+			if (!save) model.addAttribute("message", "저장 실패");
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage());
+			if (e.getCause() != null) model.addAttribute("message", "저장 실패");
+			else model.addAttribute("message", e.getMessage());
+		}
+		model.addAttribute("save", save);
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 결과이력 결과자료 폼 
+	 * @param model
+	 */
+	@Auth(url={"/hded/tc/tcList"})
+	@RequestMapping("/hded/tc/tcResultDataForm")
+	public void tcResultDataForm(Model model, String pid){
+		model.addAttribute("pid", pid);
+	}
+	
+	/**
+	 * 결과자료 조회
+	 * @param model
+	 * @param tcResultSeq
+	 * @return
+	 */
+	@RequestMapping("/hded/tc/getTcResultData")
+	public View getTcResultData(Model model, String tcResultSeq){
+		HeTcResultVo heTcResultVo = hdedTcService.selectTcResultData(tcResultSeq);
+		heTcResultVo.setHeTcResultFile(hdedTcService.selectProjectTcFileList(Integer.parseInt(tcResultSeq)));
+		model.addAttribute("tcResultDataView", heTcResultVo);
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 결과이력엑셀 다운로드
+	 * @param model
+	 * @param projectTcSeq
+	 * @return
+	 */
+	@RequestMapping("/hded/tc/getTcResultExcel")
+	public ExcelDownloadView getTcResultExcel(Model model, HeTcTmplCriteria heTcTmplCriteria){
+		List<HeTcResultVo> list  = hdedTcService.selectProjectTcResult(heTcTmplCriteria.getProjectTcSeq());
+		ExcelHeader[] headers = new ExcelHeader[] {
+			new ExcelHeader("chasu", "차수")
+			, new ExcelHeader("regDtm", "등록일시", HorizontalAlignment.CENTER)
+			, new ExcelHeader("tcResultNm", "결과", HorizontalAlignment.CENTER)
+			, new ExcelHeader("inspectorOpinion", "검수자 의견", HorizontalAlignment.CENTER)
+			, new ExcelHeader("tcResultText", "결과 자료", HorizontalAlignment.CENTER)
+		};
+		return new ExcelDownloadView(new ExcelResource(list, headers),"결과이력.xlsx");
+	}
+	
+	/**
+	 * 결과이력 결과자료 폼 
+	 * @param model
+	 */
+	@Auth(url={"/hded/tc/tcList"})
+	@RequestMapping("/hded/tc/tcListResultDataForm")
+	public void tcListResultDataForm(Model model, String pid){
+		model.addAttribute("pid", pid);
+	}
+}

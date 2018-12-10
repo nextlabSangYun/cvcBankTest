@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.nextlab.bmt.mapper.RequestMapper">
+
+	<insert id="insertRequest" parameterType="bmtRequestVo" >
+		INSERT INTO tb_bmt_request (
+			req_id,
+			progress_stat,
+			req_subject,
+			req_cont,
+			reg_id,
+			reg_dtm,
+			mod_id,
+			mod_dtm
+		) VALUES (
+			#{reqId},
+			#{progressStat},
+			#{reqSubject},
+			#{reqCont},
+			#{regId},
+			GETDATE(),
+			#{modId},
+			GETDATE()
+		)
+	</insert>
+	
+	<update id="updateRequest" parameterType="bmtRequestVo">
+		UPDATE tb_bmt_request
+		SET
+			req_subject = #{reqSubject},
+			req_cont = #{reqCont},
+			mod_id = #{modId},
+			mod_dtm = GETDATE()
+		WHERE req_id = #{reqId}
+	</update>
+	
+	<update id="updateReqProgrssStat" parameterType="bmtRequestVo">
+		UPDATE tb_bmt_request
+		SET
+			progress_stat = #{progressStat}
+			, mod_id = #{modId}
+			, mod_dtm = GETDATE()
+			<if test="cancelReason != null">
+			, cancel_reason = #{cancelReason}
+			</if>
+		WHERE req_id = #{reqId}
+	</update>
+	
+	<insert id="insertReqFile" parameterType="reqFileVo" >
+		INSERT INTO tb_req_file (
+			req_id,
+			seq,
+			file_nm,
+			file_path,
+			org_file_nm
+		) VALUES (
+			#{reqId},
+			#{seq},
+			#{fileNm},
+			#{filePath},
+			#{orgFileNm}
+		)
+	</insert>
+	
+	<delete id="deleteReqFile" parameterType="String">
+		DELETE FROM tb_req_file
+		WHERE req_id = #{reqId}
+	</delete>
+	
+	<insert id="insertReqManager" parameterType="reqManagerVo" >
+		INSERT INTO tb_req_manager (
+			req_id,
+			manager_id,
+			reg_id,
+			reg_dtm
+		) VALUES (
+			#{reqId},
+			#{managerId},
+			#{regId},
+			GETDATE()
+		)
+	</insert>
+	
+	<delete id="deleteReqManager" parameterType="String">
+		DELETE FROM tb_req_manager
+		WHERE req_id = #{reqId}
+	</delete>
+	
+	<select id="selectRequestList" resultType="bmtRequestVo" parameterType="requestCriteria">
+		SELECT
+			a.req_id,
+			a.progress_stat,
+			a.req_subject,
+			a.req_cont,
+			a.reg_id,
+			a.reg_dtm,
+			a.mod_id,
+			a.mod_dtm,
+			b.user_nm,
+			(SELECT user_group_nm FROM tb_user_group WHERE user_group_id = b.user_group_id) AS user_group_nm,
+			(SELECT count(*) FROM tb_req_file WHERE req_id = a.req_id) file_cnt 
+		FROM tb_bmt_request a
+		JOIN tb_user b 
+		ON b.user_id = a.reg_id
+		WHERE a.reg_dtm BETWEEN CONVERT(DATETIME,#{startDt}+' 00:00:00') AND CONVERT(DATETIME,#{endDt}+' 23:59:59')
+		<if test="progressStatArray != null">
+			AND a.progress_stat IN 
+			<foreach collection="progressStatArray" item="array" open="(" separator="," close=")">
+				#{array}
+			</foreach>
+		</if>
+		<if test="requesterArray != null">
+			AND a.reg_id IN 
+			<foreach collection="requesterArray" item="array" open="(" separator="," close=")">
+				#{array}
+			</foreach>
+		</if>
+		ORDER BY a.req_id DESC
+	</select>
+	
+	<select id="selectReqFileList" resultType="reqFileVo" parameterType="String">
+		SELECT
+			req_id,
+			seq,
+			file_nm,
+			file_path,
+			org_file_nm
+		FROM tb_req_file
+		WHERE req_id = #{reqId}
+	</select>
+	
+	<select id="selectBmtRequestDetail" resultType="bmtRequestVo" parameterType="String">
+		SELECT
+			req_id,
+			progress_stat,
+			req_subject,
+			req_cont,
+			reg_id,
+			reg_dtm,
+			mod_id,
+			mod_dtm,
+			cancel_reason
+		FROM tb_bmt_request
+		WHERE req_id = #{reqId}
+	</select>
+	
+	<select id="selectReqManagerList" resultType="reqManagerVo" parameterType="String">
+		SELECT
+			a.req_id,
+			a.manager_id,
+			a.reg_id,
+			a.reg_dtm,
+			b.user_nm,
+			(SELECT user_group_nm FROM tb_user_group WHERE user_group_id = b.user_group_id) AS user_group_nm
+		FROM tb_req_manager a
+		JOIN tb_user b 
+		ON b.user_id = a.manager_id
+		WHERE a.req_id = #{reqId}
+	</select>
+	
+	<select id="selectReqCommentList" resultType="reqCommentVo" parameterType="String">
+		SELECT
+			a.seq
+			, a.req_id
+			, a.comment
+			, a.reg_id
+			, a.reg_dtm
+			, b.user_nm
+			, (SELECT user_group_nm FROM tb_user_group WHERE user_group_id = b.user_group_id) AS user_group_nm
+			, a.reg_dtm
+		FROM tb_req_comment a
+		JOIN tb_user b ON (b.user_id = a.reg_id)
+		WHERE req_id = #{reqId}
+		ORDER BY a.seq DESC
+	</select>
+	
+	<insert id="insertReqComment" parameterType="reqCommentVo" >
+		INSERT INTO tb_req_comment (
+			req_id,
+			comment,
+			reg_id,
+			reg_dtm
+		) VALUES (
+			#{reqId},
+			#{comment},
+			#{regId},
+			GETDATE()
+		)
+	</insert>
+	
+	<update id="updateReqComment" parameterType="reqCommentVo">
+		UPDATE tb_req_comment
+		SET comment = #{comment}
+		WHERE seq = #{seq}
+	</update>
+	
+</mapper>

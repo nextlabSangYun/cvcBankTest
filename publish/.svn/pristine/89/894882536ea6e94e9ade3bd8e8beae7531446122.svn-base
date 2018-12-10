@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>Management Bot</title>
+	<link rel="stylesheet" href="../css/common.css">
+	<link rel="stylesheet" href="../css/bmt.css">
+	<script src="../js/jquery-3.2.1.min.js"></script>
+	<script src="../js/jquery-ui.min.js"></script>
+	<script src="../js/jquery.form.min.js"></script>
+	<script src="../js/vue.min.js"></script>
+	<script src="../js/lodash.min.js"></script>
+	<script src="../js/calendar.js"></script>
+	<script src="../js/common.js"></script>
+</head>
+<body>
+	<div class="pop_wrap" style="width:610px;">
+		<div class="pop_tit">
+			<p>새 프로젝트</p>
+		</div>
+		<div class="pop_cont pop_new_prj">
+			<div class="g_table02">
+				<table>
+					<caption>프로젝트 이름. 기간, checklist 등의 정보를 입력하는 표 입니다.</caption>
+					<colgroup>
+						<col style="width:120px;">
+						<col>
+					</colgroup>
+					<tbody>
+						<tr>
+							<th>프로젝트 이름*</th>
+							<td>
+								<input type="text" placeholder="최소 5글자 이상" class="full">
+							</td>
+						</tr>
+						<tr class="period">
+							<th>기간*</th>
+							<td><input type="text" class="input_date"><span class="bar">~</span><input type="text" class="input_date"></td>
+						</tr>
+						<tr>
+							<th>Checklist</th>
+							<td><input type="file" class="ir" id="file"><label for="file" class="sch_file">파일찾기</label>
+								<ul class="file_list">
+									<li><a href="#">UHD4Q_checklist.xlsx (356kb)</a><button class="del"></button></li>
+
+								</ul>
+							</td>
+						</tr>
+						<tr>
+							<th>측정모델 등록*</th>
+							<td  class="reg">
+								<select name="" id="">
+									<option value="">분류선택</option>
+								</select>
+								<select name="" id="">
+									<option value="">모델선택</option>
+								</select>
+								<input type="text" placeholder="버전입력">
+								<button class="g_btn01">추가</button>
+								<div class="reg_list">
+									<ul>
+										<li><span>bhx-yh400(10.3.5)</span><button class="del"></button></li>
+										<li><span>bhx-yh400(10.3.5)</span><button class="del"></button></li>
+									</ul>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<th>참여인력 등록*</th>
+							<td  class="reg">
+								<select name="" id="">
+									<option value="">그룹선택</option>
+								</select>
+								<select name="" id="">
+									<option value="">사용자선택</option>
+								</select>
+								<button class="g_btn01">추가</button>
+								<div class="reg_list">
+									<ul>
+										<li><span>김승용(미디어솔루션팀)</span><button class="del"></button></li>
+										<li><span>박윤아(미디어팀)</span><button class="del"></button></li>
+										<li><span>박윤아(미디어팀)</span><button class="del"></button></li>
+										<li><span>김승용(미디어솔루션팀)</span><button class="del"></button></li>
+										<li><span>김승용(미디어솔루션팀)</span><button class="del"></button></li>
+
+									</ul>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<th>비고</th>
+							<td>
+								<input type="text" class="full" placeholder="선택입력항목">
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<div class="btn_wrap">
+			<button class="g_btn01">등록</button>
+			<button class="g_btn02" onclick="hidePopupLayer(); return false">취소</button>
+		</div>
+	</div>
+	<script>
+		setPopup(2);
+	</script>
+</body>
+</html>

@@ -1,0 +1,219 @@
+/**
+ * @title	: Bot관리 컨트롤러
+ * @package	: kr.co.nextlab.bot.controller
+ * @file	: BotMgController.java
+ * @author	: owl16
+ * @date	: 2017. 12. 8.
+ * @desc	: 
+ */
+package kr.co.nextlab.bot.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.View;
+import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
+
+import kr.co.nextlab.annotation.security.Auth;
+import kr.co.nextlab.bot.model.BotCriteria;
+import kr.co.nextlab.bot.model.BotStatHstVo;
+import kr.co.nextlab.bot.model.BotVo;
+import kr.co.nextlab.bot.model.ScenarioFileVo;
+import kr.co.nextlab.bot.service.BotService;
+import kr.co.nextlab.comm.controller.BaseController;
+
+@Controller
+public class BotController extends BaseController {
+
+	
+	@Autowired
+	private BotService botService;
+
+	/**
+	 * 
+	 * Bot관리페이지 목록
+	 * @param model
+	 */
+	@RequestMapping("/bot/bot/botMngList")
+	public void botMngList(Model model){
+		
+	}
+	
+	/**
+	 * 
+	 * bot관리 list json Data
+	 * @param model
+	 * @param botCriteria
+	 * @return
+	 */
+	@RequestMapping("/bot/bot/getBotMngList")
+	public View getBotMngList(Model model, BotStatHstVo botStateVo, BotCriteria botCriteria){
+
+		model.addAttribute("botList",botService.selectBotMngList(botCriteria));
+		
+		return new MappingJackson2JsonView(); 
+	}
+
+	/**
+	 * Bot 관리페이지 등록,수정폼
+	 * @param model
+	 */
+	@Auth(url={"/bot/bot/botMngList"})
+	@RequestMapping("/bot/bot/botMngForm")
+	public void regBotMngForm(Model model){
+		
+	}
+	
+	
+	/**
+	 * Bot 관리 view Json Data
+	 * @param model
+	 * @param botCriteria
+	 * @return
+	 */
+	@RequestMapping("/bot/bot/getBotMngView")
+	public View getBotMngView(Model model, String botSno){
+		
+		model.addAttribute("view",botService.selectBotView(botSno));
+		model.addAttribute("userId",super.getUser().getUserId());
+		
+		return new MappingJackson2JsonView(); 
+	}
+	
+	/**
+	 * Bot 관리페이지 등록 처리
+	 * @param model
+	 * @param botVo
+	 * @return
+	 */
+	@Auth(url={"/bot/bot/botMngList"})
+	@RequestMapping("/bot/bot/regBotMngPrc")
+	public View regBotMngPrc(Model model, BotVo botVo){
+		
+		boolean save = false;
+		int result = 0;	
+		
+		botVo.setRegId(super.getUser().getUserId());
+		result = botService.insertBotMng(botVo);		
+
+		if (result == 1 ){
+			save= true;
+			model.addAttribute("save",save);
+		}
+		else {
+			model.addAttribute("error","중복된 시리얼번호가 존재합니다.");
+		}
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * Bot 관리페이지 수정 처리
+	 * @param model
+	 * @param botVo
+	 * @return
+	 */
+	@Auth(url={"/bot/bot/botMngList"})
+	@RequestMapping("/bot/bot/modBotMngPrc")
+	public View modBotMngPrc(Model model, BotVo botVo){
+		
+		boolean save = false;
+		int result = 0;
+		
+		botVo.setRegId(super.getUser().getUserId());
+		result = botService.updateBotMng(botVo);	
+
+		if (result == 1 ){
+			save= true;
+			model.addAttribute("save",save);
+		}
+		
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * bot 상태이력 목록 페이지
+	 * @param model
+	 */
+	@Auth(url={"/bot/bot/botMngList"})
+	@RequestMapping("/bot/bot/botStatHstList")
+	public void botStateHistoryList(Model model){
+		
+	}
+	
+	/**
+	 * bot 상태이력 목록 조회
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping("/bot/bot/getBotStatHstList")
+	public View getBotStateHistoryList(Model model, String botSno){
+		model.addAttribute("stateHstList",botService.selectStateHstList(botSno));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * QA Bot관리페이지 목록
+	 * @param model
+	 */
+	@RequestMapping("/bot/bot/qaBotMngList")
+	public void qaBotMngList(Model model){
+	}
+	
+	/**
+	 * QA Bot 관리페이지 수정폼
+	 * @param model
+	 */
+	@Auth(url={"/bot/bot/botMngList"})
+	@RequestMapping("/bot/bot/qaBotMngForm")
+	public void qaBotMngForm(Model model){
+	}
+	
+	/**
+	 * 시나리오 파일 관리 
+	 * @param model
+	 */
+	@RequestMapping("/bot/scenario/scenarioFileList")
+	public void scenarioFileList(Model model){
+	}
+	
+	/**
+	 * 
+	 * 시나리오 파일 조회
+	 * @param model
+	 * @param botCriteria
+	 * @return
+	 */
+	@RequestMapping("/bot/scenario/getScenarioList")
+	public View getScenarioList(Model model, @RequestBody ScenarioFileVo scenarioFileVo){
+		model.addAttribute("scenarioList", botService.selectScenarioList(scenarioFileVo));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 시나리오 파일 등록 FORM
+	 * @param model
+	 */
+	@Auth(url={"/bot/scenario/scenarioFileList"})
+	@RequestMapping("/bot/scenario/scenarioFileForm")
+	public void scenarioFileForm(Model model){
+	}
+	
+	/**
+	 * 시나리오 파일 등록
+	 * @param model
+	 * @param botVo
+	 * @return
+	 */
+	@Auth(url={"/bot/scenario/scenarioFileList"})
+	@RequestMapping("/bot/scenario/regScenario")
+	public View regScenario(Model model, @RequestBody ScenarioFileVo scenarioFileVo){
+		
+		boolean save = false;
+		scenarioFileVo.setRegId(super.getUser().getUserId());
+		save = botService.insertScenario(scenarioFileVo);
+		model.addAttribute("save",save);
+		return new MappingJackson2JsonView();
+	}
+}

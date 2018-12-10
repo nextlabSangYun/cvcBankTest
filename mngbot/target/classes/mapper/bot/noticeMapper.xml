@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.nextlab.bot.mapper.NoticeMapper">
+	<select id="selectNoticeList" resultType = "noticeVo" parameterType="noticeCriteria">
+		SELECT TOP 5 
+			a.notice_seq
+			, a.title
+			, a.content
+			, a.reg_dtm
+			, a.reg_id
+			, (SELECT USER_NM FROM tb_user WHERE user_id = a.reg_id ) AS reg_nm
+			, a.org_file_nm
+			, a.file_nm
+			, a.file_path
+		FROM tb_notice a
+		ORDER BY reg_dtm DESC
+	</select>
+
+	<select id="selectNoticeMngList" resultType = "noticeVo" parameterType="noticeCriteria">
+		SELECT a.notice_seq
+			, a.title
+			, a.content
+			, a.reg_dtm
+			, a.reg_id
+			, (SELECT USER_NM FROM tb_user WHERE user_id = a.reg_id ) AS reg_nm
+			, a.org_file_nm
+			, a.file_nm
+			, a.file_path
+		FROM tb_notice a
+		ORDER BY reg_dtm DESC
+	</select>
+		
+	<select id="selectNoticeView" resultType = "noticeVo" parameterType="String">
+		SELECT a.notice_seq
+			, a.title
+			, a.content
+			, a.org_file_nm
+			, a.file_nm
+			, a.file_path
+		FROM tb_notice a
+		WHERE a.notice_seq= #{noticeSeq}
+	</select>
+	
+	<insert id="insertNotice" parameterType="noticeVo">
+		INSERT INTO tb_notice
+				(
+					title
+					, content
+					, reg_id
+					, org_file_nm
+					, file_nm
+					, file_path
+				)
+		VALUES (
+					#{title}
+					, #{content}
+					, #{regId}
+					, #{orgFileNm}
+					, #{fileNm}
+					, #{filePath}
+				)	
+	</insert>
+	
+	<update id="updateNotice" parameterType="noticeVo">
+		UPDATE tb_notice
+		SET
+			title = #{title}
+			, content = #{content}
+			, org_file_nm = #{orgFileNm}
+			, file_nm = #{fileNm}
+			, file_path = #{filePath}
+		WHERE notice_seq = #{noticeSeq}
+	</update>
+</mapper>

@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>Management Bot</title>
+	<link rel="stylesheet" href="../css/common.css">
+	<link rel="stylesheet" href="../css/bmt.css">
+	<script src="../js/jquery-3.2.1.min.js"></script>
+	<script src="../js/jquery-ui.min.js"></script>
+	<script src="../js/jquery.form.min.js"></script>
+	<script src="../js/vue.min.js"></script>
+	<script src="../js/lodash.min.js"></script>
+	<script src="../js/calendar.js"></script>
+	<script src="../js/common.js"></script>
+</head>
+<body>
+<div class="wrap">
+	<header>
+		<div class="inner">
+			<a href="index.html" class="syt_name">Management Bot</a>
+			<button class="btn_nav"><span class="icon"></span></button>
+			<div class="btn_right">
+				<button class="btn_notice"><span class="ir">알림</span><span class="new">2</span></button>
+				<button class="btn_setting"><span class="photo" style="background-image:url('../images/common/btn_my.png')"></span>김성민</button>
+			</div>
+		</div>
+	</header>
+	<nav class="nav">
+		<div class="app_list">
+			<p class="cate_tit">Favorites</p>
+			<ul>
+				<li class="fav">
+					<a href="#">
+						<div class="app_icon"><img src="../images/common/app_bmt.png" alt="BMT 프로젝트"></div>
+						<span class="app_name">BMT 프로젝트</span>
+					</a>
+					<button class="btn_fav"></button>
+				</li>
+				<li class="fav">
+					<a href="#">
+						<div class="app_icon"><img src="../images/common/app_live.png" alt="실시간 방송 측정"></div>
+						<span class="app_name">실시간 방송 측정</span>
+					</a>
+					<button class="btn_fav"></button>
+				</li>
+			</ul>
+		</div>
+		<div class="app_list">
+			<p class="cate_tit">All</p>
+			<ul>
+				<li class="fav">
+					<a href="#">
+						<div class="app_icon"><img src="../images/common/app_bmt.png" alt="BMT 프로젝트"></div>
+						<span class="app_name">BMT 프로젝트</span>
+					</a>
+					<button class="btn_fav"></button>
+				</li>
+				<li class="fav">
+					<a href="#">
+						<div class="app_icon"><img src="../images/common/app_live.png" alt="실시간 방송 측정"></div>
+						<span class="app_name">실시간 방송 측정</span>
+					</a>
+					<button class="btn_fav"></button>
+				</li>
+				<li>
+					<a href="#">
+						<div class="app_icon"><img src="../images/common/app_err.png" alt="장애이력관리"></div>
+						<span class="app_name">장애이력관리</span>
+					</a>
+					<button class="btn_fav"></button>
+				</li>
+				<li>
+					<a href="#">
+						<div class="app_icon"><img src="../images/common/app_stat.png" alt="통계분석"></div>
+						<span class="app_name">통계분석</span>
+					</a>
+					<button class="btn_fav"></button>
+				</li>
+				<li>
+					<a href="system_setting_main.html">
+						<div class="app_icon"><img src="../images/common/app_setting.png" alt="시스템설정"></div>
+						<span class="app_name">시스템설정</span>
+					</a>
+					<button class="btn_fav"></button>
+				</li>
+			</ul>
+		</div>
+	</nav>
+	<div class="ly_notice">
+		<div class="notice_list">
+			<p class="cate_tit">Notice</p>
+			<ul>
+				<li>
+					<p class="tit"><a href="#">시스템 정기점검 공지</a></p>
+					<div class="info">
+						<p class="date">2017년 10월 30일</p>
+						<p class="writer">By 관리자</p>
+					</div>
+				</li>
+				<li>
+					<p class="tit"><a href="#">시스템 정기점검 공지</a></p>
+					<div class="info">
+						<p class="date">2017년 10월 30일</p>
+						<p class="writer">By 관리자</p>
+					</div>
+				</li>
+				<li>
+					<p class="tit"><a href="#">시스템 정기점검 공지</a></p>
+					<div class="info">
+						<p class="date">2017년 10월 30일</p>
+						<p class="writer">By 관리자</p>
+					</div>
+				</li>
+				<li>
+					<p class="tit"><a href="#">시스템 정기점검 공지</a></p>
+					<div class="info">
+						<p class="date">2017년 10월 30일</p>
+						<p class="writer">By 관리자</p>
+					</div>
+				</li>
+				<li>
+					<p class="tit"><a href="#">시스템 정기점검 공지</a></p>
+					<div class="info">
+						<p class="date">2017년 10월 30일</p>
+						<p class="writer">By 관리자</p>
+					</div>
+				</li>
+			</ul>
+		</div>
+		<div class="notice_list">
+			<p class="cate_tit">Received Messages</p>
+			<ul>
+				<li>
+					<p class="tit"><a href="#">이슈Update–채널전환 시간 이슈Update–채널전환 시간</a></p>
+					<div class="info">
+						<p class="date">2017년 10월 30일</p>
+						<p class="writer">By 관리자</p>
+					</div>
+				</li>
+				<li>
+					<p class="tit"><a href="#">이슈Update–채널전환 시간 이슈Update–채널전환 시간</a></p>
+					<div class="info">
+						<p class="date">2017년 10월 30일</p>
+						<p class="writer">By 관리자</p>
+					</div>
+				</li>
+				<li>
+					<p class="tit"><a href="#">이슈Update–채널전환 시간 이슈Update–채널전환 시간</a></p>
+					<div class="info">
+						<p class="date">2017년 10월 30일</p>
+						<p class="writer">By 관리자</p>
+					</div>
+				</li>
+				<li>
+					<p class="tit"><a href="#">이슈Update–채널전환 시간 이슈Update–채널전환 시간</a></p>
+					<div class="info">
+						<p class="date">2017년 10월 30일</p>
+						<p class="writer">By 관리자</p>
+					</div>
+				</li>
+				<li>
+					<p class="tit"><a href="#">이슈Update–채널전환 시간 이슈Update–채널전환 시간</a></p>
+					<div class="info">
+						<p class="date">2017년 10월 30일</p>
+						<p class="writer">By 관리자</p>
+					</div>
+				</li>
+			</ul>
+		</div>
+	</div>
+	<div class="ly_my_setting">
+		<ul>
+			<li><a href="#">개인정보 수정</a></li>
+			<li class="bg"><a href="#">배경화면 설정</a></li>
+			<li class="logout"><a href="#">로그아웃</a></li>
+		</ul>
+	</div>
+	<div class="location">
+		<ol>
+			<!-- 17.12.18 수정 -->
+			<li><a href="#"><span class="app_ico"><img src="../images/common/app_bmt.png" alt=""></span>품질측정 프로젝트 Main</a></li>
+			<li>전체 측정이력 조회</li>
+		</ol>
+	</div>
+	<div class="content">
+		<div class="sub_layout">
+			<div class="sort_area">
+				<div class="sel_item full">
+					<span class="sort_tit">기간</span>
+					<div class="period">
+						<input type="text" class="input_date"><span class="bar">~</span><input type="text" class="input_date">
+					</div>
+				</div>
+				<div class="sel_item full">
+					<span class="sort_tit">프로젝트</span>
+					<div class="con_col2">
+						<div class="sch_area sel2">
+							<select name="" id="">
+								<option value="">년도선택</option>
+							</select>
+							<select name="" id="">
+								<option value="">프로젝트선택</option>
+							</select>
+						</div>
+						<div class="reg_list">
+							<ul>
+								<li><span>bhx-yh400(10.3.5)</span><button class="del"></button></li>
+							</ul>
+						</div>
+					</div>
+				</div>
+				<div class="sel_item full">
+					<span class="sort_tit">측정모델</span>
+					<div class="con_col2">
+						<div class="sch_area">
+							<select name="" id="">
+								<option value="">모델선택</option>
+							</select>
+						</div>
+						<div class="reg_list">
+							<ul>
+								<li><span>bhx-yh400(10.3.5)</span><button class="del"></button></li>
+								<li><span>bhx-yh400(10.3.5)</span><button class="del"></button></li>
+								<li><span>bhx-yh400(10.3.5)</span><button class="del"></button></li>
+								<li><span>bhx-yh400(10.3.5)</span><button class="del"></button></li>
+								<li><span>bhx-yh400(10.3.5)</span><button class="del"></button></li>
+								<li><span>bhx-yh400(10.3.5)</span><button class="del"></button></li>
+								<li><span>bhx-yh400(10.3.5)</span><button class="del"></button></li>
+								<li><span>bhx-yh400(10.3.5)</span><button class="del"></button></li>
+								<li><span>bhx-yh400(10.3.5)</span><button class="del"></button></li>
+								<li><span>bhx-yh400(10.3.5)</span><button class="del"></button></li>
+							</ul>
+						</div>
+					</div>
+				</div>
+				<button class="g_btn01">조회</button>
+			</div>
+			<div class="tab_wrap">
+				<ul class="g_tab">
+					<li><a href="#">BMT</a></li>
+					<li><a href="#">채널변경시간</a></li>
+					<li><a href="#">Cold Reset Delay</a></li>
+				</ul>
+				<div class="tab_con_wrap">
+					<div class="tab_con">
+						<div class="tb_desc">
+							<p>조회결과 : 24건</p>
+							<a href="#" class="g_btn01">다운로드</a>
+						</div>
+						<div class="g_table">
+							<table>
+								<caption>대상 프로젝트, 측정일시, 측정모델 등 정보로 구성된 표 입니다.</caption>
+								<colgroup>
+									<col style="width:16%;">
+									<col style="width:16%;">
+									<col style="width:8.5%;">
+									<col style="width:7%;">
+									<col style="width:7.5%;">
+									<col style="width:7%;">
+									<col style="width:12%;">
+									<col>
+								</colgroup>
+								<thead>
+									<tr>
+										<th>대상 프로젝트</th>
+										<th>Test Case</th>
+										<th>측정모델</th>
+										<th>리모컨</th>
+										<th>담당자</th>
+										<th>Bot 이름</th>
+										<th>측정일시</th>
+										<th>측정결과</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>UHD STB 서비스 고도화 BMT</td>
+										<td>찜등록한 해당 회차</td>
+										<td>BHX-UH400</td>
+										<td>IR</td>
+										<td>김현우</td>
+										<td>1기</td>
+										<td>2017/04/28/09:33</td>
+										<td><span class="state04">Pass</span></td>
+									</tr>
+									<tr>
+										<td>UHD STB 서비스 고도화 BMT</td>
+										<td>찜등록한 해당 회차</td>
+										<td>BHX-UH400</td>
+										<td>IR</td>
+										<td>김현우</td>
+										<td>1기</td>
+										<td>2017/04/28/09:33</td>
+										<td><span class="state04">Pass</span></td>
+									</tr>
+									<tr>
+										<td>UHD STB 서비스 고도화 BMT</td>
+										<td>찜등록한 해당 회차</td>
+										<td>BHX-UH400</td>
+										<td>IR</td>
+										<td>김현우</td>
+										<td>1기</td>
+										<td>2017/04/28/09:33</td>
+										<td><span class="state01">Fail</span></td>
+									</tr>
+									<tr>
+										<td>UHD STB 서비스 고도화 BMT</td>
+										<td>찜등록한 해당 회차</td>
+										<td>BHX-UH400</td>
+										<td>IR</td>
+										<td>김현우</td>
+										<td>1기</td>
+										<td>2017/04/28/09:33</td>
+										<td><span class="state01">Fail</span></td>
+									</tr>
+									<tr>
+										<td>UHD STB 서비스 고도화 BMT</td>
+										<td>찜등록한 해당 회차</td>
+										<td>BHX-UH400</td>
+										<td>IR</td>
+										<td>김현우</td>
+										<td>1기</td>
+										<td>2017/04/28/09:33</td>
+										<td><span class="state04">Pass</span></td>
+									</tr>
+									<tr>
+										<td>UHD STB 서비스 고도화 BMT</td>
+										<td>찜등록한 해당 회차</td>
+										<td>BHX-UH400</td>
+										<td>IR</td>
+										<td>김현우</td>
+										<td>1기</td>
+										<td>2017/04/28/09:33</td>
+										<td><span class="state04">Pass</span></td>
+									</tr>
+									<tr>
+										<td>UHD STB 서비스 고도화 BMT</td>
+										<td>찜등록한 해당 회차</td>
+										<td>BHX-UH400</td>
+										<td>IR</td>
+										<td>김현우</td>
+										<td>1기</td>
+										<td>2017/04/28/09:33</td>
+										<td><span class="state04">Pass</span></td>
+									</tr>
+									<tr>
+										<td>UHD STB 서비스 고도화 BMT</td>
+										<td>찜등록한 해당 회차</td>
+										<td>BHX-UH400</td>
+										<td>IR</td>
+										<td>김현우</td>
+										<td>1기</td>
+										<td>2017/04/28/09:33</td>
+										<td><span class="state04">Pass</span></td>
+									</tr>
+									<tr>
+										<td>UHD STB 서비스 고도화 BMT</td>
+										<td>찜등록한 해당 회차</td>
+										<td>BHX-UH400</td>
+										<td>IR</td>
+										<td>김현우</td>
+										<td>1기</td>
+										<td>2017/04/28/09:33</td>
+										<td><span class="state04">Pass</span></td>
+									</tr>
+									<tr>
+										<td>UHD STB 서비스 고도화 BMT</td>
+										<td>찜등록한 해당 회차</td>
+										<td>BHX-UH400</td>
+										<td>IR</td>
+										<td>김현우</td>
+										<td>1기</td>
+										<td>2017/04/28/09:33</td>
+										<td><span class="state04">Pass</span></td>
+									</tr>
+								</tbody>
+							</table>
+							<div class="pagination">
+								<ol>
+									<li class="btn_first"><button>처음</button></li>
+									<li class="btn_prev"><button>이전</button></li>
+									<li class="num on"><button>1</button></li>
+									<li class="num"><button>2</button></li>
+									<li class="num"><button>3</button></li>
+									<li class="num"><button>4</button></li>
+									<li class="num"><button>5</button></li>
+									<li class="btn_next"><button>다음</button></li>
+									<li class="btn_last"><button>마지막</button></li>
+								</ol>
+							</div>
+						</div>
+					</div>
+					<div class="tab_con">
+						<div class="tb_desc">
+							<p>조회결과 : 24건</p>
+							<a href="#" class="g_btn01">다운로드</a>
+						</div>
+						<div class="g_table">
+							<table>
+								<caption>대상 프로젝트, 측정일시, 측정모델 등 정보로 구성된 표 입니다.</caption>
+								<colgroup>
+									<col style="width:16%;">
+									<col style="width:16%;">
+									<col style="width:8.5%;">
+									<col style="width:7%;">
+									<col style="width:7.5%;">
+									<col style="width:7%;">
+									<col style="width:12%;">
+									<col>
+								</colgroup>
+								<thead>
+									<tr>
+										<th>대상 프로젝트</th>
+										<th>Test Case</th>
+										<th>측정모델</th>
+										<th>리모컨</th>
+										<th>담당자</th>
+										<th>Bot 이름</th>
+										<th>측정일시</th>
+										<th>측정결과</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>UHD STB 서비스 고도화 BMT</td>
+										<td>찜등록한 해당 회차</td>
+										<td>BHX-UH400</td>
+										<td>IR</td>
+										<td>김현우</td>
+										<td>1기</td>
+										<td>2017/04/28/09:33</td>
+										<td class="inner_table">
+											<table>
+												<thead>
+													<tr>
+														<th>A구간</th>
+														<th>B구간</th>
+														<th>C구간</th>
+														<th>총소요</th>
+														<th>네트워크</th>
+													</tr>
+												</thead>
+												<tbody>
+													<tr>
+														<td>256</td>
+														<td>562</td>
+														<td>134</td>
+														<td>1522</td>
+														<td>35</td>
+													</tr>
+												</tbody>
+											</table>
+										</td>
+									</tr>
+									<tr>
+										<td>UHD STB 서비스 고도화 BMT</td>
+										<td>찜등록한 해당 회차</td>
+										<td>BHX-UH400</td>
+										<td>IR</td>
+										<td>김현우</td>
+										<td>1기</td>
+										<td>2017/04/28/09:33</td>
+										<td class="inner_table">
+											<table>
+												<thead>
+													<tr>
+														<th>A구간</th>
+														<th>B구간</th>
+														<th>C구간</th>
+														<th>총소요</th>
+														<th>네트워크</th>
+													</tr>
+												</thead>
+												<tbody>
+													<tr>
+														<td>256</td>
+														<td>562</td>
+														<td>134</td>
+														<td>1522</td>
+														<td>35</td>
+													</tr>
+												</tbody>
+											</table>
+										</td>
+									</tr>
+									<tr>
+										<td>UHD STB 서비스 고도화 BMT</td>
+										<td>찜등록한 해당 회차</td>
+										<td>BHX-UH400</td>
+										<td>IR</td>
+										<td>김현우</td>
+										<td>1기</td>
+										<td>2017/04/28/09:33</td>
+										<td class="inner_table">
+											<table>
+												<thead>
+													<tr>
+														<th>A구간</th>
+														<th>B구간</th>
+														<th>C구간</th>
+														<th>총소요</th>
+														<th>네트워크</th>
+													</tr>
+												</thead>
+												<tbody>
+													<tr>
+														<td>256</td>
+														<td>562</td>
+														<td>134</td>
+														<td>1522</td>
+														<td>35</td>
+													</tr>
+												</tbody>
+											</table>
+										</td>
+									</tr>
+									<tr>
+										<td>UHD STB 서비스 고도화 BMT</td>
+										<td>찜등록한 해당 회차</td>
+										<td>BHX-UH400</td>
+										<td>IR</td>
+										<td>김현우</td>
+										<td>1기</td>
+										<td>2017/04/28/09:33</td>
+										<td class="inner_table">
+											<table>
+												<thead>
+													<tr>
+														<th>A구간</th>
+														<th>B구간</th>
+														<th>C구간</th>
+														<th>총소요</th>
+														<th>네트워크</th>
+													</tr>
+												</thead>
+												<tbody>
+													<tr>
+														<td>256</td>
+														<td>562</td>
+														<td>134</td>
+														<td>1522</td>
+														<td>35</td>
+													</tr>
+												</tbody>
+											</table>
+										</td>
+									</tr>
+									<tr>
+										<td>UHD STB 서비스 고도화 BMT</td>
+										<td>찜등록한 해당 회차</td>
+										<td>BHX-UH400</td>
+										<td>IR</td>
+										<td>김현우</td>
+										<td>1기</td>
+										<td>2017/04/28/09:33</td>
+										<td class="inner_table">
+											<table>
+												<thead>
+													<tr>
+														<th>A구간</th>
+														<th>B구간</th>
+														<th>C구간</th>
+														<th>총소요</th>
+														<th>네트워크</th>
+													</tr>
+												</thead>
+												<tbody>
+													<tr>
+														<td>256</td>
+														<td>562</td>
+														<td>134</td>
+														<td>1522</td>
+														<td>35</td>
+													</tr>
+												</tbody>
+											</table>
+										</td>
+									</tr>
+									<tr>
+										<td>UHD STB 서비스 고도화 BMT</td>
+										<td>찜등록한 해당 회차</td>
+										<td>BHX-UH400</td>
+										<td>IR</td>
+										<td>김현우</td>
+										<td>1기</td>
+										<td>2017/04/28/09:33</td>
+										<td class="inner_table">
+											<table>
+												<thead>
+													<tr>
+														<th>A구간</th>
+														<th>B구간</th>
+														<th>C구간</th>
+														<th>총소요</th>
+														<th>네트워크</th>
+													</tr>
+												</thead>
+												<tbody>
+													<tr>
+														<td>256</td>
+														<td>562</td>
+														<td>134</td>
+														<td>1522</td>
+														<td>35</td>
+													</tr>
+												</tbody>
+											</table>
+										</td>
+									</tr>
+									<tr>
+										<td>UHD STB 서비스 고도화 BMT</td>
+										<td>찜등록한 해당 회차</td>
+										<td>BHX-UH400</td>
+										<td>IR</td>
+										<td>김현우</td>
+										<td>1기</td>
+										<td>2017/04/28/09:33</td>
+										<td class="inner_table">
+											<table>
+												<thead>
+													<tr>
+														<th>A구간</th>
+														<th>B구간</th>
+														<th>C구간</th>
+														<th>총소요</th>
+														<th>네트워크</th>
+													</tr>
+												</thead>
+												<tbody>
+													<tr>
+														<td>256</td>
+														<td>562</td>
+														<td>134</td>
+														<td>1522</td>
+														<td>35</td>
+													</tr>
+												</tbody>
+											</table>
+										</td>
+									</tr>
+									<tr>
+										<td>UHD STB 서비스 고도화 BMT</td>
+										<td>찜등록한 해당 회차</td>
+										<td>BHX-UH400</td>
+										<td>IR</td>
+										<td>김현우</td>
+										<td>1기</td>
+										<td>2017/04/28/09:33</td>
+										<td class="inner_table">
+											<table>
+												<thead>
+													<tr>
+														<th>A구간</th>
+														<th>B구간</th>
+														<th>C구간</th>
+														<th>총소요</th>
+														<th>네트워크</th>
+													</tr>
+												</thead>
+												<tbody>
+													<tr>
+														<td>256</td>
+														<td>562</td>
+														<td>134</td>
+														<td>1522</td>
+														<td>35</td>
+													</tr>
+												</tbody>
+											</table>
+										</td>
+									</tr>
+									<tr>
+										<td>UHD STB 서비스 고도화 BMT</td>
+										<td>찜등록한 해당 회차</td>
+										<td>BHX-UH400</td>
+										<td>IR</td>
+										<td>김현우</td>
+										<td>1기</td>
+										<td>2017/04/28/09:33</td>
+										<td class="inner_table">
+											<table>
+												<thead>
+													<tr>
+														<th>A구간</th>
+														<th>B구간</th>
+														<th>C구간</th>
+														<th>총소요</th>
+														<th>네트워크</th>
+													</tr>
+												</thead>
+												<tbody>
+													<tr>
+														<td>256</td>
+														<td>562</td>
+														<td>134</td>
+														<td>1522</td>
+														<td>35</td>
+													</tr>
+												</tbody>
+											</table>
+										</td>
+									</tr>
+									<tr>
+										<td>UHD STB 서비스 고도화 BMT</td>
+										<td>찜등록한 해당 회차</td>
+										<td>BHX-UH400</td>
+										<td>IR</td>
+										<td>김현우</td>
+										<td>1기</td>
+										<td>2017/04/28/09:33</td>
+										<td class="inner_table">
+											<table>
+												<thead>
+													<tr>
+														<th>A구간</th>
+														<th>B구간</th>
+														<th>C구간</th>
+														<th>총소요</th>
+														<th>네트워크</th>
+													</tr>
+												</thead>
+												<tbody>
+													<tr>
+														<td>256</td>
+														<td>562</td>
+														<td>134</td>
+														<td>1522</td>
+														<td>35</td>
+													</tr>
+												</tbody>
+											</table>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+							<div class="pagination">
+								<ol>
+									<li class="btn_first"><button>처음</button></li>
+									<li class="btn_prev"><button>이전</button></li>
+									<li class="num on"><button>1</button></li>
+									<li class="num"><button>2</button></li>
+									<li class="num"><button>3</button></li>
+									<li class="num"><button>4</button></li>
+									<li class="num"><button>5</button></li>
+									<li class="btn_next"><button>다음</button></li>
+									<li class="btn_last"><button>마지막</button></li>
+								</ol>
+							</div>
+						</div>
+					</div>
+					<div class="tab_con">
+						<div class="tb_desc">
+							<p>조회결과 : 24건</p>
+							<a href="#" class="g_btn01">다운로드</a>
+						</div>
+						<div class="g_table">
+							<table>
+								<caption>대상 프로젝트, 측정일시, 측정모델 등 정보로 구성된 표 입니다.</caption>
+								<colgroup>
+									<col style="width:16%;">
+									<col style="width:16%;">
+									<col style="width:8.5%;">
+									<col style="width:7%;">
+									<col style="width:7.5%;">
+									<col style="width:7%;">
+									<col style="width:12%;">
+									<col>
+								</colgroup>
+								<thead>
+									<tr>
+										<th>대상 프로젝트</th>
+										<th>Test Case</th>
+										<th>측정모델</th>
+										<th>리모컨</th>
+										<th>담당자</th>
+										<th>Bot 이름</th>
+										<th>측정일시</th>
+										<th>측정결과</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>UHD STB 서비스 고도화 BMT</td>
+										<td>찜등록한 해당 회차</td>
+										<td>BHX-UH400</td>
+										<td>IR</td>
+										<td>김현우</td>
+										<td>1기</td>
+										<td>2017/04/28/09:33</td>
+										<td class="inner_table">
+											<table>
+												<thead>
+													<tr>
+														<th>매칭시간</th>
+														<th>커서반응시간</th>
+														<th>변화율시간</th>
+													</tr>
+												</thead>
+												<tbody>
+													<tr>
+														<td>152</td>
+														<td>256</td>
+														<td>562</td>
+													</tr>
+												</tbody>
+											</table>
+										</td>
+									</tr>
+									<tr>
+										<td>UHD STB 서비스 고도화 BMT</td>
+										<td>찜등록한 해당 회차</td>
+										<td>BHX-UH400</td>
+										<td>IR</td>
+										<td>김현우</td>
+										<td>1기</td>
+										<td>2017/04/28/09:33</td>
+										<td class="inner_table">
+											<table>
+												<thead>
+													<tr>
+														<th>매칭시간</th>
+														<th>커서반응시간</th>
+														<th>변화율시간</th>
+													</tr>
+												</thead>
+												<tbody>
+													<tr>
+														<td>152</td>
+														<td>256</td>
+														<td>562</td>
+													</tr>
+												</tbody>
+											</table>
+										</td>
+									</tr>
+									<tr>
+										<td>UHD STB 서비스 고도화 BMT</td>
+										<td>찜등록한 해당 회차</td>
+										<td>BHX-UH400</td>
+										<td>IR</td>
+										<td>김현우</td>
+										<td>1기</td>
+										<td>2017/04/28/09:33</td>
+										<td class="inner_table">
+											<table>
+												<thead>
+													<tr>
+														<th>매칭시간</th>
+														<th>커서반응시간</th>
+														<th>변화율시간</th>
+													</tr>
+												</thead>
+												<tbody>
+													<tr>
+														<td>152</td>
+														<td>256</td>
+														<td>562</td>
+													</tr>
+												</tbody>
+											</table>
+										</td>
+									</tr>
+									<tr>
+										<td>UHD STB 서비스 고도화 BMT</td>
+										<td>찜등록한 해당 회차</td>
+										<td>BHX-UH400</td>
+										<td>IR</td>
+										<td>김현우</td>
+										<td>1기</td>
+										<td>2017/04/28/09:33</td>
+										<td class="inner_table">
+											<table>
+												<thead>
+													<tr>
+														<th>매칭시간</th>
+														<th>커서반응시간</th>
+														<th>변화율시간</th>
+													</tr>
+												</thead>
+												<tbody>
+													<tr>
+														<td>152</td>
+														<td>256</td>
+														<td>562</td>
+													</tr>
+												</tbody>
+											</table>
+										</td>
+									</tr>
+									<tr>
+										<td>UHD STB 서비스 고도화 BMT</td>
+										<td>찜등록한 해당 회차</td>
+										<td>BHX-UH400</td>
+										<td>IR</td>
+										<td>김현우</td>
+										<td>1기</td>
+										<td>2017/04/28/09:33</td>
+										<td class="inner_table">
+											<table>
+												<thead>
+													<tr>
+														<th>매칭시간</th>
+														<th>커서반응시간</th>
+														<th>변화율시간</th>
+													</tr>
+												</thead>
+												<tbody>
+													<tr>
+														<td>152</td>
+														<td>256</td>
+														<td>562</td>
+													</tr>
+												</tbody>
+											</table>
+										</td>
+									</tr>
+									<tr>
+										<td>UHD STB 서비스 고도화 BMT</td>
+										<td>찜등록한 해당 회차</td>
+										<td>BHX-UH400</td>
+										<td>IR</td>
+										<td>김현우</td>
+										<td>1기</td>
+										<td>2017/04/28/09:33</td>
+										<td class="inner_table">
+											<table>
+												<thead>
+													<tr>
+														<th>매칭시간</th>
+														<th>커서반응시간</th>
+														<th>변화율시간</th>
+													</tr>
+												</thead>
+												<tbody>
+													<tr>
+														<td>152</td>
+														<td>256</td>
+														<td>562</td>
+													</tr>
+												</tbody>
+											</table>
+										</td>
+									</tr>
+									<tr>
+										<td>UHD STB 서비스 고도화 BMT</td>
+										<td>찜등록한 해당 회차</td>
+										<td>BHX-UH400</td>
+										<td>IR</td>
+										<td>김현우</td>
+										<td>1기</td>
+										<td>2017/04/28/09:33</td>
+										<td class="inner_table">
+											<table>
+												<thead>
+													<tr>
+														<th>매칭시간</th>
+														<th>커서반응시간</th>
+														<th>변화율시간</th>
+													</tr>
+												</thead>
+												<tbody>
+													<tr>
+														<td>152</td>
+														<td>256</td>
+														<td>562</td>
+													</tr>
+												</tbody>
+											</table>
+										</td>
+									</tr>
+									<tr>
+										<td>UHD STB 서비스 고도화 BMT</td>
+										<td>찜등록한 해당 회차</td>
+										<td>BHX-UH400</td>
+										<td>IR</td>
+										<td>김현우</td>
+										<td>1기</td>
+										<td>2017/04/28/09:33</td>
+										<td class="inner_table">
+											<table>
+												<thead>
+													<tr>
+														<th>매칭시간</th>
+														<th>커서반응시간</th>
+														<th>변화율시간</th>
+													</tr>
+												</thead>
+												<tbody>
+													<tr>
+														<td>152</td>
+														<td>256</td>
+														<td>562</td>
+													</tr>
+												</tbody>
+											</table>
+										</td>
+									</tr>
+									<tr>
+										<td>UHD STB 서비스 고도화 BMT</td>
+										<td>찜등록한 해당 회차</td>
+										<td>BHX-UH400</td>
+										<td>IR</td>
+										<td>김현우</td>
+										<td>1기</td>
+										<td>2017/04/28/09:33</td>
+										<td class="inner_table">
+											<table>
+												<thead>
+													<tr>
+														<th>매칭시간</th>
+														<th>커서반응시간</th>
+														<th>변화율시간</th>
+													</tr>
+												</thead>
+												<tbody>
+													<tr>
+														<td>152</td>
+														<td>256</td>
+														<td>562</td>
+													</tr>
+												</tbody>
+											</table>
+										</td>
+									</tr>
+									<tr>
+										<td>UHD STB 서비스 고도화 BMT</td>
+										<td>찜등록한 해당 회차</td>
+										<td>BHX-UH400</td>
+										<td>IR</td>
+										<td>김현우</td>
+										<td>1기</td>
+										<td>2017/04/28/09:33</td>
+										<td class="inner_table">
+											<table>
+												<thead>
+													<tr>
+														<th>매칭시간</th>
+														<th>커서반응시간</th>
+														<th>변화율시간</th>
+													</tr>
+												</thead>
+												<tbody>
+													<tr>
+														<td>152</td>
+														<td>256</td>
+														<td>562</td>
+													</tr>
+												</tbody>
+											</table>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+							<div class="pagination">
+								<ol>
+									<li class="btn_first"><button>처음</button></li>
+									<li class="btn_prev"><button>이전</button></li>
+									<li class="num on"><button>1</button></li>
+									<li class="num"><button>2</button></li>
+									<li class="num"><button>3</button></li>
+									<li class="num"><button>4</button></li>
+									<li class="num"><button>5</button></li>
+									<li class="btn_next"><button>다음</button></li>
+									<li class="btn_last"><button>마지막</button></li>
+								</ol>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+</html>

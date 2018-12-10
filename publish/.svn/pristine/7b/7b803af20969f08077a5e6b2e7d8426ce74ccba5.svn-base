@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>DIMS</title>    
+    <link href="../css/style.css" rel="stylesheet">    
+</head>
+<body class="sub">
+	
+	<div class="wrapper">
+		
+		<div class="right_box">
+			<div class="content_top">
+				<h2><img src="../images/bullet_title.png" alt=""><span>작업자 관리</span></h2>
+				<ul class="path_list">
+					<li><a href="#"><img src="../images/icon_home.png" alt="home"></a></li>
+					<li><a href="#">홈센터관리</a></li>
+					<li><a href="#">행복기사관리</a></li>
+					<li><a href="#">작업자관리</a></li>
+				</ul>
+			</div><!-- end content_top -->
+			<div class="content_middle">
+				<div class="height20"></div>
+				<section>
+					<div class="detailsearch_wrap table">	
+						<div class="detailsearch">
+							<table>
+								<colgroup>
+									<col width="15%">
+									<col width="35%">
+									<col width="15%">
+									<col width="35%">
+								</colgroup>
+								<tr>
+									<th>등록일자</th>	
+									<td colspan="3">
+										<div class="datepicker_wrap"><input type="text" class="datepicker"></div>
+										<span class="datepicker_txt">~</span>
+										<div class="datepicker_wrap"><input type="text" class="datepicker"></div>						
+										<button type="button" class="btn_item grey">오늘</button>
+										<button type="button" class="btn_item">1주일</button>
+										<button type="button" class="btn_item">1개월</button>
+									</td>	
+								</tr>									
+								<tr>
+									<th>
+										<div class="select_wrap full">
+											<select>
+												<option value="hide">선택</option>
+												<option value="">작업자명</option>
+												<option value="">연락처</option>
+											</select>
+										</div>
+									</th>								 
+									<td colspan="3">
+										<input type="text" class="dims_input" id="" name="" placeholder="검색어를 입력하세요" style="width:300px;">
+										<input type="checkbox" class="dims_checkbox" id="checkbox1_1" name="" checked>
+										<label for="checkbox1_1">비활성화 작업자 포함</label>
+									</td> 
+								</tr>											
+							</table>							
+						</div>
+						<!-- end.detailsearch -->
+						<div class="btn_wrap">
+							<button type="submit" class="search btn_search">검색</button>						
+							<button type="button" class="reset btn_reset">초기화</button>
+						</div>					
+					</div><!-- end .detailsearch_wrap -->
+				</section>
+				<div class="height20"></div>
+				<section>
+					<div class="table_top_wrap">
+						<div class="count">Total <span>2,000</span> 건</div>											
+					</div><!-- end .table_option_wrap -->		
+					
+					<div class="table_vertical">
+						<table summary="검색결과">
+							<caption>검색결과</caption>
+							<colgroup>                        
+								<col width="55"><col width="15%">
+								<col style="width: calc(30% - 55px);">
+								<col width="10%"><col width="15%">
+								<col width="10%"><col width="10%">
+								<col width="10%">						
+							</colgroup>
+							<thead>
+								<tr>								
+									<th scope="col" rowspan="2">No.</th>
+									<th scope="col" rowspan="2">등록일</th>
+									<th scope="col" rowspan="2">소속</th>
+									<th scope="col" rowspan="2">작업자명</th>
+									<th scope="col" rowspan="2">연락처</th>
+									<th scope="col" colspan="2">부속물 보유현황</th>
+									<th scope="col" rowspan="2">상태</th>
+								</tr>
+								<tr>
+									<th scope="col">어댑터</th>
+									<th scope="col">리모컨</th>
+								</tr>
+							</thead> 
+							<tbody> 
+								<tr>
+									<td>10</td>
+									<td>2018-03-12</td>
+									<td>Home클리닉_고양</td>
+									<td><a href="#">홍길동</a></td>
+									<td>010-1234-5678</td>
+									<td>10</td>
+									<td>10</td>
+									<td>정상</td>
+								</tr>
+								<tr>
+									<td>9</td>
+									<td>2018-03-12</td>
+									<td>Home클리닉_고양</td>
+									<td><a href="#">홍길동</a></td>
+									<td>010-1234-5678</td>
+									<td>10</td>
+									<td>10</td>
+									<td>정상</td>
+								</tr>
+								<tr>
+									<td>8</td>
+									<td>2018-03-12</td>
+									<td>Home클리닉_고양</td>
+									<td><a href="#">홍길동</a></td>
+									<td>010-1234-5678</td>
+									<td>10</td>
+									<td>10</td>
+									<td>정상</td>
+								</tr>
+								<tr>
+									<td>7</td>
+									<td>2018-03-12</td>
+									<td>Home클리닉_고양</td>
+									<td><a href="#">홍길동</a></td>
+									<td>010-1234-5678</td>
+									<td>10</td>
+									<td>10</td>
+									<td>정상</td>
+								</tr>
+								<tr>
+									<td>6</td>
+									<td>2018-03-12</td>
+									<td>Home클리닉_고양</td>
+									<td><a href="#">홍길동</a></td>
+									<td>010-1234-5678</td>
+									<td>10</td>
+									<td>10</td>
+									<td>정상</td>
+								</tr>
+								<tr>
+									<td>5</td>
+									<td>2018-03-12</td>
+									<td>Home클리닉_고양</td>
+									<td><a href="#">홍길동</a></td>
+									<td>010-1234-5678</td>
+									<td>10</td>
+									<td>10</td>
+									<td>정상</td>
+								</tr>
+								<tr>
+									<td>4</td>
+									<td>2018-03-12</td>
+									<td>Home클리닉_고양</td>
+									<td><a href="#">홍길동</a></td>
+									<td>010-1234-5678</td>
+									<td>10</td>
+									<td>10</td>
+									<td>정상</td>
+								</tr>
+								<tr>
+									<td>3</td>
+									<td>2018-03-12</td>
+									<td>Home클리닉_고양</td>
+									<td><a href="#">홍길동</a></td>
+									<td>010-1234-5678</td>
+									<td>10</td>
+									<td>10</td>
+									<td>정상</td>
+								</tr>
+								<tr>
+									<td>2</td>
+									<td>2018-03-12</td>
+									<td>Home클리닉_고양</td>
+									<td><a href="#">홍길동</a></td>
+									<td>010-1234-5678</td>
+									<td>10</td>
+									<td>10</td>
+									<td>정상</td>
+								</tr>
+								<tr>
+									<td>1</td>
+									<td>2018-03-12</td>
+									<td>Home클리닉_고양</td>
+									<td><a href="#">홍길동</a></td>
+									<td>010-1234-5678</td>
+									<td>10</td>
+									<td>10</td>
+									<td>정상</td>
+								</tr>
+							</tbody> 
+						</table>						
+					</div><!-- end table_wrap -->
+					<div class="table_bottom_wrap">
+						<div class="paginate">
+							<a href="#" class="pre"><img src="../images/icon_paging_prev.png" alt=""></a>
+							<a href="#">1</a>
+							<a href="#">2</a>
+							<a href="#">3</a>
+							<a href="#">4</a>
+							<a href="#">5</a>
+							<strong>6</strong>
+							<a href="#">7</a>
+							<a href="#">8</a>
+							<a href="#">9</a>
+							<a href="#">10</a>
+							<a href="#" class="next"><img src="../images/icon_paging_next.png" alt=""></a>
+						</div><!-- end paginate -->	
+						
+					</div>
+					<!-- end.table_bottom_wrap -->
+				</section>				
+            </div><!-- end.content_middle -->
+            
+			
+		</div><!-- end right_box -->
+	</div><!-- end .wrapper -->	
+    
+    <script src="../js/lib/jquery-3.2.1.min.js"></script>
+    <script src="../js/lib/jquery-ui.min.js"></script>	
+	<script src="../js/ui.js"></script>
+	<script src="../js/lib/prefixfree.min.js"></script>	
+	<script src="../js/lib/jquery.form.min.js"></script>
+	<script src="../js/lib/calendar.js"></script>	
+</body>
+</html>

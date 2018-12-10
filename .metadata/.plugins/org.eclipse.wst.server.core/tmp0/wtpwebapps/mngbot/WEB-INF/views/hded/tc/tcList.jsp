@@ -1,0 +1,296 @@
+<%@ page contentType="text/html" pageEncoding="UTF-8" %>
+<%@ taglib uri="http://www.nextlab.co.kr/tags/nextlab" prefix="nl"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<div class="content"  id="list">
+	<div class="sub_layout has_snb tc_list_wrap">
+		<div class="cont_wrap">
+			<div class="sort_area">
+				<div class="sel_item full">
+					<span class="sort_tit">분류</span>
+					<div class="column3">
+						<input type="text" v-model="criteria.lcateNm" placeholder="대분류를 입력하세요.">
+						<input type="text" v-model="criteria.mcateNm" placeholder="중분류를 입력하세요.">
+						<input type="text" v-model="criteria.scateNm" placeholder="소분류를 입력하세요.">
+					</div>
+				</div>
+				<div class="sel_item full">
+					<span class="sort_tit">테스트 결과</span>
+					<select v-model="criteria.lastResultCd">
+						<option value="">- 전체 -</option>
+						<option v-for="list in getTestResultMenuList" :value="list.codeId">{{list.codeNm}}</option>
+						<option value="B305">미입력</option>
+					</select>
+				</div>
+				<div class="sel_item full">
+					<span class="sort_tit">T.C명</span>	
+					<input type="text" class="full" v-model="criteria.tcNm" placeholder="Test Case 명을 입력하세요.">
+				</div>
+				<button class="btn_default" @click="getProjectTcList">조회</button>
+			</div>
+			<div class="tb_desc">
+				<p>조회결과 : {{projectTcList.length | number(0)}}건</p>
+				<div class="btn_wrap">
+					<button v-if="prjVo.projectStat != 'C304' && authId == 'AU009'" class="btn_down" @click="goTcLargeAddForm"><span>엑셀업로드</span></button>
+					<button v-if="prjVo.projectStat != 'C304'" class="btn_default" @click="addIssue">이슈 등록</button>
+					<button v-if="prjVo.projectStat != 'C304'" class="btn_default" @click="addTc">T.C 추가</button>
+					<button v-if="prjVo.projectStat != 'C304'" class="btn_cancel" @click="delTc"><span>T.C 삭제</span></button>
+				</div>
+			</div>
+			<ul class="list_table">
+				<li class="list_tr list_th">
+					<p><input type="checkbox" v-model="selectAll"></p>
+					<p>대분류</p>
+					<p>중분류</p>
+					<p>소분류</p>
+					<p>T.C명</p>
+					<p>테스트 결과</p>
+					<p>결과자료</p>
+					<p></p>
+				</li>
+				<li v-if="tcPagingList == 0">
+					<div class="list_tr">
+						<p class="list_none">조회된 데이터가 없습니다.</p>
+					</div>
+				</li>
+				<li v-else v-for="(list, idx) in tcPagingList">
+					<div class="list_tr accordion_link">
+						<p class="nontarget"><input type="checkbox" name="tcCheck" v-model="list.check"></p>
+						<p>{{list.lcateNm}}</p>
+						<p>{{list.mcateNm}}</p>
+						<p>{{list.scateNm}}</p>
+						<p>{{list.abstractTcNm}}</p>
+						<p class="nontarget">
+							<button v-if="list.lastResultCd === 'B301'" class="smbtn_pass" @click="testResult(list.projectTcSeq)">PASS</button>
+							<button v-if="list.lastResultCd === 'B302'" class="smbtn_fail" @click="testResult(list.projectTcSeq)">FAIL</button>
+							<button v-if="list.lastResultCd === 'B305'" class="smbtn_none" @click="testResult(list.projectTcSeq)">미입력</button>
+						</p>
+						<p class="nontarget"><button v-if="list.lastResultCd != 'B305'" class="smbtn_view" @click="resultData(list.tcResultSeq, list.lcateNm, list.mcateNm, list.scateNm, list.lastResultCd, list.tcNm)"></button></p>
+						<p><img class="ico_arrow" src="../../images/hded/arrow_right.png" alt="arrow"></p>
+					</div>
+					<div class="hidden_desc accordion_target">
+						<div class="nontarget g_table05">
+							<table>
+								<caption></caption>
+								<colgroup>
+									<col style="width: 150px;">
+									<col>
+								</colgroup>
+								<tbody>
+									<tr>
+										<th>T.C명</th>
+										<td><span v-html="list.tcNm"></span></td>
+									</tr>
+									<tr>
+										<th>사전 환경</th>
+										<td>{{list.tcPreEnvir}}</td>
+									</tr>
+									<tr>
+										<th>테스트 입력 값</th>
+										<td class='tb_break'>{{list.tcInputVal}}</td>
+									</tr>
+									<tr>
+										<th>예상 결과 값</th>
+										<td>{{list.tcOutputVal}}</td>
+									</tr>
+									<tr>
+										<th>정상판단기준</th>
+										<td>{{list.normalCriterion}}</td>
+									</tr>
+									<tr>
+										<th>사전 테스트 결과</th>
+										<td>{{list.beforeResultCd | code(resultCodeNm)}}</td>
+									</tr>
+									<tr>
+										<th>검수자 의견</th>
+										<td>{{list.inspectorOpinion}}</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</li>
+			</ul>
+			<paginator ref="paginator" :go-fn="getProjectTcPagingList" :init-rows="50"></paginator>
+		</div>
+	</div>
+</div>
+<script>
+
+var list = new Vue({
+	el: '#list',
+	data: {
+		criteria:{
+			pid:'<c:out value="${heProjectVo.pid}"/>'
+			, systemId:'<c:out value="${heProjectVo.systemId}"/>'
+			, sysSeq:'<c:out value="${heProjectVo.sysSeq}"/>'
+			, lcateNm:""
+			, mcateNm:""
+			, scateNm:""
+			, tcNm:""
+			, lastResultCd:""
+		}
+		, prjVo:{
+			projectStat: '<c:out value="${heProjectVo.projectStat}"/>'
+		}
+		, projectTcList:[]
+		, tcPagingList:[]
+		, resultCodeNm: '<nl:codeListJson codeType="B300" />'
+		, importanceCodeNm: '<nl:codeListJson codeType="B100" />'
+		, tcDivisionCodeNm: '<nl:codeListJson codeType="B900" />'
+		, testResultNm: '<nl:codeListJson codeType="B300" />'
+		, testResultNmList: []
+		, testResultFilter: ['B301', 'B302']
+		, authId: '<c:out value="${authId}"/>'
+	}
+	, updated: function() {
+		tcListSection();
+	}
+	, beforeMount:function(){
+		this.$nextTick(function() {
+			this.testResultNmList = JSON.parse(decodeURIComponent(this.testResultNm));
+			this.getProjectTcList();
+		});
+	}
+	, mounted:function(){
+		
+	}
+	, methods:{
+		getProjectTcList: function(){
+			closeAccordionSection();
+			if(this.criteria.scateNm != ''){
+				if(this.criteria.mcateNm == ''){
+					alert("중분류명을 입력해주세요");
+					return;
+				}else{
+					if(this.criteria.lcateNm == ''){
+						alert("대분류명을 입력해주세요");
+						return;
+					}
+				}
+			}
+			if(this.criteria.mcateNm != ''){
+				if(this.criteria.lcateNm ==''){
+					alert("대분류명을 입력해 주세요");
+					return;
+				}
+			}
+			$.ajax({
+				type: "post"
+				, url : "/hded/tc/getProjectTcList"
+				, contentType: "application/json"
+				, data : JSON.stringify(list.criteria)
+				, success: function(data) {
+					list.projectTcList = data.projectTcList;
+					list.getProjectTcPagingList();
+				}
+				, error: function(xhr, status, error) {
+					alert($(xhr.responseText).text());
+				}	
+			});
+		}
+		, getProjectTcPagingList: function() {
+			var tempList = [];
+			tempList = this.$refs.paginator.pagingList(this.projectTcList);
+			
+			tempList.forEach(function(o,i){
+				tempList[i].abstractTcNm = tempList[i].tcNm 
+				tempList[i].tcNm = o.tcNm.replace(/(?:\n)/g, '<br>');
+				tempList[i].tcNm.split('\n').join('<br>');
+			});
+			
+			this.tcPagingList = tempList;
+		}
+		, goTcLargeAddForm : function() {
+			showPopupLayer('/hded/tc/tcLargeAddForm?pid='+this.criteria.pid+'&systemId='+this.criteria.systemId+'&sysSeq='+this.criteria.sysSeq);
+		}
+		, addTc:function(){
+			var pid = this.criteria.pid;
+			var sysSeq = this.criteria.sysSeq;
+			var systemId = this.criteria.systemId;
+			popup('/hded/tc/tcAddForm?pid='+pid+'&sysSeq='+sysSeq+'&systemId='+systemId, 'Test Case 등록', 900, 500,'yes');
+		}
+		, delTc:function(){
+			var param = [];
+			var paramStr = '';
+			this.projectTcList.forEach(function(tc) {
+				if (tc.check) {
+					for(var i=0; i<list.projectTcList.length; i++){
+						if(tc.projectTcSeq === list.projectTcList[i].projectTcSeq){
+							param.push(list.projectTcList[i].projectTcSeq);
+							paramStr += list.projectTcList[i].projectTcSeq + ";";
+						}
+					}
+				}
+			});
+			if (param.length < 1) {
+				alert("삭제할 T.C가 없습니다. ");
+				return;
+			}
+			
+			var cmsg = "선택한 T.C를 삭제하시겠습니까?";
+			if(confirm(cmsg)){
+				$.post('/hded/tc/delProjectTcPrc',{param:paramStr} , function(data){
+					if(data.del){
+						//리스트 초기화
+						list.getProjectTcList();
+					}
+				})
+			}
+		}
+		, addIssue: function(){
+			var parentChk = 1;
+			var url = "/hded/issue/issueForm?pid=" + this.criteria.pid+ "&parentChk="+parentChk+"&sysSeq="+this.criteria.sysSeq;
+			goShowPopupLayer(url);
+			location.href = "#";
+		}
+		, testResult: function(projectTcSeq){
+			var pid = this.criteria.pid;
+			popup('/hded/tc/tcResultAddForm?pid='+pid+'&projectTcSeq='+projectTcSeq,"테스트 결과 등록",1350, 520, "yes");
+		}
+		, resultData: function(tcResultSeq, lcateNm, mcateNm, scateNm, lastResultCd, tcNm){
+			goShowPopupLayer('/hded/tc/tcListResultDataForm?pid='+this.criteria.pid+'&tcResultSeq='+tcResultSeq+'&lcateNm='+lcateNm+'&mcateNm='+mcateNm+'&scateNm='+scateNm+'&lastResultCd='+lastResultCd+'&tcNm='+tcNm);
+		}
+		, getChkTc: function(){
+			var chkArray = []
+			this.projectTcList.forEach(function(chk){
+				if(chk.check == true){
+					chkArray.push(chk.projectTcSeq);
+				}
+			})
+			return chkArray;
+		}
+	}
+	, computed: {
+		getTestResultMenuList: function() {
+			var testResultFilter = this.testResultFilter;
+			return this.testResultNmList.filter(function(testResultMenu) {
+				return testResultFilter.some(function(m) {
+					return testResultMenu.codeId === m;
+				});
+			}).sort(function(a,b) {
+				return a.menuOrder - b.menuOrder;
+			});
+		}
+		, selectAll: {
+			get: function () {
+				var total = this.projectTcList.length;
+				var cnt = 0;
+				this.projectTcList.forEach(function(tc) {
+					if (tc.check) {
+						cnt++;
+					}
+				});
+				return total == cnt && cnt > 0;
+			}
+			, set: function (value) {
+				$('[name="tcCheck"]').each(function() {
+					$(this).prop('checked', value);
+				});
+				this.projectTcList.forEach(function(tc) {
+					tc.check = value;
+				});
+			}
+		}
+	}
+});
+</script>

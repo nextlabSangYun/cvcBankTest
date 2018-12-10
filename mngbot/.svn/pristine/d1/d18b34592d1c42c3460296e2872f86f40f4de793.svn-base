@@ -1,0 +1,197 @@
+/**
+ * @title	: QA 프로젝트관리 mapper
+ * @package	: kr.co.nextlab.qa.mapper
+ * @file	: QaProjectMapper.java
+ * @author	: winolonam
+ * @date	: 2018. 07. 10.
+ * @desc	: 
+ */
+package kr.co.nextlab.qa.mapper;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import kr.co.nextlab.qa.model.QaModelVerHstVo;
+import kr.co.nextlab.qa.model.QaProjectChasuHstVo;
+import kr.co.nextlab.qa.model.QaProjectCriteria;
+import kr.co.nextlab.qa.model.QaProjectModelVo;
+import kr.co.nextlab.qa.model.QaProjectPartiVo;
+import kr.co.nextlab.qa.model.QaProjectVo;
+
+@Mapper
+public interface QaProjectMapper {
+
+	/**
+	 * 참여한 프로젝트 리스트 차수 조회
+	 * @param qaProjectVo
+	 * @return 참여한 프로젝트 차수 리스트
+	 */
+	public List<QaProjectVo> selectMyProjectChasuList(QaProjectVo qaProjectVo);
+	
+	/**
+	 * 프로젝트 진행현황 리스트 조회
+	 * @param qaProjectVo
+	 * @return 프로젝트 진행현황 리스트
+	 */
+	public List<QaProjectVo> selectProjectStatusList(QaProjectVo qaProjectVo);
+	
+	/**
+	 * 참여한 프로젝트 리스트 조회
+	 * @param qaProjectVo
+	 * @return 참여한 프로젝트 리스트
+	 */
+	public List<QaProjectVo> selectMyProjectList(QaProjectVo qaProjectVo);
+	
+	/**
+	 * 참여한 프로젝트 overview 리스트 조회
+	 * @param qaProjectVo
+	 * @return 참여한 프로젝트 리스트
+	 */
+	public List<QaProjectVo> selectMyProjectOverviewList(QaProjectVo qaProjectVo);
+	
+	/**
+	 * 전체프로젝트 조회
+	 * @param qaProjectCriteria
+	 * @return
+	 */
+	public List<QaProjectVo> selectProjectList(QaProjectCriteria qaProjectCriteria);
+	
+	/**
+	 * 프로젝트태그 중복 확인
+	 * @param tcPrefix
+	 * @return
+	 */
+	public int selectCheckTcPrefix(String tcPrefix);
+	
+	/**
+	 * 프로젝트 기본정보 등록
+	 * @param qaProjectVo 프로젝트 정보
+	 * @return
+	 */
+	public int insertProject(QaProjectVo qaProjectVo);
+	
+	/**
+	 * 프로젝트 모델 등록
+	 * @param qaProjectModelVo
+	 * @return
+	 */
+	public int insertQaProjectModel(QaProjectModelVo qaProjectModelVo);
+	
+	/**
+	 * 프로젝트 모델 히스토리 등록
+	 * @param qaProjectModelVerHstVo
+	 * @return
+	 */
+	public int insertQaModelVerHst(QaModelVerHstVo qaProjectModelVerHstVo);
+	
+	/**
+	 * 프로젝트 참여인력 등록
+	 * @param qaProjectPartiVo
+	 * @return
+	 */
+	public int insertQaProjectParti(QaProjectPartiVo qaProjectPartiVo);
+	
+	/**
+	 * 프로젝트 차수 히스토리 등록
+	 * @param qaProjectChasuHstVo
+	 * @return
+	 */
+	public int insertQaProjectChasuHst(QaProjectChasuHstVo qaProjectChasuHstVo);
+	
+	/**
+	 * 프로젝트 기본정보 조회
+	 * @param pid
+	 * @return
+	 */
+	public QaProjectVo selectProjectView(String pid);
+	
+	/**
+	 * 프로젝트 모델 리스트 조회
+	 * @param pid
+	 * @return
+	 */
+	public List<QaProjectModelVo> selectQaProjectModelList(String pid);
+	
+	/**
+	 * 측정모델 버전 변경이력 리스트 조회
+	 * @param modelSeq
+	 * @return
+	 */
+	public List<QaProjectModelVo> selectProjectModelHstList(Integer modelSeq);
+	
+	/**
+	 * 프로젝트 참여인력 조회
+	 * @param pid
+	 * @return
+	 */
+	public List<QaProjectPartiVo> selectProjectPartiList(String pid);
+	
+	/**
+	 * 다음 프로젝트 차수로 변경
+	 * @param qaProjectChasuHstVo
+	 * @return
+	 */
+	public int updateNextQaProjectChasuHst(QaProjectChasuHstVo qaProjectChasuHstVo);
+	
+	/**
+	 * 프로젝트 차수 수정
+	 * @param qaProjectVo
+	 * @return
+	 */
+	public int updateNextProjectChasu(QaProjectVo qaProjectVo);
+	
+	/**
+	 * 프로젝트 useYn 변경
+	 * @param projectVo
+	 * @return
+	 */
+	public int updateProjectUseYn(QaProjectVo qaProjectVo);
+	
+	/**
+	 * 프로젝트 상태 변경
+	 * @param qaProjectVo
+	 * @return
+	 */
+	public int updateProjectStat(QaProjectVo qaProjectVo);
+	
+	/**
+	 * 프로젝트 참여자 조회
+	 * @param pid
+	 * @return
+	 */
+	public List<QaProjectPartiVo> selectProjectEditPartiList(String pid);
+	
+	/**
+	 * 프로젝트 수정
+	 * @param qaProjectVo
+	 * @return
+	 */
+	public int updateProject(QaProjectVo qaProjectVo);
+	
+	/**
+	 * 참여자 삭제
+	 * @param pid
+	 * @return
+	 */
+	public int deleteProjectParti(String pid);
+	
+	/**
+	 * 프로젝트 모델 버전 수정
+	 * @param qaProjectModelVo
+	 * @return
+	 */
+	public int updateProjectModelVerPrc(QaProjectModelVo qaProjectModelVo);
+	
+	/**
+	 * 테스트케이스 최종결과 null처리
+	 */
+	public int updateLastResultInit(String pid);
+	
+	/**
+	 * 프로젝트 측정모델 리스트 상세 조회(모델그룹정보포함)
+	 * @param pid 프로젝트 아이디
+	 * @return 프로젝트 측정모델 리스트
+	 */
+	public List<QaProjectModelVo> selectQaProjectModelDetailList(String pid);
+}

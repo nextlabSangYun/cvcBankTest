@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>CVCBank</title>
+	<link rel="shortcut icon" href="../../images/favicon.ico" type="image/x-icon">
+	<link rel="stylesheet" href="../../css/common.css">
+	<link rel="stylesheet" href="../../css/hded.css">
+	<script src="../../js/jquery-3.2.1.min.js"></script>
+	<script src="../../js/jquery-ui.min.js"></script>
+	<script src="../../js/jquery.form.min.js"></script>
+	<script src="../../js/vue.min.js"></script>
+	<script src="../../js/lodash.min.js"></script>
+	<script src="../../js/calendar.js"></script>
+	<script src="../../js/common.js"></script>
+	<style>
+		.pop_wrap { position: relative; }
+		.modal-background {
+			position: fixed;
+			top: 0;
+			left: 0;
+			background-color: rgba(0, 0, 0, 0.6);
+			z-index: 100;
+			display: none;
+			width: 100%;
+			height: 100%;
+		}
+		.modal-background.on { display: block; }
+		.modal-wrap {
+			position: relative;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			z-index: 101;
+			width: 610px;
+			padding: 20px;
+			border: 1px solid #aaa;
+			border-radius: 4px;
+			background-color: #fff;
+			box-sizing: border-box;
+		}
+	</style>
+</head>
+<body>
+	<div class="wrap">
+		<header>
+			<div class="inner">
+				<a href="index.html" class="syt_name">Btv Commercial Verification & Certification Bank</a>
+				<button class="btn_nav"><span class="icon"></span></button>
+				<div class="btn_right">
+					<button class="btn_notice"><span class="ir">알림</span></button>
+					<button class="btn_setting"><span class="photo" style="background-image:url('../../images/common/btn_my.png')"></span>넥스트랩</button>
+				</div>
+			</div>
+		</header>
+		<nav class="nav">
+			<div class="app_list">
+				<p class="cate_tit">Favorites</p>
+				<ul>
+					<li class="fav">
+						<a href="#">
+							<div class="app_icon"><img src="../../images/common/app_stat.png" alt="통계분석"></div>
+							<span class="app_name">통계분석</span>
+						</a>
+						<button class="btn_fav"></button>
+					</li>
+					<li class="fav">
+						<a href="#">
+							<div class="app_icon"><img src="../../images/common/app_setting.png" alt="시스템설정"></div>
+							<span class="app_name">시스템설정</span>
+						</a>
+						<button class="btn_fav"></button>
+					</li>
+					<li class="fav">
+						<a href="#">
+							<div class="app_icon"><img src="../../images/common/app_bmt.png" alt="BMT"></div>
+							<span class="app_name">BMT</span>
+						</a>
+						<button class="btn_fav"></button>
+					</li>
+					<li class="fav">
+						<a href="#">
+							<div class="app_icon"><img src="../../images/common/app_hded.png" alt="H/E"></div>
+							<span class="app_name">H/E</span>
+						</a>
+						<button class="btn_fav"></button>
+					</li>
+				</ul>
+			</div>
+			<div class="app_list">
+				<p class="cate_tit">All</p>
+				<ul>
+					<li class="fav">
+						<a href="#">
+							<div class="app_icon"><img src="../../images/common/app_stat.png" alt="통계분석"></div>
+							<span class="app_name">통계분석</span>
+						</a>
+						<button class="btn_fav"></button>
+					</li>
+					<li class="fav">
+						<a href="#">
+							<div class="app_icon"><img src="../../images/common/app_setting.png" alt="시스템설정"></div>
+							<span class="app_name">시스템설정</span>
+						</a>
+						<button class="btn_fav"></button>
+					</li>
+					<li class="fav">
+						<a href="#">
+							<div class="app_icon"><img src="../../images/common/app_bmt.png" alt="BMT"></div>
+							<span class="app_name">BMT</span>
+						</a>
+						<button class="btn_fav"></button>
+					</li>
+					<li class="fav">
+						<a href="#">
+							<div class="app_icon"><img src="../../images/common/app_hded.png" alt="H/E"></div>
+							<span class="app_name">H/E</span>
+						</a>
+						<button class="btn_fav"></button>
+					</li>
+				</ul>
+			</div>
+		</nav>
+		<div class="ly_notice">
+			<div class="notice_list">
+				<p class="cate_tit">Notice</p>
+				<ul>
+					<li>
+						<p class="tit"><a href="#">시스템 정기점검 공지</a></p>
+						<div class="info">
+							<p class="date">2017년 10월 30일</p>
+							<p class="writer">By 관리자</p>
+						</div>
+					</li>
+					<li>
+						<p class="tit"><a href="#">시스템 정기점검 공지</a></p>
+						<div class="info">
+							<p class="date">2017년 10월 30일</p>
+							<p class="writer">By 관리자</p>
+						</div>
+					</li>
+					<li>
+						<p class="tit"><a href="#">시스템 정기점검 공지</a></p>
+						<div class="info">
+							<p class="date">2017년 10월 30일</p>
+							<p class="writer">By 관리자</p>
+						</div>
+					</li>
+					<li>
+						<p class="tit"><a href="#">시스템 정기점검 공지</a></p>
+						<div class="info">
+							<p class="date">2017년 10월 30일</p>
+							<p class="writer">By 관리자</p>
+						</div>
+					</li>
+					<li>
+						<p class="tit"><a href="#">시스템 정기점검 공지</a></p>
+						<div class="info">
+							<p class="date">2017년 10월 30일</p>
+							<p class="writer">By 관리자</p>
+						</div>
+					</li>
+				</ul>
+			</div>
+			<div class="notice_list">
+				<p class="cate_tit">Received Messages</p>
+				<ul>
+					<li>
+						<p class="tit"><a href="#">이슈Update–채널전환 시간 이슈Update–채널전환 시간</a></p>
+						<div class="info">
+							<p class="date">2017년 10월 30일</p>
+							<p class="writer">By 관리자</p>
+						</div>
+					</li>
+					<li>
+						<p class="tit"><a href="#">이슈Update–채널전환 시간 이슈Update–채널전환 시간</a></p>
+						<div class="info">
+							<p class="date">2017년 10월 30일</p>
+							<p class="writer">By 관리자</p>
+						</div>
+					</li>
+					<li>
+						<p class="tit"><a href="#">이슈Update–채널전환 시간 이슈Update–채널전환 시간</a></p>
+						<div class="info">
+							<p class="date">2017년 10월 30일</p>
+							<p class="writer">By 관리자</p>
+						</div>
+					</li>
+					<li>
+						<p class="tit"><a href="#">이슈Update–채널전환 시간 이슈Update–채널전환 시간</a></p>
+						<div class="info">
+							<p class="date">2017년 10월 30일</p>
+							<p class="writer">By 관리자</p>
+						</div>
+					</li>
+					<li>
+						<p class="tit"><a href="#">이슈Update–채널전환 시간 이슈Update–채널전환 시간</a></p>
+						<div class="info">
+							<p class="date">2017년 10월 30일</p>
+							<p class="writer">By 관리자</p>
+						</div>
+					</li>
+				</ul>
+			</div>
+		</div>
+		<div class="ly_my_setting">
+			<ul>
+				<li><a href="#">개인정보 수정</a></li>
+				<li class="bg"><a href="#">배경화면 설정</a></li>
+				<li class="logout"><a href="#">로그아웃</a></li>
+			</ul>
+		</div>
+		<div class="location">
+			<ol>
+				<!-- 17.12.18 수정 -->
+				<li>
+					<span class="app_ico">
+						<img src="../../images/common/app_hded.png" alt="">
+					</span>
+					<a href="#"> H/E메인</a>
+				</li>
+				<!-- <li>Smart STB 4Q BMT</li> -->
+			</ol>
+		</div>
+		<div class="content">
+			<div class="sub_layout">
+				<p class="cate_tit">참여중인 프로젝트</p>
+				<!-- 18.01.11 수정 -->
+				<div class="g_table">
+					<table>
+						<caption>프로젝트 이름, 기간, 진행상태, 바로가기로 구성된 표 입니다.</caption>
+						<colgroup>
+							<col style="width:35%;">
+							<col style="width:15%;">
+							<col style="width:10%;">
+							<col style="width:10%;">
+							<col style="width:15%;">
+							<col style="width:15%;">
+						</colgroup>
+						<thead>
+							<tr>
+								<th>프로젝트명</th>
+								<th>기간</th>
+								<th>시스템</th>
+								<th>차수</th>
+								<th>최초 작성</th>
+								<th>최종 수정</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td><p class="ellips"><a href="#" class="link">프로젝트 홈가기</a></p></td>
+								<td>2017/10/02~2017/10/13</td>
+								<td>SCS</td>
+								<td>1차 (대기중)</td>
+								<td>홍길동<br />(2018-04-05 12:35:56)</td>
+								<td>홍길동<br />(2018-04-05 12:35:56)</td>
+							</tr>
+							<tr>
+								<td colspan="6">참여중인 프로젝트가 없습니다.</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="btm_con con_col2">
+					<div class="l_cont">
+						<p class="cate_tit">프로젝트 스케쥴</p>
+						<div class="prj_sch_frame">
+							<img src="../../images/hded/main_calendar.png" alt="">
+						</div>
+					</div>
+					<!-- TC 변경이력 (18.06.07 작업완료) -->
+					<div class="r_cont">
+						<p class="cate_tit prj_tc_title">TC 변경이력(최근30건)
+							<button class="btn_default">
+								<span>H/E TC 변경이력 전체 조회</span>
+							</button>
+						</p>
+						<div class="prj_tc_frame">
+							<div class="tc_title">
+								<div class="g_table">
+									<table>
+										<caption>TC 최근 30건 변경이력으로 구성된 표입니다.</caption>
+										<colgroup>
+											<col style="width:95px;">
+											<col style="width:170px;">
+											<col style="width:175px;">
+											<col>
+										</colgroup>
+										<thead>
+											<tr>
+												<th>변경일시</th>
+												<th>프로젝트명</th>
+												<th>TC</th>
+												<th>변경이력</th>
+											</tr>
+										</thead>
+									</table>
+								</div>
+							</div>
+							<div class="tc_wrap">
+								<div class="g_table">
+									<table>
+										<caption>TC 최근 30건 변경이력으로 구성된 표입니다.</caption>
+										<colgroup>
+											<col style="width:95px;">
+											<col style="width:170px;">
+											<col style="width:175px;">
+											<col>
+										</colgroup>
+										<tbody>
+											<tr>
+												<td>2018-04-06 12:34:56</td>
+												<td class="prj_title">프로젝트명</td>
+												<td class="prj_title">content-video 정보 없음</td>
+												<td>
+													<div class="tb_fixed_btns">
+														<button class="smbtn_default">변경이력</button>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>2018-04-06 12:34:56</td>
+												<td class="prj_title">프로젝트명이 이렇게 길게 들어갑니다.</td>
+												<td class="prj_title">content-video 정보 없을거 같지면 더 있을거예요</td>
+												<td>
+													<div class="tb_fixed_btns">
+														<button class="smbtn_default">변경이력</button>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>2018-04-06 12:34:56</td>
+												<td class="prj_title">어쩌고저쩌고</td>
+												<td class="prj_title">TestCase 제목</td>
+												<td>
+													<div class="tb_fixed_btns">
+														<button class="smbtn_default">변경이력</button>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>2018-04-06 12:34:56</td>
+												<td class="prj_title">제목 내용 어쩌고저쩌고</td>
+												<td class="prj_title">TestCase content-video</td>
+												<td>
+													<div class="tb_fixed_btns">
+														<button class="smbtn_default">변경이력</button>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>2018-04-06 12:34:56</td>
+												<td class="prj_title">제목 내용 어쩌고저쩌고</td>
+												<td class="prj_title">TestCase content-video</td>
+												<td>
+													<div class="tb_fixed_btns">
+														<button class="smbtn_default">변경이력</button>
+													</div>
+												</td>
+											</tr>
+											<!-- <tr>
+												<td>2018-04-06 12:34:56</td>
+												<td class="prj_title">제목 내용 어쩌고저쩌고</td>
+												<td class="prj_title">TestCase content-video</td>
+												<td>
+													<div class="tb_fixed_btns">
+														<button class="smbtn_default">변경이력</button>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>2018-04-06 12:34:56</td>
+												<td class="prj_title">제목 내용 어쩌고저쩌고</td>
+												<td class="prj_title">TestCase content-video</td>
+												<td>
+													<div class="tb_fixed_btns">
+														<button class="smbtn_default">변경이력</button>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>2018-04-06 12:34:56</td>
+												<td class="prj_title">제목 내용 어쩌고저쩌고</td>
+												<td class="prj_title">TestCase content-video</td>
+												<td>
+													<div class="tb_fixed_btns">
+														<button class="smbtn_default">변경이력</button>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>2018-04-06 12:34:56</td>
+												<td class="prj_title">제목 내용 어쩌고저쩌고</td>
+												<td class="prj_title">TestCase content-video</td>
+												<td>
+													<div class="tb_fixed_btns">
+														<button class="smbtn_default">변경이력</button>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>2018-04-06 12:34:56</td>
+												<td class="prj_title">제목 내용 어쩌고저쩌고</td>
+												<td class="prj_title">TestCase content-video</td>
+												<td>
+													<div class="tb_fixed_btns">
+														<button class="smbtn_default">변경이력</button>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>2018-04-06 12:34:56</td>
+												<td class="prj_title">제목 내용 어쩌고저쩌고</td>
+												<td class="prj_title">TestCase content-video</td>
+												<td>
+													<div class="tb_fixed_btns">
+														<button class="smbtn_default">변경이력</button>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>2018-04-06 12:34:56</td>
+												<td class="prj_title">제목 내용 어쩌고저쩌고</td>
+												<td class="prj_title">TestCase content-video</td>
+												<td>
+													<div class="tb_fixed_btns">
+														<button class="smbtn_default">변경이력</button>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>2018-04-06 12:34:56</td>
+												<td class="prj_title">제목 내용 어쩌고저쩌고</td>
+												<td class="prj_title">TestCase content-video</td>
+												<td>
+													<div class="tb_fixed_btns">
+														<button class="smbtn_default">변경이력</button>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>2018-04-06 12:34:56</td>
+												<td class="prj_title">제목 내용 어쩌고저쩌고</td>
+												<td class="prj_title">TestCase content-video</td>
+												<td>
+													<div class="tb_fixed_btns">
+														<button class="smbtn_default">변경이력</button>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>2018-04-06 12:34:56</td>
+												<td class="prj_title">제목 내용 어쩌고저쩌고</td>
+												<td class="prj_title">TestCase content-video</td>
+												<td>
+													<div class="tb_fixed_btns">
+														<button class="smbtn_default">변경이력</button>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>2018-04-06 12:34:56</td>
+												<td class="prj_title">제목 내용 어쩌고저쩌고</td>
+												<td class="prj_title">TestCase content-video</td>
+												<td>
+													<div class="tb_fixed_btns">
+														<button class="smbtn_default">변경이력</button>
+													</div>
+												</td>
+											</tr> -->
+											<!-- 여기까지 스크롤 -->
+											<!-- <tr>
+												<td>2018-04-06 12:34:56</td>
+												<td class="prj_title">제목 내용 어쩌고저쩌고</td>
+												<td class="prj_title">TestCase content-video</td>
+												<td>
+													<div class="tb_fixed_btns">
+														<button class="smbtn_default">변경이력</button>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>2018-04-06 12:34:56</td>
+												<td class="prj_title">제목 내용 어쩌고저쩌고</td>
+												<td class="prj_title">TestCase content-video</td>
+												<td>
+													<div class="tb_fixed_btns">
+														<button class="smbtn_default">변경이력</button>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>2018-04-06 12:34:56</td>
+												<td class="prj_title">제목 내용 어쩌고저쩌고</td>
+												<td class="prj_title">TestCase content-video</td>
+												<td>
+													<div class="tb_fixed_btns">
+														<button class="smbtn_default">변경이력</button>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>2018-04-06 12:34:56</td>
+												<td class="prj_title">제목 내용 어쩌고저쩌고</td>
+												<td class="prj_title">TestCase content-video</td>
+												<td>
+													<div class="tb_fixed_btns">
+														<button class="smbtn_default">변경이력</button>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>2018-04-06 12:34:56</td>
+												<td class="prj_title">제목 내용 어쩌고저쩌고</td>
+												<td class="prj_title">TestCase content-video</td>
+												<td>
+													<div class="tb_fixed_btns">
+														<button class="smbtn_default">변경이력</button>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>2018-04-06 12:34:56</td>
+												<td class="prj_title">제목 내용 어쩌고저쩌고</td>
+												<td class="prj_title">TestCase content-video</td>
+												<td>
+													<div class="tb_fixed_btns">
+														<button class="smbtn_default">변경이력</button>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>2018-04-06 12:34:56</td>
+												<td class="prj_title">제목 내용 어쩌고저쩌고</td>
+												<td class="prj_title">TestCase content-video</td>
+												<td>
+													<div class="tb_fixed_btns">
+														<button class="smbtn_default">변경이력</button>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>2018-04-06 12:34:56</td>
+												<td class="prj_title">제목 내용 어쩌고저쩌고</td>
+												<td class="prj_title">TestCase content-video</td>
+												<td>
+													<div class="tb_fixed_btns">
+														<button class="smbtn_default">변경이력</button>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>2018-04-06 12:34:56</td>
+												<td class="prj_title">제목 내용 어쩌고저쩌고</td>
+												<td class="prj_title">TestCase content-video</td>
+												<td>
+													<div class="tb_fixed_btns">
+														<button class="smbtn_default">변경이력</button>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>2018-04-06 12:34:56</td>
+												<td class="prj_title">제목 내용 어쩌고저쩌고</td>
+												<td class="prj_title">TestCase content-video</td>
+												<td>
+													<div class="tb_fixed_btns">
+														<button class="smbtn_default">변경이력</button>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>2018-04-06 12:34:56</td>
+												<td class="prj_title">제목 내용 어쩌고저쩌고</td>
+												<td class="prj_title">TestCase content-video</td>
+												<td>
+													<div class="tb_fixed_btns">
+														<button class="smbtn_default">변경이력</button>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>2018-04-06 12:34:56</td>
+												<td class="prj_title">제목 내용 어쩌고저쩌고</td>
+												<td class="prj_title">TestCase content-video</td>
+												<td>
+													<div class="tb_fixed_btns">
+														<button class="smbtn_default">변경이력</button>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>2018-04-06 12:34:56</td>
+												<td class="prj_title">제목 내용 어쩌고저쩌고</td>
+												<td class="prj_title">TestCase content-video</td>
+												<td>
+													<div class="tb_fixed_btns">
+														<button class="smbtn_default">변경이력</button>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>2018-04-06 12:34:56</td>
+												<td class="prj_title">제목 내용 어쩌고저쩌고</td>
+												<td class="prj_title">TestCase content-video</td>
+												<td>
+													<div class="tb_fixed_btns">
+														<button class="smbtn_default">변경이력</button>
+													</div>
+												</td>
+											</tr> -->
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- TC 변경이력 (18.06.07 작업완료) -->
+				</div>
+				<!-- 17.12.28 툴팁 영역 추가  -->
+				<div class="top_fixed_btns">
+					<div class="btn_add">
+						<!-- <a href="#"><img src="../../images/bmt/btn_000201.png" alt="새 프로젝트"></a>
+						<span class="tooltip">프로젝트 생성</span> -->
+						<button class="modal-open" data-modal="register"><img src="../../images/bmt/btn_000201.png" alt="새 프로젝트"></button>
+						<span class="tooltip">프로젝트 생성</span>
+					</div>
+					<div class="btn_link_all">
+						<a href="#"><img src="../../images/bmt/btn_000202.png" alt="TestCase 버킷관리"></a>
+						<span class="tooltip">TestCase 버킷관리</span>
+					</div>
+					<div class="btn_sch">
+						<a href="#"><img src="../../images/bmt/btn_000204.png" alt="프로젝트 검색"></a>
+						<span class="tooltip">프로젝트 조회</span>
+					</div>
+				</div>
+				<div class="modal-background" data-modal-target="register">
+					<div class="pop_wrap modal-wrap">
+						<div class="pop_tit">
+							<p>새 프로젝트</p>
+						</div>
+						<div class="pop_cont pop_new_prj">
+							<div class="g_table02">
+								<table>
+									<caption>프로젝트 이름. 기간, checklist 등의 정보를 입력하는 표 입니다.</caption>
+									<colgroup>
+										<col style="width:120px;">
+										<col>
+									</colgroup>
+									<tbody>
+										<tr>
+											<th>프로젝트 이름*</th>
+											<td>
+												<input type="text" class="full"id="projectNm" maxlength="50">
+											</td>
+										</tr>
+										<tr class="period">
+											<th>기간*</th>
+											<td>
+												<input type="text" class="input_date" id="projectStDt" name="projectStDt" readonly>
+												<span class="bar">~</span>
+												<input type="text" class="input_date" id="projectEndDt" name="projectEndDt" readonly>
+											</td>
+										</tr>
+										<tr>
+											<th>등급*</th>
+											<td>
+												<select name="" id="">
+													<option value="">선택</option>
+												</select>
+											</td>
+										</tr>
+										<tr>
+											<th>테이블정보*</th>
+											<td class="reg">
+												<select name="" id="">
+													<option value="">선택</option>
+												</select>
+												<button class="btn_default">추가</button>
+											</td>
+										</tr>
+										<tr>
+											<th>비고</th>
+											<td>
+												<input type="text" class="full" placeholder="선택입력항목" maxlength="300">
+												<br/>
+											</td>
+										</tr>
+										<tr>
+											<th>참여인력</th>
+											<td class="reg">
+												<div>
+													<select name="" id="">
+														<option value="">선택</option>
+														<option value="">그룹선택</option>
+														<option value="">내용이 길어지면 어떻게 되나요</option>
+														<option value="">선택</option>
+														<option value="">선택</option>
+													</select>
+													<button class="btn_default">추가</button>
+												</div>
+												<div class="member">
+													<span>
+														<input type="checkbox" name="userSelectName" id="u.userId">
+														<label>유재석</label>
+													</span>
+													<span>
+														<input type="checkbox" name="userSelectName" id="u.userId">
+														<label>강호동</label>
+													</span>
+													<span>
+														<input type="checkbox" name="userSelectName" id="u.userId">
+														<label>김수박</label>
+													</span>
+													<!-- <span>
+														<input type="checkbox" name="userSelectName" id="u.userId">
+														<label>박낑깡</label>
+													</span>
+													<span>
+														<input type="checkbox" name="userSelectName" id="u.userId">
+														<label>유재석</label>
+													</span>
+													<span>
+														<input type="checkbox" name="userSelectName" id="u.userId">
+														<label>강호동</label>
+													</span>
+													<span>
+														<input type="checkbox" name="userSelectName" id="u.userId">
+														<label>김수박</label>
+													</span>
+													<span>
+														<input type="checkbox" name="userSelectName" id="u.userId">
+														<label>박낑깡</label>
+													</span>
+													<span>
+														<input type="checkbox" name="userSelectName" id="u.userId">
+														<label>유재석</label>
+													</span>
+													<span>
+														<input type="checkbox" name="userSelectName" id="u.userId">
+														<label>강호동</label>
+													</span>
+													<span>
+														<input type="checkbox" name="userSelectName" id="u.userId">
+														<label>김수박</label>
+													</span>
+													<span>
+														<input type="checkbox" name="userSelectName" id="u.userId">
+														<label>박낑깡</label>
+													</span> -->
+												</div>
+												<div class="reg_list">
+													<ul>
+														<li>
+															<span>유재석</span>
+															<button class="del"></button>
+														</li>
+														<li>
+															<span>강호동</span>
+															<button class="del"></button>
+														</li>
+														<li>
+															<span>김수박</span>
+															<button class="del"></button>
+														</li>
+														<li>
+															<span>박낑깡</span>
+															<button class="del"></button>
+														</li>
+														<li>
+															<span>최오렌지</span>
+															<button class="del"></button>
+														</li>
+
+														<li>
+															<span>신두부</span>
+															<button class="del"></button>
+														</li>
+														<li>
+															<span>정딸기</span>
+															<button class="del"></button>
+														</li>
+														<li>
+															<span>이사과</span>
+															<button class="del"></button>
+														</li>
+														<li>
+															<span>강나물</span>
+															<button class="del"></button>
+														</li>
+													</ul>
+												</div>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+						<div class="btn_wrap">
+							<button class="btn_default">수정</button>
+							<button v-else class="btn_proc">등록</button>
+							<button class="btn_cancel modal-close">닫기</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- 모달레이어 스크립트는 브라우저 확인용으로 작업 -->
+	<script type="text/javascript">
+		function modalLayer(){
+			var $btn_modal = null;
+			var $btn_modal_close = null;
+			var $modal_wrap = null;
+			var selected_modal = null;
+			function init(){
+				$btn_modal = $(".modal-open");
+				$btn_modal_close = $(".modal-close");
+				$modal_wrap = $(".modal-background");
+			}
+			function initEvent(){
+				$btn_modal.on("click", function(){
+					selected_modal = $(this).data("modal");
+					$("[data-modal-target="+selected_modal+"]").addClass("on");
+				});
+				$btn_modal_close.on("click", function(){
+					$("[data-modal-target="+selected_modal+"]").removeClass("on");
+				});
+				$modal_wrap.on("click", function(e){
+					$(this).removeClass("on");
+				});
+				$(".modal-wrap").on("click", function(e){
+					e.stopPropagation();
+				});
+			}
+			init();
+			initEvent();
+		}
+		$(function() {
+			$(".ly_close").addClass('modal-close');
+			modalLayer();
+			var listLength = $(".tc_wrap tr").length;
+			console.log(listLength);
+		});
+	</script>
+</body>
+</html>

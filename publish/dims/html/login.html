@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>DIMS</title>    
+    <link href="../css/style.css" rel="stylesheet">    
+</head>
+<body>   		
+	<div class="wrapper_login">
+		<div class="login_box">
+			<h1>
+				<img src="../images/logo_login.png" alt="단말통합관리시스템">
+				<div>단말통합관리시스템</div>				
+			</h1>
+			<form action="">
+				<label for="dims_id">아이디</label><input type="text" id="dims_id" class="dims_input" placeholder="ID">
+				<label for="dims_pw">비밀번호</label><input type="password" id="dims_pw" class="dims_input" placeholder="PASSWORD">
+				<button type="submit" class="btn_login">로그인</button>
+				<div class="save_id_wrap">
+					<input type="checkbox" class="dims_checkbox" id="checkbox1" name="" checked>
+					<label for="checkbox1">아이디 저장</label>
+				</div>			
+				<div class="height20"></div>
+				<a href="#" class="btn_request" onclick="window.open('../request_account.html','','width=1120, height=620')">계정생성요청</a>																	
+				<span class="vertical_line">|</span>
+				<a href="#" class="btn_request">아이디/비밀번호 찾기</a>
+				<div class="height20"></div>
+			</form>						
+		</div>
+    </div><!-- end .wrapper_login -->	
+	
+	<footer>
+		<div class="footertext">
+			<span>COPYRIGHT SK broadband CO.,LTD. ALL RIGHTS RESERVED.</span>			
+		</div>			
+	</footer>
+
+    <script src="../js/jquery-3.2.1.min.js"></script>
+    <script src="../js/jquery-ui.min.js"></script>	
+	<script src="../js/ui.js"></script>
+	<script src="../js/prefixfree.min.js"></script>		
+	<script src="../js/calendar/jquery.form.min.js"></script>
+	<script src="../js/calendar/calendar.js"></script>
+</body>
+</html>

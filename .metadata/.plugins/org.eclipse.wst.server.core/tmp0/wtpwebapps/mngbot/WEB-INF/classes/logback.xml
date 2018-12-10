@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+<configuration>
+	<property resource="config-${spring.profiles.active}/app.properties"/>
+	
+	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<Pattern>
+				▶ %-5level %d{HH:mm:ss.SSS} [%thread] %logger.%method:%line - %msg%n
+			</Pattern>
+		</layout>
+	</appender>
+	
+	<appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${log.path}/log.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${log.path}/log.%d{yyyyMMdd}.%i.log</fileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<maxFileSize>500MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+			<maxHistory>30</maxHistory>
+		</rollingPolicy>
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<pattern>
+				▶  %-5level %d{HH:mm:ss.SSS} [%thread] %logger.%method:%line - %msg%n
+			</pattern>
+		</layout>
+	</appender>
+	
+	<logger name="org.springframework" level="INFO"/>
+	<logger name="org.apache.commons.digester.Digester" level="INFO"/>
+	
+	<logger name="jdbc.resultset" level="OFF" additivity="true">
+		<appender-ref ref="console" />
+		<appender-ref ref="file" />
+	</logger>
+	
+	<root level="debug">
+		<appender-ref ref="console" />
+		<appender-ref ref="file" />
+	</root>
+</configuration>

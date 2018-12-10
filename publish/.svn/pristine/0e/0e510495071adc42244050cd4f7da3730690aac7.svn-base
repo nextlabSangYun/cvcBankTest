@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>Management Bot</title>
+	<link rel="stylesheet" href="../css/common.css">
+	<link rel="stylesheet" href="../css/bot.css">
+	<script src="../js/jquery-3.2.1.min.js"></script>
+	<script src="../js/jquery-ui.min.js"></script>
+	<script src="../js/jquery.form.min.js"></script>
+	<script src="../js/vue.min.js"></script>
+	<script src="../js/lodash.min.js"></script>
+	<script src="../js/calendar.js"></script>
+	<script src="../js/common.js"></script>
+</head>
+<body>
+	<div class="pop_wrap" style="width:480px;">
+		<div class="pop_tit">
+			<p>사용자 정보수정</p>
+		</div>
+		<div class="pop_cont">
+			<div class="g_table02">
+				<table>
+					<caption>사용자 ID, 비밀번호, 성명 등 사용자 정보 확인 및 수정하는 표 입니다.</caption>
+					<colgroup>
+						<col style="width:120px;">
+						<col>
+					</colgroup>
+					<tbody>
+						<tr>
+							<th>사용자 ID</th>
+							<td class="verify">
+								<input type="text" class="full" disabled value="ksms77">
+								<button class="g_btn02">중복확인</button>
+							</td>
+						</tr>
+						<tr>
+							<th>비밀번호</th>
+							<td><input type="password" class="full"></td>
+						</tr>
+						<tr>
+							<th>비밀번호확인</th>
+							<td><input type="password" class="full"></td>
+						</tr>
+						<tr>
+							<th>성명</th>
+							<td>
+								<input type="text" class="full" disabled  value="김성민">
+							</td>
+						</tr>
+						<tr>
+							<th>이메일주소</th>
+							<td>
+								<input type="text" class="full" value="test@nextlab.co.kr">
+							</td>
+						</tr>
+						<tr>
+							<th>휴대전화번호</th>
+							<td>
+								<div class="mobile_num">
+									<select name="" id="">
+										<option value="">010</option>
+									</select>
+									<span class="bar">-</span>
+									<input type="text">
+									<span class="bar">-</span>
+									<input type="text">
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<th>사용자그룹</th>
+							<td>
+								<select name="" id="" class="full">
+									<option value="">NEXT Lab</option>
+								</select>
+							</td>
+						</tr>
+						<tr>
+							<th>활성화상태</th>
+							<td><input type="radio" id="radio01" name="radio"><label for="radio01">활성</label><input type="radio" id="radio02" name="radio"><label for="radio02">비활성</label></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<div class="btn_wrap">
+			<button class="g_btn01">저장</button>
+			<button class="g_btn02" onclick="hidePopupLayer(); return false">닫기</button>
+		</div>
+	</div>
+	<script>
+		setPopup(2);
+	</script>
+</body>
+</html>

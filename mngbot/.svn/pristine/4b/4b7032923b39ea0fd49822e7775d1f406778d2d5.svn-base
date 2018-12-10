@@ -1,0 +1,248 @@
+/**
+ * @title	: TC측정이력 service
+ * @package	: kr.co.nextlab.bmt.service
+ * @file	: XqmsService.java
+ * @author	: eunbi
+ * @date	: 2017. 12. 18.
+ * @desc	: 
+ */
+package kr.co.nextlab.bmt.service;
+
+import java.util.List;
+
+import kr.co.nextlab.bmt.model.XqmsAttachVo;
+import kr.co.nextlab.bmt.model.XqmsCriteria;
+import kr.co.nextlab.bmt.model.XqmsVo;
+
+public interface XqmsService {
+
+	/**
+	 * bmt 측정이력 리스트 조회
+	 * @param model
+	 * @param criteria 검색조건
+	 * @return bmt 측정이력 리스트
+	 */
+	public List<XqmsVo> selectXqmsBmtList(XqmsCriteria criteria);
+	
+	/**
+	 * 리모컨 로봇 테스트 측정이력 리스트 조회
+	 * @param model
+	 * @param criteria 검색조건
+	 * @return 리모컨 로봇 테스트 측정이력 리스트
+	 */
+	public List<XqmsVo> selectXqmsRemoconRobotList(XqmsCriteria criteria);
+	
+	/**
+	 * 채널변경시간 측정이력 리스트 조회
+	 * @param criteria 검색조건
+	 * @return 채널변경시간 측정이력 리스트
+	 */
+	public List<XqmsVo> selectXqmsChannelList(XqmsCriteria criteria);
+
+	/**
+	 * UI Reaction 측정이력 리스트 조회
+	 * @param criteria 검색조건
+	 * @return UI Reaction 측정이력 리스트
+	 */
+	public List<XqmsVo> selectXqmsUiReactionList(XqmsCriteria criteria);
+
+	/**
+	 * tc측정에 사용한 모델의 버전 리스트 조회
+	 * @return tc측정에 사용한 모델의 버전 리스트
+	 */
+	public List<XqmsVo> selectXqmsModelVerList(String modelId);
+	
+	
+	/**
+	 * 프로젝트 Bmt 측정이력 조회
+	 * @param criteria 검색조건
+	 * @return 프로젝트 Bmt 측정이력 조회
+	 */
+	public List<XqmsVo> selectProjectXqmsBmtList(XqmsCriteria criteria);
+	
+	/**
+	 * 프로젝트 리모컨 로봇 테스트 측정이력 조회
+	 * @param criteria 검색조건
+	 * @return 프로젝트 리모컨 로봇 테스트 측정이력 조회
+	 */
+	public List<XqmsVo> selectProjectXqmsRemoconRobotList(XqmsCriteria criteria);
+	/**
+	 * 프로젝트  channel 측정이력 리스트 조회
+	 * @param criteria
+	 * @return
+	 */
+	public List<XqmsVo> selectProjectXqmsChannelList(XqmsCriteria criteria);
+	
+	
+	/**
+	 * 프로젝트 UiReation 측정이력 리스트 조회
+	 * @param criteria
+	 * @return
+	 */
+	public List<XqmsVo> selectProjectXqmsUiReationList(XqmsCriteria criteria);
+	
+	/**
+	 * 측정이력관리 Bmt 측정결과 상세
+	 * @param xqmsSeq
+	 * @return
+	 */
+	public XqmsVo selectProjectXqmsBmtView(String xqmsSeq);
+
+	
+	/**
+	 * 측정이력관리 Channel 측정결과 상세
+	 * @param xqmsSeq
+	 * @return
+	 */
+	public XqmsVo selectProjectXqmsChannelView(String xqmsSeq);
+	
+	/**
+	 * 측정이력관리 uiReaction 측정결과 상세
+	 * @param xqmsSeq
+	 * @return
+	 */
+	public XqmsVo selectProjectXqmsUiReactionView(String xqmsSeq);
+	
+	/**
+	 * 측정이력관리 리모컨 로봇 테스트 측정결과 상세
+	 * @param xqmsSeq
+	 * @return
+	 */
+	public XqmsVo selectProjectXqmsRemoconRobotView(String xqmsSeq);
+	
+	/**
+	 * 측정이력관리 측정결과 bmt 수정 처리 프로세스
+	 * @param vo
+	 * @return
+	 */
+	public int updateProjectXqmsBmtResult(XqmsVo vo);
+	
+	/**
+	 * 측정이력관리 측정결과 channel 수정 처리 프로세스
+	 * @param vo
+	 * @return
+	 */	
+	public int updateProjectXqmsChannelResult(XqmsVo vo);
+
+	/**
+	 * 측정이력관리 측정결과 UIReaction 수정 처리 프로세스
+	 * @param vo
+	 * @return
+	 */
+	public int updateProjectXqmsUiReactionResult(XqmsVo vo);
+	
+	/**
+	 * 측정이력관리 측정결과 리모컨 로봇 테스트 수정 처리 프로세스
+	 * @param vo
+	 * @return
+	 */
+	public int updateProjectXqmsRemoconRobotResult(XqmsVo vo);
+	
+	/**
+	 * 측정이력관리 Xqmsdata 삭제 처리 전 bmt data 삭제
+	 * @param criteria
+	 * @return
+	 */
+	public int deleteBmtData(String xqmsSeq);
+	
+	/**
+	 * 측정이력관리 > 해당 seq의 xqms 첨부된 파일 삭제
+	 * @param vo (vo.selectSeq)
+	 * @return
+	 */
+	public int deleteXqmsFileData(String xqmsSeq);
+	
+	/**
+	 * 측정이력관리 Bmt 삭제 처리 프로세스
+	 * @param criteria
+	 * @return
+	 */
+	public boolean deleteProjectXqmsBmt(XqmsVo vo);
+
+	/**
+	 * 측정이력관리 Xqmsdata 삭제 처리 전 Channel data 삭제
+	 * @param criteria
+	 * @return
+	 */
+	public int deleteChannelData(String xqmsSeq);
+	
+	/**
+	 * 측정이력관리 Channel 삭제 처리 프로세스
+	 * @param criteria
+	 * @return
+	 */
+	public boolean deleteProjectXqmsChannel(XqmsVo vo);
+	
+	/**
+	 * 측정이력관리 Xqmsdata 삭제 처리 전 uiReaction data 삭제
+	 * @param criteria
+	 * @return
+	 */
+	public int deleteUiReactionData(String xqmsSeq);
+	
+	/**
+	 * 측정이력관리 UiReaction 삭제 처리 프로세스
+	 * @param criteria
+	 * @return
+	 */
+	public boolean deleteProjectXqmsUiReatction(XqmsVo vo);
+	
+	/**
+	 * 측정이력관리 리모컨 로봇 삭제 처리 프로세스
+	 * @param criteria
+	 * @return
+	 */
+	public boolean deleteProjectXqmsRemoconRobot(XqmsVo vo);
+	
+	/**
+	 * 측정이력관리 Xqmsdata 삭제 처리 전 리모컨 로봇 삭제 data 삭제
+	 * @param criteria
+	 * @return
+	 */
+	public int deleteRemoconRobotData(String xqmsSeq);
+	/**
+	 * 버전별 채널변경시간 통계 데이터 조회
+	 * @param model
+	 * @param criteria 검색조건
+	 * @return 버전별 채널변경시간 통계 데이터
+	 */
+	public XqmsVo selectXqmsChannelStsView(XqmsCriteria criteria);
+
+	/**
+	 * 버전별 채널변경시간 정보 상세 리스트 조회
+	 * @param model
+	 * @param criteria 검색조건
+	 * @return 버전별 채널변경시간 정보 상세 리스트
+	 */
+	public List<XqmsVo> selectXqmsChannelDetailList(XqmsCriteria criteria);
+
+	/**
+	 * 버전별 ui반응시간 통계 데이터 조회
+	 * @param model
+	 * @param criteria 검색조건
+	 * @return 버전별 ui반응시간 통계 데이터
+	 */
+	public XqmsVo selectXqmsUiReactionStsView(XqmsCriteria criteria);
+
+	/**
+	 * 버전별 ui반응시간 정보 상세 리스트 조회
+	 * @param model
+	 * @param criteria 검색조건
+	 * @return 버전별 ui반응시간 정보 상세 리스트
+	 */
+	public List<XqmsVo> selectXqmsUiReactionDetailList(XqmsCriteria criteria);
+	
+	/**
+	 * xqmsSeq에 맞는 측정이력 첨부파일 리스트조회
+	 * @param xqmsSeq
+	 * @return
+	 */
+	public List<XqmsAttachVo> selectXqmsAttachList(String xqmsSeq);
+	/**
+	 * 사용자 이름으로 조회한 마지막 xqms 리포트를 리턴 
+	 * @param xqmsCriteria
+	 * @return
+	 */
+	public XqmsVo selectLastReport(XqmsCriteria xqmsCriteria);
+
+}

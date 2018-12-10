@@ -1,0 +1,5 @@
+eclipse.preferences.version=1
+externalMigrateFromAuthorizationDatabase/isMigrated=true
+migrateFromAuthorizationDatabase/isMigrated=true
+repositories/30d353d3f15300181e9fbb1ae54bc1ff=30d353d3f15300181e9fbb1ae54bc1ff;http\://svn.nextlab.co.kr\:8090/svn/publish/;http\://svn.nextlab.co.kr\:8090/svn/publish/;branches;tags;trunk;true;e32f7fc9-9d4c-9646-ac05-3b23aab68b39;http\://svn.nextlab.co.kr\:8090/svn/publish;;false;;;0
+repositories/90418784714400181225c4bd75fdda4a=90418784714400181225c4bd75fdda4a;http\://svn.nextlab.co.kr\:8090/svn/mngbot;http\://svn.nextlab.co.kr\:8090/svn/mngbot;branches;tags;trunk;true;005228ba-704b-5a48-ad48-0925bf6ac693;http\://svn.nextlab.co.kr\:8090/svn/mngbot;;false;<http\://svn.nextlab.co.kr\:8090> VisualSVN Server;;0

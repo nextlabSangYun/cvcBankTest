@@ -1,0 +1,183 @@
+<%@ page contentType="text/html" pageEncoding="UTF-8" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<link href="/css/kendo.common-material.min.css" rel="stylesheet">
+<link href="/css/kendo.material.min.css" rel="stylesheet">
+<script type="text/javascript" src="/js/kendo.all.min.js"></script>
+<div class="content">
+	<div class="sub_layout has_snb">
+		<p class="cate_tit">측정모델 버전변경</p>
+		<div class="g_table">
+			<table>
+				<colgroup>
+					<col style="width:50%">
+					<col>
+				</colgroup>
+				<thead>
+					<tr>
+						<th>측정모델</th>
+						<th>모델버전</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr v-for="list in projectBmtModelList">
+						<td>{{ list.modelNm }}</td>
+						<td class="verify">
+							<input type="text" :value="list.modelVer" maxlength="30"  v-show="list.performYn=='N'">
+							<button class="g_btn01" @click="saveModelVer(event)" :value="list.modelSeq" :name="list.modelId" :id="list.modelVer" v-show="list.performYn=='N'">저장</button>
+							<input type="hidden" v-once v-model="list.modelVer">
+							<span v-if="list.performYn=='Y'">{{ list.modelVer }} 버전은 성능평가가 완료된 버전입니다.</span>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div class="btm_con">
+			<p class="cate_tit">측정환경 구성</p>
+			<div class="com_cond">
+				<div class="sel_cond con_col2">
+					<div class="l_cont">
+					</div>
+					<div class="r_cont">
+						<button class="g_btn01" @click="goJoinCompose">관리</button>
+					</div>
+				</div>
+				<div class="cond_frame" id="diagram"></div>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+	var cont = new Vue({
+		el: '.content'
+		, data: {
+			projectBmtModelList: []
+			, pid: '<c:out value="${param.pid}"/>'
+			, changeModelVer: ''
+			, shapesDataSource: {
+				batch : false,
+				data : [],
+				schema : { model : { children : "items" } }
+			}
+		}
+		, mounted: function() {
+			this.$nextTick(function() {
+				this.getProjectBmtModelList();
+				this.setJoinComposeDiagram();
+			});
+		}
+		, methods: {
+			getProjectBmtModelList: function() {
+				$.get("/bmt/project/getProjectBmtModelList?pid="+cont.pid, function(data){
+					cont.projectBmtModelList = data.projectBmtModelList;
+				});
+			}
+			, saveModelVer: function(event) {
+				var chk = true;
+				var e = event.target;
+				var currModelVer = e.nextElementSibling.value;
+				var param = {
+					modelId: e.name
+					, modelVer: e.previousElementSibling.value
+					, modelSeq: e.value
+					, pid: cont.pid
+				}
+				
+				if (param.modelVer == currModelVer) { // 기존버전과 수정한버전의 값이 같을때
+					chk = false;
+					alert("현재버전과 동일한 버전입니다.");
+				} else { // 수정한버전의 값과 같은 모델의 버전이 같을때
+					this.projectBmtModelList.forEach(function(i){
+						if (param.modelId == i.modelId && param.modelVer == i.modelVer) {
+							chk = false;
+							alert("이미 등록된 버전이 있습니다.");
+						}
+					});
+				}
+				
+				if (chk) {
+					$.post('/bmt/project/modProjectBmtModelVerPrc', param, function(data) {
+						if (data.save) {
+							alert("저장되었습니다.");
+							cont.getProjectBmtModelList();
+						} else {
+							alert("저장실패하였습니다.");
+						}
+					});
+				}
+			}
+			, setJoinComposeDiagram: function() {
+				var nowJoinCompose = '${projectView.nowJoinCompose}';
+				if (isEmpty(nowJoinCompose)) return;
+				
+				var array = JSON.parse(nowJoinCompose);
+				this.shapesDataSource.data = convertJsonTree(array, "id", "parentId");
+				this.setDiagram();
+			}
+			, setDiagram: function() {
+				var diagramElement = $("#diagram").kendoDiagram({
+					dataSource : this.shapesDataSource
+					, layout : {
+						type : "tree"
+						, subtype: "down"
+						, horizontalSeparation : 50
+						, verticalSeparation : 30
+					}
+					, shapeDefaults : {
+						visual : this.visualTemplate
+					}
+				});
+				diagram = diagramElement.data("kendoDiagram");
+				diagramElement.css("height", "450");
+				diagramElement.css("width", "1118");
+			}
+			, visualTemplate: function(options) {
+				var dataviz = kendo.dataviz;
+				var g = new dataviz.diagram.Group();
+				var dataItem = options.dataItem;
+				g.append(new dataviz.diagram.Rectangle({
+					width : 170
+					, height : 60
+					, stroke : {
+						width : 2
+					}
+					, fill : {
+						color : "#fff"
+					}
+				}));
+				
+				g.append(new dataviz.diagram.TextBlock({
+					text : dataItem.model.modelGroupNm
+					, x : 60
+					, y : 8
+					, fill : "#333"
+				}));
+				
+				g.append(new dataviz.diagram.TextBlock({
+					text : "(" + dataItem.model.modelNm + ")"
+					, x : 60
+					, y : 28
+					, fill : "#333"
+				}));
+				
+				if (!isEmpty(dataItem.model.icon)) {
+					g.append(new dataviz.diagram.Image({
+						source : "/images/bot/ico_model_" + dataItem.model.icon + ".png"
+						, x : 2
+						, y : 4
+						, width : 52
+						, height : 52
+					}));
+				}
+				return g;
+			}
+			, goJoinCompose: function() {
+				var url = "/bmt/project/joinComposeForm?pid=" + this.pid;
+				showPopupLayer(url);
+			}
+			, setJoinCompose: function(joinCompose) {
+				this.shapesDataSource.data = convertJsonTree(joinCompose, "id", "parentId");
+				this.setDiagram();
+			}
+		}
+	});
+</script>

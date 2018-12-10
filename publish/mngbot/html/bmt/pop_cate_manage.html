@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>Management Bot</title>
+	<link rel="stylesheet" href="../css/common.css">
+	<link rel="stylesheet" href="../css/bmt.css">
+	<script src="../js/jquery-3.2.1.min.js"></script>
+	<script src="../js/jquery-ui.min.js"></script>
+	<script src="../js/jquery.form.min.js"></script>
+	<script src="../js/vue.min.js"></script>
+	<script src="../js/lodash.min.js"></script>
+	<script src="../js/calendar.js"></script>
+	<script src="../js/common.js"></script>
+</head>
+<body>
+	<div class="pop_wrap" style="width:1080px;">
+		<div class="pop_tit">
+			<p>분류 관리</p>
+		</div>
+		<div class="pop_cont">
+			<div class="con_col2">
+				<!-- 18.01.08 폴더 오픈 클래스 추가 -->
+				<div class="sel_tree">
+					<ul class="sel_tree_list">
+						<li>
+							<div class="top list show"><p class="auth_name"><i class="ico_folder"></i>홈</p></div>
+						</li>
+						<li>
+							<div class="list sub1 show"><p class="auth_name"><i class="ico_folder"></i>마이 Btv</p></div>
+						</li>
+						<!-- 선택 시 selected 클래스 추가 -->
+						<li class="selected">
+							<div class="list sub2"><p class="auth_name"><i class="ico_file"></i>최근시청채널</p></div>
+						</li>
+						<li>
+							<div class="list sub2"><p class="auth_name"><i class="ico_file"></i>최근시청VOD</p></div>
+						</li>
+						<li>
+							<div class="list sub2"><p class="auth_name"><i class="ico_folder"></i>최근구매VOD</p></div>
+						</li>
+						<li>
+							<div class="list sub3"><p class="auth_name"><i class="ico_file"></i>최근구매VOD</p></div>
+						</li>
+						<li>
+							<div class="list sub4"><p class="auth_name"><i class="ico_file"></i>최근구매VOD</p></div>
+						</li>
+						<li>
+							<div class="list sub5"><p class="auth_name"><i class="ico_file"></i>최근구매VOD</p></div>
+						</li>
+						<li>
+							<div class="list sub6"><p class="auth_name"><i class="ico_file"></i>최근구매VOD</p></div>
+						</li>
+						<li>
+							<div class="list sub7"><p class="auth_name"><i class="ico_file"></i>최근구매VOD</p></div>
+						</li>
+						<li>
+							<div class="list sub8"><p class="auth_name"><i class="ico_file"></i>최근구매VOD</p></div>
+						</li>
+						<li>
+							<div class="list sub9"><p class="auth_name"><i class="ico_file"></i>최근구매VOD</p></div>
+						</li>
+						<li>
+							<div class="list sub10"><p class="auth_name"><i class="ico_file"></i>최근구매VOD</p></div>
+						</li>
+						<li>
+							<div class="top list"><p class="auth_name"><i class="ico_folder"></i>전체메뉴</p></div>
+						</li>
+						<li>
+							<div class="top list"><p class="auth_name"><i class="ico_folder"></i>VOD</p></div>
+						</li>
+					</ul>
+				</div>
+				<div class="r_cont">
+					<div class="g_table03">
+						<table>
+							<colgroup>
+								<col style="width:100px;">
+								<col>
+							</colgroup>
+							<tbody>
+								<tr>
+									<th>상위메뉴</th>
+									<td>홈</td>
+								</tr>
+								<tr>
+									<th>메뉴명</th>
+									<td>마이Btv</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="btn_wrap">
+						<button class="g_btn01">하위메뉴추가</button>
+						<button class="g_btn01">삭제</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="btn_wrap">
+			<button class="g_btn02" onclick="hidePopupLayer(); return false">닫기</button>
+		</div>
+	</div>
+	<script>
+		setPopup(2);
+	</script>
+</body>
+</html>

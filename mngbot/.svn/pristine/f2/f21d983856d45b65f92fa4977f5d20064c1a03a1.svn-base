@@ -1,0 +1,46 @@
+/**
+ * @title	: BMT요청관리 관련 Vo
+ * @package	: kr.co.nextlab.bmt.model
+ * @file	: BmtRequestVo.java
+ * @author	: winolonam
+ * @date	: 2018. 04. 18.
+ * @desc	: 
+ */
+package kr.co.nextlab.bmt.model;
+
+import java.util.Date;
+import java.util.List;
+
+import lombok.Data;
+
+@Data
+public class BmtRequestVo {
+
+	private String reqId;
+	private String progressStat;
+	private String reqSubject;
+	private String reqCont;
+	private String regId;
+	private Date regDtm;
+	private String modId;
+	private Date modDtm;
+	private String cancelReason;
+	
+	private List<ReqFileVo> fileList;
+	private List<ReqManagerVo> managerList;
+	private List<ReqCommentVo> commentList;
+	
+	private String userNm;
+	private String userGroupNm;
+	private int fileCnt;
+	
+	//요청자 정보
+	private String petitorNm;
+	private String petitorGroupNm;
+	
+	//승인자 정보
+	private String regNm;
+	private String modNm;
+	private String modGroupNm;
+	
+}

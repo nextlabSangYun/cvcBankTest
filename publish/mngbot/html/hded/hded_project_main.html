@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>CVCBank</title>
+	<link rel="shortcut icon" href="../../images/favicon.ico" type="image/x-icon">
+	<link rel="stylesheet" href="../../css/common.css">
+	<link rel="stylesheet" href="../../css/hded.css">
+	<script src="../../js/jquery-3.2.1.min.js"></script>
+	<script src="../../js/jquery-ui.min.js"></script>
+	<script src="../../js/jquery.form.min.js"></script>
+	<script src="../../js/vue.min.js"></script>
+	<script src="../../js/lodash.min.js"></script>
+	<script src="../../js/calendar.js"></script>
+	<script src="../../js/common.js"></script>
+</head>
+<body>
+	<div class="wrap">
+		<div class="content">
+			<div class="sub_layout has_snb">
+				<div class="cont_wrap">
+					<div class="g_table04">
+						<table>
+							<caption>기간, 현재상태, 참여인력 등을 확인할 수 있는 표 입니다.</caption>
+							<colgroup>
+								<col style="width:170px;">
+								<col>
+								<col style="width:170px;">
+								<col>
+							</colgroup>
+							<tbody>
+								<tr>
+									<th>프로젝트명</th>
+									<td>생성테스트1</td>
+									<th>차수</th>
+									<td>1차</td>
+								</tr>
+								<tr>
+									<th>기간</th>
+									<td colspan="3">2018-06-01 ~ 2018-06-07</td>
+								</tr>
+								<tr>
+									<th>시스템</th>
+									<td colspan="3">test</td>
+								</tr>
+								<tr>
+									<th>참여인력</th>
+									<td colspan="3">
+										<div class="g_table inner">
+											<table>
+												<thead>
+													<tr>
+														<th>그룹명</th>
+														<th>참여자</th>
+													</tr>
+												</thead>
+												<tbody>
+													<tr>
+														<td>테스트그룹</td>
+														<td>이순신</td>
+													</tr>
+													<tr>
+														<td>테스트그룹</td>
+														<td>이순신</td>
+													</tr>
+													<tr>
+														<td>테스트그룹</td>
+														<td>이순신</td>
+													</tr>
+												</tbody>
+											</table>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<th>비고</th>
+									<td colspan="3">test</td>
+								</tr>
+								<tr>
+									<th>최초작성자</th>
+									<td>홍길동</td>
+									<th>최초 작성일시</th>
+									<td>2018-06-11 17:14</td>
+								</tr>
+								<tr>
+									<th>최종작성자</th>
+									<td>홍길동</td>
+									<th>최종 작성일시</th>
+									<td>2018-06-11 17:14</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<p class="cate_tit">프로젝트 관리</p>
+					<div class="now_state">
+						<ul>
+							<li>
+								<span>현재</span>
+								<p><strong>2</strong>회차</p>
+								<button class="btn_default">다음회차시작</button>
+							</li>
+							<li>
+								<span>프로젝트</span>
+								<p><strong class="point_cr">진행중</strong></p>
+								<div class="state_desc">
+									<select>
+										<option value="">- 검증결과 -</option>
+										<option>미평가</option>
+										<option>적합</option>
+										<option>부분부적합</option>
+										<option>부적합</option>
+									</select>
+									<button class="btn_default">프로젝트 완료 처리</button>
+								</div>
+							</li>
+							<li>
+								<button class="btn_cancel">프로젝트 삭제</button>
+							</li>
+							<li class="setting_list">
+								<a href="#"><span class="ico"><img src="../../images/bmt/ico_bmt_set_0002030701.png"></span><span class="name">프로젝트 정보수정</span></a>
+							</li>
+						</ul>
+					</div>
+					<p class="cate_tit">T.C Pass rate</p>
+					<div class="tc_chart"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

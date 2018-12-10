@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>DIMS</title>
+	<link href="../css/style.css" rel="stylesheet">    
+</head>
+<body class="sub">
+	<header class="fixed">
+		<div class="header_wrap">
+			<h1 class="logo"><a href="#"><img src="../images/logo.png"/> <span class="">단말통합관리시스템</span></a></h1>
+			<nav>
+				<ul class="depth1">
+					<li class="on"><a href="#">물류센터관리</a></li>    
+					<li><a href="#">홈센터관리</a></li>					
+					<li><a href="#">통계</a></li>
+					<li><a href="#">시스템관리</a></li>					
+				</ul>					
+			</nav>					
+			<div class="user">			
+				<div class="user_name">
+					<span>00000</span> 관리자<span>(admin2)</span>님 반갑습니다.
+				</div>
+				<a href="#"><button type="button" class="mypage btn_member">마이페이지</button></a>
+				<a href="#"><button type="button" class="logout btn_member">로그아웃</button></a>			
+			</div>
+		</div>		
+	</header>
+			
+	<div class="wrapper">
+		<div class="left_box">			
+			<h3><img src="../images/icon_submenu1.png" alt=""> <span>물류센터관리</span></h3>
+			<ul class="depth2_list">
+				<li class="on">
+					<a href="#" class="dims_accordion">입고관리<span class="arrow"><img src="../images/icon_menu_down.png" alt=""></span></a>
+					<ul class="dims_panel depth3_list">
+						<li><a href="#">단말 입고</a></li>
+						<li><a href="#">부속물 신품 등록</a></li>
+						<li class="on"><a href="#">재활용 입고</a></li>
+						<li><a href="#">재활용 스크린</a></li>
+					</ul>
+				</li>
+				<li>
+					<a href="#" class="dims_accordion">출고관리<span class="arrow"><img src="../images/icon_menu_down.png" alt=""></span></a>
+					<ul class="dims_panel depth3_list">
+						<li><a href="#">단말 출고</a></li>
+						<li><a href="#">부속물 출고</a></li>
+					</ul>
+				</li>	
+				<li>
+					<a href="#" class="dims_accordion">재고 조회<span class="arrow"><img src="../images/icon_menu_down.png" alt=""></span></a>
+					<ul class="dims_panel depth3_list">
+						<li><a href="#">재고 조회(단말)</a></li>
+						<li><a href="#">재고 조회(부속물)</a></li>
+						<li><a href="#">부속물 이력조회</a></li>
+					</ul>
+				</li>					
+			</ul>				
+		</div><!-- end left_box -->
+		<div class="right_box">
+			
+			<div class="content_middle">
+				<div class="height20"></div>	
+				<h1>green</h1>
+				<div class="height20"></div>			
+				<section>															
+					<button type="button" class="btn_tbl green exceldownload">엑셀양식 다운로드</button>
+					<button type="button" class="btn_tbl reverse green exceldownload">엑셀양식 다운로드</button>
+					<button type="button" class="btn_tbl green excelupload">엑셀양식 업로드</button>
+					<button type="button" class="btn_tbl reverse green excelupload">엑셀양식 업로드</button>
+					
+				</section>
+				<div class="height20"></div>		
+				<h1>blue</h1>
+				<div class="height20"></div>
+				<section>						
+					<button type="button" class="btn_tbl blue">정보 입력 완료</button>
+					<button type="button" class="btn_tbl reverse blue">정보 입력 완료</button>
+					
+				</section>
+				<div class="height20"></div>		
+				<h1>orange</h1>
+				<div class="height20"></div>
+				<section>						
+					<button type="button" class="btn_tbl orange">정보 입력 완료</button>						
+					<button type="button" class="btn_tbl reverse orange">정보 입력 완료</button>
+												
+				</section>
+				<div class="height20"></div>		
+				<h1>red</h1>
+				<div class="height20"></div>		
+				<section>	
+					<button type="button" class="btn_tbl red">정보 입력 완료</button>	
+					<button type="button" class="btn_tbl reverse red">정보 입력 완료</button>
+															
+				</section>
+				<div class="height20"></div>	
+				<h1>gray</h1>
+				<div class="height20"></div>
+				<section>		
+					<button type="button" class="btn_tbl gray">정보 입력 완료</button>	
+					<button type="button" class="btn_tbl reverse gray">정보 입력 완료</button>
+					
+				</section>
+				<div class="height20"></div>	
+				<h1>balck</h1>
+				<div class="height20"></div>
+				<section>		
+					<button type="button" class="btn_tbl black">정보 입력 완료</button>	
+					<button type="button" class="btn_tbl reverse black">정보 입력 완료</button>
+					
+				</section>
+				
+			</div><!-- end.content_middle -->
+			
+		</div><!-- end right_box -->
+			
+    </div><!-- end .wrapper -->	
+    <footer>
+		<div class="footertext">
+			<img src="../images/logo_footer.png" alt="">
+			<span>COPYRIGHT SK broadband CO.,LTD. ALL RIGHTS RESERVED.</span>			
+		</div>			
+	</footer>
+    <script src="../js/lib/jquery-3.2.1.min.js"></script>
+    <script src="../js/lib/jquery-ui.min.js"></script>	
+	<script src="../js/ui.js"></script>
+	<script src="../js/lib/prefixfree.min.js"></script>		
+	<script src="../js/lib/jquery.form.min.js"></script>
+	<script src="../js/lib/calendar.js"></script>		
+</body>
+</html>

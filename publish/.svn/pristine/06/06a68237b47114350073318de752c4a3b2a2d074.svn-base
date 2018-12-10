@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>STBTestingBot</title>
+	<link rel="shortcut icon" href="../images/favicon.ico" type="image/x-icon">
+	<link rel="stylesheet" href="../css/common.css">
+	<script src="../js/jquery-3.2.1.min.js"></script>
+	<script src="../js/jquery-ui.min.js"></script>
+	<script src="../js/common.js"></script>
+</head>
+<body>
+	<div class="pop_wrap win_pop" style="width: 500px;">
+		<p class="cate_tit">채널정보 신규등록</p>
+		<div class="pop_cont">
+			<div class="g_table l_align">
+				<div class="tb_line">
+					<div class="line-yellow"></div>
+					<div class="line-purple"></div>
+					<div class="line-red"></div>
+					<div class="line-green"></div>
+				</div>
+				<table>
+					<caption></caption>
+					<colgroup>
+						<col style="width:120px;">
+						<col>
+					</colgroup>
+					<tbody>
+						<tr>
+							<th>채널명<strong>*</strong></th>
+							<td><input type="text" class="full" id="" maxlength="100" placeholder="채널명을 입력해주세요"></td>
+						</tr>
+						<tr>
+							<th>모니터링 Bot<strong>*</strong></th>
+							<td class="file">
+								<input type="file" class="ir" id="file" name="file" @change="regFile"><label for="file" class="sch_file">찾아보기</label>
+								<div class="list_wrap">
+									<ul class="file_list">
+										<li>
+											<span>STB Station 1호기</span>
+											<button class="del"></button>
+										</li>
+										<li>
+											<span>STB Station 87호기</span>
+											<button class="del"></button>
+										</li>
+										<li>
+											<span>STB Station 123호기</span>
+											<button class="del"></button>
+										</li>
+										<li>
+											<span>STB Station Test</span>
+											<button class="del"></button>
+										</li>
+										<li>
+											<span>STB Station</span>
+											<button class="del"></button>
+										</li>
+									</ul>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<th>모니터링 정책</th>
+							<td>
+								<input type="radio" name="monitering" value="nothing" />정책없음
+								<input type="radio" class="sel_chk" id="alarm" name="monitering" value="alarm" />
+								<input type="text" class="txt_num" id="alarm" maxlength="5" disabled="disabled" />회 연속 Fail 발생 시 알림
+							</td>
+						</tr>
+						<tr>
+							<th>비고</th>
+							<td><input type="text" class="full" id="" maxlength="100" placeholder="비고를 입력해주세요(20자 이내)"></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<ul class="notice">
+				<li>알림채널은 입력한 ‘채널명_noti’로 자동 생성됩니다.</li>
+			</ul>
+		</div>
+		<div class="btn_wrap">
+			<button class="btn_default">등록</button>
+			<button class="btn_cancel">취소</button>
+		</div>
+	</div>
+</body>
+</html>

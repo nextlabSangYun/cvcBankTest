@@ -1,0 +1,78 @@
+/**
+ * @title	: db관련 기본 설정
+ * @package	: kr.co.nextlab.config
+ * @file	: DataConfiguration.java
+ * @author	: jnlee
+ * @date	: 2017. 11. 3.
+ * @desc	: 
+ */
+package kr.co.nextlab.config;
+
+import javax.sql.DataSource;
+
+import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.ibatis.session.ExecutorType;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.mybatis.spring.SqlSessionFactoryBean;
+import org.mybatis.spring.SqlSessionTemplate;
+import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.core.env.Environment;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+@Configuration
+@EnableTransactionManagement
+@MapperScan({"kr.co.nextlab.comm.mapper","kr.co.nextlab.bot.mapper","kr.co.nextlab.bmt.mapper","kr.co.nextlab.stats.mapper","kr.co.nextlab.test.mapper","kr.co.nextlab.hded.mapper"})
+public class DataConfiguration {
+	
+	@Autowired
+	private Environment env;
+	
+	@Bean
+	public DataSource dataSource() {
+		BasicDataSource dataSource = new BasicDataSource();
+		dataSource.setDriverClassName(env.getProperty("db.driver-class-name"));
+		dataSource.setUrl(env.getProperty("db.url"));
+		dataSource.setUsername(env.getProperty("db.username"));
+		dataSource.setPassword(env.getProperty("db.password"));
+		dataSource.setValidationQuery(env.getProperty("db.validation-query"));
+		dataSource.setMaxActive(env.getProperty("db.max-active", int.class));
+		dataSource.setTestWhileIdle(env.getProperty("db.test-while-idle", boolean.class));
+		dataSource.setTimeBetweenEvictionRunsMillis(env.getProperty("db.time-between-eviction-runs-millis", long.class));
+		return dataSource;
+	}
+	
+	@Bean
+	public SqlSessionFactoryBean sqlSessionFactory() throws Exception {
+		SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
+		sessionFactory.setDataSource(dataSource());
+		sessionFactory.setConfigLocation(new ClassPathResource("mybatis-config.xml"));
+		sessionFactory.setMapperLocations(
+				new PathMatchingResourcePatternResolver().getResources("classpath:mapper/**/*.xml"));
+		return sessionFactory;
+	}
+	
+	@Bean
+	public PlatformTransactionManager txManager() {
+		return new DataSourceTransactionManager(dataSource());
+	}
+	
+	@Bean
+	@Primary
+	public SqlSessionTemplate sqlSessionTemplate(SqlSessionFactory sqlSessionFactory) throws Exception {
+		return new SqlSessionTemplate(sqlSessionFactory);
+	}
+	
+	@Bean("batchSqlSessionTemplate")
+	public SqlSessionTemplate batchSqlSessionTemplate(SqlSessionFactory sqlSessionFactory) throws Exception {
+		return new SqlSessionTemplate(sqlSessionFactory, ExecutorType.BATCH);
+	}
+	
+}

@@ -1,0 +1,55 @@
+/**
+ * @title	: 이슈관리 vo
+ * @package	: kr.co.nextlab.bmt.model
+ * @file	: IssueVo.java
+ * @author	: jnlee
+ * @date	: 2018. 1. 4.
+ * @desc	: 
+ */
+package kr.co.nextlab.bmt.model;
+
+import java.util.Date;
+import java.util.List;
+
+import lombok.Data;
+
+@Data
+public class IssueVo {
+
+	private String issueId;
+	private String pid;
+	private String issueSubject;
+	private String issueCont;
+	private String progressStat;
+	private String importance;
+	private String fileNm;
+	private String filePath;
+	private String orgFileNm;
+	private String regId;
+	private String regNm;
+	private Date regDtm;
+	private String modId;
+	private Date modDtm;
+	private String issueLcateCd;
+	private String condition;
+	
+	private List<IssueTcVo> tcList;
+	private List<IssueFileVo> fileList;
+	private List<IssuePartiVo> partiList;
+	private List<IssueCommentVo> commentList;
+
+	private String[] addPartiArray;
+	private String[] addFileArray;
+	private String modelListNm;
+	
+	private String tcCateId;
+	private List<IssueCateVo> cateList;
+	private List<IssueModelVo> modelList;
+	
+	private String userId;
+	private List<IssueCateVo> issueCateList;
+	
+	/** 이슈첨부파일 여부 체크*/
+	private int isYn;
+	
+}

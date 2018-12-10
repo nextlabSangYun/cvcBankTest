@@ -1,0 +1,1045 @@
+// 페이징
+var paginator = Vue.component('paginator', {
+	template: "<div class=\"pagination\" v-show=\"totRows\">"
+			+ "	<ol>"
+			+ "		<li v-if=\"page > 1\" class=\"btn_first\"><button @click.stop.prevent=\"goPage(1)\">처음</button></li>"
+			+ "		<li v-if=\"page >= 11\" class=\"btn_prev\"><button @click.stop.prevent=\"goPage(startPageBlock-1)\">이전</button></li>"
+			+ "		<li v-for=\"n in paginationRange\" class=\"num \" :class=\"{on:n==page}\"><button @click.stop.prevent=\"goPage(n)\">{{ n }}</button></li>"
+			+ "		<li v-if=\"endPageBlock < totPage\" class=\"btn_next\"><button @click.stop.prevent=\"goPage(endPageBlock+1)\">다음</button></li>"
+			+ "		<li v-if=\"page < totPage\" class=\"btn_last\"><button @click.stop.prevent=\"goPage(totPage)\">마지막</button></li>"
+			+ "	</ol>"
+			+ "</div>"
+	, props: {
+		goFn: {
+			type: Function
+			, default: function() {}
+		}
+		, initRows: {
+			type: Number
+			, default: 50
+		}
+	}
+	, data: function() {
+		return {
+			page: 1
+			, totRows: 0
+			, rows: 50
+			, block: 10
+		}
+	}
+	, computed: {
+		paginationRange: function() {
+			var range = new Array();
+			for (var i = this.startPageBlock; i <= this.endPageBlock; i++)
+				range.push(i);
+			return range;
+		}
+		, startPageBlock: function() {
+			return Math.floor((this.page-1) / this.block) * this.block + 1;
+		}
+		, endPageBlock: function() {
+			var endBlock = this.startPageBlock + this.block - 1;
+			if (endBlock > this.totPage)
+				return this.totPage;
+			else
+				return endBlock;
+		}
+		, totPage: function() {
+			return Math.ceil(this.totRows / this.rows);
+		}
+		, startRow: function() {
+			return (this.page * this.rows) - this.rows;
+		}
+		, endRow: function() {
+			return this.startRow + this.rows - 1;
+		}
+		, pageNumAsc: function() {
+			return (this.page - 1) * this.rows + 1;
+		}
+		, pageNumDesc: function() {
+			return this.totRows - ((this.page - 1) * this.rows);
+		}
+	}
+	, mounted: function() {
+		this.rows = Number(this.initRows);
+	}
+	, methods: {
+		goPage: function(page) {
+			this.page = page;
+			if(typeof(this.goFn) == "function"){
+				this.goFn(page);
+			}
+		}
+		, pagingList: function(list) {
+			this.totRows = list.length;
+			var startRow = this.startRow;
+			var endRow = this.endRow;
+			return list.filter(function(obj, idx) {
+				return (idx >= startRow && idx <= endRow);
+			});
+		}
+		, setPagingInit: function(obj) {
+			if (obj) {
+				this.rows = obj.rows;
+				this.block = obj.block;
+				this.totRows = obj.totRows;
+				this.page = obj.page;
+			}
+		}
+	}
+});
+
+// 사용자검색 (그룹-사용자)
+var userSelect = Vue.component('userSelect', {
+	template: "<span>"
+			+ "	<select :name=\"userGroupSelectName\" :id=\"userGroupSelectId\" v-model=\"userGroupId\" @change=\"setUserGroupId\">"
+			+ "		<option value=\"\">그룹선택</option>"
+			+ "		<option v-for=\"o in userGroup\" :value=\"o.userGroupId\">{{o.userGroupNm}}</option>"
+			+ "	</select>"
+			+ "	<select :name=\"userSelectName\" :id=\"userSelectId\" v-model=\"userId\" @change=\"setUserId\">"
+			+ "		<option value=\"\">사용자선택</option>"
+			+ "		<option v-for=\"o in filterUser\" :value=\"o.userId\">{{o.userNm}}</option>"
+			+ "	</select>"
+			+ "	<button class=\"g_btn01\" @click=\"addUserList\" v-show=\"addFn\">추가</button>"
+			+ "</span>"
+	, props: {
+		userGroupSelectName: {
+			type: String
+			, default: "userGroupId"
+		}
+		, userGroupSelectId: {
+			type: String
+			, default: ""
+		}
+		, userSelectName: {
+			type: String
+			, default: "userId"
+		}
+		, userSelectId: {
+			type: String
+			, default: ""
+		}
+		, userGroupIdModel: {
+			type: String
+			, default: "userGroupId"
+		}
+		, userIdModel: {
+			type: String
+			, default: "userId"
+		}
+		, changeFn: {
+			type: Function
+			, default: function() {}
+		}
+		, addFn: {
+			type: Function
+			, default: null
+		}
+		, autoInit: {
+			type: Boolean
+			, default: true
+		}
+	}
+	, data: function() {
+		return {
+			userGroup: []
+			, user: []
+			, userGroupId: ""
+			, userId: ""
+			, userGroupNm: ""
+			, userNm: ""
+			, isBinding: false
+		}
+	}
+	, computed: {
+		filterUser: function() {
+			var userGroupId = this.userGroupId;
+			return this.user.filter(function(v) {
+				return v.userGroupId === userGroupId;
+			});
+		}
+	}
+	, beforeMount: function() {
+		this.$nextTick(function() {
+			this.getUserGroup();
+			this.getUser();
+			this.bindData();
+		});
+	}
+	, mounted: function() {
+		if (this.$parent[this.userGroupIdModel] != null
+			&& this.$parent[this.userIdModel] != null)
+			this.isBinding = true;
+	}
+	, methods: {
+		getUserGroup: function() {
+			var cp = this;
+			$.get('/bot/userGroup/getUserGroupUseList', function(data) {
+				cp.userGroup = data.userGroupUseList;
+			});
+		}
+		, getUser: function() {
+			var cp = this;
+			$.get('/bot/user/getUserUseList', function(data) {
+				if (data.userUseList)
+					cp.user = data.userUseList;
+			});
+		}
+		, bindData: function() {
+			if (this.isBinding) {
+				this.userGroupId = this.$parent[this.userGroupIdModel];
+				this.userId = this.$parent[this.userIdModel];
+			}
+		}
+		, initData: function() {
+			this.userGroupId = "";
+			this.userGroupNm = "";
+			this.userId = "";
+			this.userNm = "";
+			if (this.isBinding) {
+				this.$parent[this.userGroupIdModel] = "";
+				this.$parent[this.userIdModel] = "";
+			}
+		}
+		, setUserGroupId: function(event) {
+			this.userGroupNm = event.target[event.target.options.selectedIndex].text;
+			this.userId = "";
+			this.userNm = "";
+			if (this.isBinding) {
+				this.$parent[this.userGroupIdModel] = this.userGroupId;
+				this.$parent[this.userIdModel] = "";
+			}
+		}
+		, setUserId: function(event) {
+			if (this.isBinding)
+				this.$parent[this.userIdModel] = this.userId;
+			this.userNm = event.target[event.target.options.selectedIndex].text;
+			if(typeof(this.changeFn) == "function") {
+				this.changeFn(this.getData());
+				if (!this.addFn && this.autoInit) this.initData();
+			}
+		}
+		, getData: function() {
+			var returnData = {
+				userGroupId: this.userGroupId
+				, userId: this.userId
+				, userGroupNm: this.getUserGroupNm(this.userGroupId)
+				, userNm: this.getUserNm(this.userId)
+			}
+			return returnData;
+		}
+		, getUserGroupNm: function(userGroupId) {
+			var len = this.userGroup.length;
+			for (var i=0; i<len; i++) {
+				if (userGroupId == this.userGroup[i].userGroupId) {
+					return this.userGroup[i].userGroupNm;
+				}
+			}
+		}
+		, getUserNm: function(userId) {
+			var len = this.user.length;
+			for (var i=0; i<len; i++) {
+				if (userId == this.user[i].userId) {
+					return this.user[i].userNm;
+				}
+			}
+		}
+		, addUserList: function() {
+			if (this.userGroupId == "") {
+				alert("그룹을 선택해주세요.");
+				return;
+			}
+			if (this.userId == "") {
+				alert("사용자를 선택해주세요.");
+				return;
+			}
+			
+			if(typeof(this.addFn) == "function") {
+				this.addFn(this.getData());
+				if (this.autoInit) this.initData();
+			}
+		}
+	}
+});
+
+// 모델검색 (분류-모델)
+var modelSelect = Vue.component('modelSelect', {
+	template: "<span>"
+			+ "	<select v-if=\"!modelType\" :name=\"modelGroupSelectName\" :id=\"modelGroupSelectId\" v-model=\"modelGroupId\" @change=\"setModelGroupId\">"
+			+ "		<option value=\"\">분류선택</option>"
+			+ "		<option v-for=\"o in modelGroup\" :value=\"o.modelGroupId\">{{o.modelGroupNm}}</option>"
+			+ "	</select>"
+			+ "	<select :name=\"modelSelectName\" :id=\"modelSelectId\" v-model=\"modelId\" @change=\"setModelId\">"
+			+ "		<option value=\"\">{{modelSelectText}}</option>"
+			+ "		<option v-for=\"o in filterModel\" :value=\"o.modelId\">{{o.modelNm}}</option>"
+			+ "	</select>"
+			+ "	<input type=\"text\" placeholder=\"버전입력\" v-model=\"modelVer\" v-show=\"inputModelVersion\" @keyup.enter=\"addModelList\" maxlength=\"30\">"
+			+ "	<button class=\"g_btn01\" @click=\"addModelList\" v-show=\"addFn\">추가</button>"
+			+ "</span>"
+	, props: {
+		modelGroupSelectName: {
+			type: String
+			, default: "modelGroupId"
+		}
+		, modelGroupSelectId: {
+			type: String
+			, default: ""
+		}
+		, modelSelectName: {
+			type: String
+			, default: "modelId"
+		}
+		, modelSelectId: {
+			type: String
+			, default: ""
+		}
+		, modelSelectText: {
+			type: String
+			, default: "모델선택"
+		}
+		, modelGroupIdModel: {
+			type: String
+			, default: "modelGroupId"
+		}
+		, modelIdModel: {
+			type: String
+			, default: "modelId"
+		}
+		, changeFn: {
+			type: Function
+			, default: function() {}
+		}
+		, addFn: {
+			type: Function
+			, default: null
+		}
+		, inputModelVersion: {
+			type: Boolean
+			, default: false
+		}
+		, modelType: {
+			type: String
+			, default: null
+		}
+		, autoInit: {
+			type: Boolean
+			, default: true
+		}
+	}
+	, data: function() {
+		return {
+			modelGroup: []
+			, model: []
+			, modelGroupId: ""
+			, modelId: ""
+			, modelGroupNm: ""
+			, modelNm: ""
+			, modelVer: ""
+			, isBinding: false
+		}
+	}
+	, computed: {
+		filterModel: function() {
+			var modelGroupId = this.modelGroupId;
+			var modelType = this.modelType;
+			
+			if (modelType) {
+				return this.model.filter(function(v) {
+					return v.modelType === modelType;
+				});
+			}
+			else {
+				return this.model.filter(function(v) {
+					return v.modelGroupId === modelGroupId;
+				});
+			}
+		}
+	}
+	, beforeMount: function() {
+		this.$nextTick(function() {
+			this.getModelGroup();
+			this.getModel();
+			this.bindData();
+		});
+	}
+	, mounted: function() {
+		if (this.$parent[this.modelGroupIdModel] != null
+			&& this.$parent[this.modelIdModel] != null)
+			this.isBinding = true;
+	}
+	, methods: {
+		getModelGroup: function() {
+			var cp = this;
+			$.get('/bot/modelGroup/getModelGroupList', function(data) {
+				cp.modelGroup = data.modelGroupList;
+			});
+		}
+		, getModel: function() {
+			var cp = this;
+			$.get('/bot/model/getModelUseList', function(data) {
+				if (data.modelUseList)
+					cp.model = data.modelUseList;
+			});
+		}
+		, bindData: function() {
+			if (this.isBinding) {
+				this.modelGroupId = this.$parent[this.modelGroupIdModel];
+				this.modelId = this.$parent[this.modelIdModel];
+			}
+		}
+		, initData: function() {
+			this.modelGroupId = "";
+			this.modelGroupNm = "";
+			this.modelId = "";
+			this.modelNm = "";
+			this.modelVer = "";
+			if (this.isBinding) {
+				this.$parent[this.modelGroupIdModel] = "";
+				this.$parent[this.modelIdModel] = "";
+			}
+		}
+		, setModelGroupId: function(event) {
+			this.modelGroupNm = event.target[event.target.options.selectedIndex].text;
+			this.modelId = "";
+			this.modelNm = "";
+			if (this.isBinding) {
+				this.$parent[this.modelGroupIdModel] = this.modelGroupId;
+				this.$parent[this.modelIdModel] = "";
+			}
+		}
+		, setModelId: function(event) {
+			if (this.isBinding) 
+				this.$parent[this.modelIdModel] = this.modelId;
+			
+			this.modelNm = event.target[event.target.options.selectedIndex].text;
+			
+			if(typeof(this.changeFn) == "function") {
+				this.changeFn(this.getData());
+				if (!this.addFn && this.autoInit) this.initData();
+			}
+		}
+		, setData: function(modelGroupId, modelId) {
+			this.modelGroupId = modelGroupId;
+			this.modelId = modelId;
+		}
+		, getData: function() {
+			var returnData = $.extend(true, this.getModelGroupData(this.modelGroupId), this.getModelData(this.modelId));
+			returnData.modelVer = this.modelVer;
+			return $.extend(true, {}, returnData);
+		}
+		, getModelGroupData: function(modelGroupId) {
+			var len = this.modelGroup.length;
+			for (var i=0; i<len; i++) {
+				if (modelGroupId == this.modelGroup[i].modelGroupId) {
+					return this.modelGroup[i];
+				}
+			}
+		}
+		, getModelData: function(modelId) {
+			var len = this.model.length;
+			for (var i=0; i<len; i++) {
+				if (modelId == this.model[i].modelId) {
+					return this.model[i];
+				}
+			}
+		}
+		, addModelList: function() {
+			if (!this.modelType && this.modelGroupId == "") {
+				alert("측정모델 분류를 선택해주세요.");
+				return;
+			}
+			
+			if (this.modelId == "") {
+				alert("측정모델을 선택해주세요.");
+				return;
+			}
+			
+			if (this.inputModelVersion && this.modelVer == "") {
+				alert("측정모델 버전을 입력해주세요.");
+				return;
+			}
+			
+			if(typeof(this.addFn) == "function") {
+				this.addFn(this.getData());
+				if (this.autoInit) this.initData();
+			}
+		}
+	}
+});
+
+// 프로젝트 검색 (년도-프로젝트명)
+var projectSelect = Vue.component('projectSelect', {
+	template: "<span>"
+			+ "	<select :name=\"yyyymmddSelectName\" :id=\"yyyymmddSelectId\" v-model=\"yyyymmdd\" @change=\"setYYYYMMDD\">"
+			+ "		<option value=\"\">년도선택</option>"
+			+ "		<option v-for=\"o in yyyymmddList\" :value=\"o\">{{o}}</option>"
+			+ "	</select>"
+			+ "	<select :name=\"pidSelectName\" :id=\"pidSelectId\" v-model=\"pid\" @change=\"setPid\">"
+			+ "		<option value=\"\">프로젝트선택</option>"
+			+ "		<option v-for=\"o in filterProject\" :value=\"o.pid\">{{o.projectNm}}</option>"
+			+ "	</select>"
+			+ "	<button class=\"g_btn01\" @click=\"addProjectList\" v-show=\"addFn\">추가</button>"
+			+ "</span>"
+	, props: {
+		yyyymmddSelectName: {
+			type: String
+			, default: "yyyymmdd"
+		}
+		, yyyymmddSelectId: {
+			type: String
+			, default: ""
+		}
+		, pidSelectName: {
+			type: String
+			, default: "pid"
+		}
+		, pidSelectId: {
+			type: String
+			, default: ""
+		}
+		, yyyymmddModel: {
+			type: String
+			, default: "yyyymmdd"
+		}
+		, pidModel: {
+			type: String
+			, default: "pid"
+		}
+		, changeFn: {
+			type: Function
+			, default: function() {}
+		}
+		, addFn: {
+			type: Function
+			, default: null
+		}
+		, autoInit: {
+			type: Boolean
+			, default: true
+		}
+	}
+	, data: function() {
+		return {
+			yyyymmddList: []
+			, projectList: []
+			, yyyymmdd: ""
+			, pid: ""
+			, projectNm: ""
+			, isBinding: false
+		}
+	}
+	, computed: {
+		filterProject: function() {
+			var yyyymmdd = this.yyyymmdd;
+			return this.projectList.filter(function(v) {
+				return v.yyyymmdd === yyyymmdd;
+			});
+		}
+	}
+	, beforeMount: function() {
+		this.$nextTick(function() {
+			this.getProject();
+			this.bindData();
+		});
+	}
+	, mounted: function() {
+		if (this.$parent[this.yyyymmddModel] != null
+			&& this.$parent[this.pidModel] != null)
+			this.isBinding = true;
+	}
+	, methods: {
+		getProject: function() {
+			var cp = this;
+			var criteria = {
+				startDt: '1900-01-01'
+				, endDt: '9999-12-31'
+			}
+			$.get('/bmt/project/getProjectList', criteria, function(data) {
+				if (data.projectList) {
+					cp.projectList = data.projectList;
+					cp.projectList.forEach(function(p) {
+						if (cp.yyyymmddList.indexOf(p.yyyymmdd) == -1)
+							cp.yyyymmddList.push(p.yyyymmdd);
+					});
+				}
+			});
+		}
+		, bindData: function() {
+			if (this.isBinding) {
+				this.yyyymmdd = this.$parent[this.yyyymmddModel];
+				this.pid = this.$parent[this.pidModel];
+			}
+		}
+		, initData: function() {
+			this.yyyymmdd = "";
+			this.pid = "";
+			this.projectNm = "";
+			if (this.isBinding) {
+				this.$parent[this.yyyymmddModel] = "";
+				this.$parent[this.pidModel] = "";
+			}
+		}
+		, setYYYYMMDD: function(event) {
+			this.pid = "";
+			this.projectNm = "";
+			if (this.isBinding) {
+				this.$parent[this.yyyymmddModel] = this.yyyymmdd;
+				this.$parent[this.pidModel] = "";
+			}
+		}
+		, setPid: function(event) {
+			if (this.isBinding) 
+				this.$parent[this.pidModel] = this.pid;
+			
+			this.projectNm = event.target[event.target.options.selectedIndex].text;
+			
+			if(typeof(this.changeFn) == "function") {
+				this.changeFn(this.getData());
+				if (!this.addFn && this.autoInit) this.initData();
+			}
+		}
+		, getData: function() {
+			var returnData = {
+				yyyymmdd: this.yyyymmdd
+				, pid: this.pid
+				, projectNm: this.projectNm
+			}
+			return returnData;
+		}
+		, addProjectList: function() {
+			if (this.yyyymmdd == "") {
+				alert("년도를 선택해주세요.");
+				return;
+			}
+			
+			if (this.pid == "") {
+				alert("프로젝트를 선택해주세요.");
+				return;
+			}
+			
+			if(typeof(this.addFn) == "function") {
+				this.addFn(this.getData());
+				if (this.autoInit) this.initData();
+			}
+		}
+	}
+});
+
+//프로젝트모델검색
+var projectModelSelect = Vue.component('projectModelSelect', {
+	template: "<span>"
+			+ "	<select :name=\"modelSelectName\" :id=\"modelSelectId\" v-model=\"modelSeq\" @change=\"setModel\">"
+			+ "		<option value=\"\">{{modelSelectText}}</option>"
+			+ "		<option v-for=\"o in filterModel\" :value=\"o.modelSeq\">{{o.modelNm}}({{o.modelVer}})</option>"
+			+ "	</select>"
+			+ "	<button class=\"g_btn01\" @click=\"addModelList\" v-show=\"addFn\">추가</button>"
+			+ "</span>"
+	, props: {
+		modelSelectName: {
+			type: String
+			, default: "modelSeq"
+		}
+		, modelSelectText: {
+			type: String
+			, default: "모델선택"
+		}
+		, modelSelectId: {
+			type: String
+			, default: ""
+		}
+		, modelSeqModel: {
+			type: String
+			, default: "modelSeq"
+		}
+		, changeFn: {
+			type: Function
+			, default: function() {}
+		}
+		, addFn: {
+			type: Function
+			, default: null
+		}
+		, modelType: {
+			type: String
+			, default: null
+		}
+		, autoInit: {
+			type: Boolean
+			, default: true
+		}
+		, pid: {
+			type: String
+			, default: null
+		}
+	}
+	, data: function() {
+		return {
+			model: []
+			, modelInfo: {}
+			, modelSeq: ""
+			, isBinding: false
+		}
+	}
+	, computed: {
+		filterModel: function() {
+			var modelType = this.modelType;
+			
+			if (modelType) {
+				return this.model.filter(function(v) {
+					return v.modelType === modelType;
+				});
+			}
+			else {
+				return this.model.filter(function(v) {
+					return true;
+				});
+			}
+		}
+	}
+	, beforeMount: function() {
+		this.$nextTick(function() {
+			this.getModel();
+			this.bindData();
+		});
+	}
+	, mounted: function() {
+		if (this.$parent[this.modelSeqModel] != null)
+			this.isBinding = true;
+	}
+	, methods: {
+		getModel: function() {
+			var cp = this;
+			$.get('/bmt/project/selectProjectBmtModelDetailList?pid='+this.pid, function(data) {
+				cp.model = data.modelList;
+			});
+		}
+		, bindData: function() {
+			if (this.isBinding) {
+				this.modelSeq = this.$parent[this.modelSeqModel];
+			}
+		}
+		, initData: function() {
+			this.modelInfo = {};
+			this.modelSeq = "";
+			if (this.isBinding) {
+				this.$parent[this.modelSeqModel] = "";
+			}
+		}
+		, setModel: function(event) {
+			if (this.isBinding) 
+				this.$parent[this.modelSeqModel] = this.modelSeq;
+			
+			this.setData();
+			
+			if(typeof(this.changeFn) == "function") {
+				this.changeFn(this.getData());
+				if (!this.addFn && this.autoInit) this.initData();
+			}
+		}
+		, setData: function() {
+			var o = this;
+			var modelSeq = this.modelSeq;
+			this.model.forEach(function(m) {
+				if (m.modelSeq == modelSeq) {
+					o.modelInfo = m;
+					return;
+				}
+			});
+		}
+		, getData: function() {
+			var returnData = this.modelInfo;
+			return returnData;
+		}
+		, addModelList: function() {
+			if (this.modelId == "") {
+				alert("측정모델을 선택해주세요.");
+				return;
+			}
+			
+			if(typeof(this.addFn) == "function") {
+				this.addFn(this.getData());
+				if (this.autoInit) this.initData();
+			}
+		}
+	}
+});
+
+// 프로젝트 카테고리
+var projectCategorySelect = Vue.component('projectCategorySelect', {
+	template: "<span>"
+			+ "	<select v-if=\"level>=1\" :name=\"bigCateSelectName\" :id=\"bigCateSelectId\" v-model=\"bigCateId\" @change=\"changeData(event, 1)\">"
+			+ "		<option value=\"\">{{bigCateSelectText}}</option>"
+			+ "		<option v-for=\"c in getBigCategory\" :value=\"c.tcCateId\">{{c.tcCateNm}}</option>"
+			+ "	</select>"
+			+ "	<select v-if=\"level>=2\" :name=\"middleCateSelectName\" :id=\"middleCateSelectId\" v-model=\"middleCateId\" @change=\"changeData(event, 2)\">"
+			+ "		<option value=\"\">중분류</option>"
+			+ "		<option v-for=\"c in getMiddleCategory\" :value=\"c.tcCateId\">{{c.tcCateNm}}</option>"
+			+ "	</select>"
+			+ "	<select v-if=\"level>=3\" :name=\"smallCateSelectName\" :id=\"smallCateSelectId\" v-model=\"smallCateId\" @change=\"changeData(event, 3)\">"
+			+ "		<option value=\"\">소분류</option>"
+			+ "		<option v-for=\"c in getSmallCategory\" :value=\"c.tcCateId\">{{c.tcCateNm}}</option>"
+			+ "	</select>"
+			+ "</span>"
+	, props: {
+		bigCateSelectName: {
+			type: String
+			, default: "bigCateId"
+		}
+		, bigCateSelectText: {
+			type: String
+			, default: "대분류"
+		}
+		, bigCateSelectId: {
+			type: String
+			, default: ""
+		}
+		, middleCateSelectName: {
+			type: String
+			, default: "middleCateId"
+		}
+		, middleCateSelectId: {
+			type: String
+			, default: ""
+		}
+		, smallCateSelectName: {
+			type: String
+			, default: "smallCateId"
+		}
+		, smallCateSelectId: {
+			type: String
+			, default: ""
+		}
+		, level: {
+			type: Number
+			, default: 3
+		}
+		, changeFn: {
+			type: Function
+			, default: function() {}
+		}
+		, pid: {
+			type: String
+			, default: null
+		}
+		, useYn: {
+			type: String
+			, default: "Y"
+		}
+	}
+	, data: function() {
+		return {
+			cateList: []
+			, bigCateId: ""
+			, middleCateId: ""
+			, smallCateId: ""
+			, bigCateNm: ""
+			, middleCateNm: ""
+			, smallCateNm: ""
+		}
+	}
+	, computed: {
+		getBigCategory: function() {
+			var tcCateParId = "000000000000000000000000000000000000";
+			return this.cateList.filter(function(cl) {
+				return cl.tcCateParId === tcCateParId;
+			});
+		}
+		, getMiddleCategory: function() {
+			var tcCateParId = this.bigCateId;
+			return this.cateList.filter(function(cl) {
+				return cl.tcCateParId === tcCateParId;
+			});
+		}
+		, getSmallCategory: function() {
+			var tcCateParId = this.middleCateId;
+			return this.cateList.filter(function(cl) {
+				return cl.tcCateParId === tcCateParId;
+			});
+		}
+	}
+	, beforeMount: function() {
+		this.getCategory();
+	}
+	, methods: {
+		getCategory: function() {
+			var cp = this;
+			var param = {
+				pid: this.pid
+				, useYn: this.useYn
+			}
+			
+			if (this.level==1) {
+				param.tcCateParId = "000000000000000000000000000000000000";
+			}
+			
+			$.get("/bmt/tc/getTcCategoryList", param, function(data) {
+				cp.cateList = data.tcCategoryList;
+			});
+		}
+		, initData: function() {
+			this.bigCateId = "";
+			this.middleCateId = "";
+			this.smallCateId = "";
+		}
+		, changeData: function(event, level) {
+			if (level==1) {
+				this.bigCateNm = event.target[event.target.options.selectedIndex].text;
+				this.middleCateId = "";
+				this.middleCateNm = "";
+				this.smallCateId = "";
+				this.smallCateNm = "";
+			}
+			else if (level==2) {
+				this.middleCateNm = event.target[event.target.options.selectedIndex].text;
+				this.smallCateId = "";
+				this.smallCateNm = "";
+			}
+			else if (level==3) {
+				this.smallCateNm = event.target[event.target.options.selectedIndex].text;
+			}
+			
+			if(typeof(this.changeFn) == "function") {
+				this.changeFn(this.getData());
+			}
+		}
+		, getData: function() {
+			var returnData = {
+				bigCateId : this.bigCateId
+				, bigCateNm : this.bigCateNm
+				, middleCateId : this.middleCateId
+				, middleCateNm : this.middleCateNm
+				, smallCateId : this.smallCateId
+				, smallCateNm : this.smallCateNm
+			}
+			return returnData;
+		}
+	}
+});
+
+// 참여인력 다중 선택
+var multiUserSelect = Vue.component('multiUserSelect', {
+	template: '<div>' 
+			+	'<div>' 
+			+		'<select :name="userGroupSelectName" v-model="userGroupId" @change="setUserGroupId">'
+			+			'<option value="">그룹선택</option>'
+			+			'<option v-for="o in userGroup" :value="o.userGroupId">{{o.userGroupNm}}</option>'
+			+		'</select>'
+			+		'<button class="btn_default" @click="addUserList" v-show="addFn">추가</button>'
+			+	'</div>'
+			+	'<div class="member">'
+			+		'<span v-for="u in filterUser"><input type="checkbox" :name="userSelectName" :id="u.userId" :value="u.userId" v-model="userIds"><label :for="u.userId">{{u.userNm}}</label></span>' 
+			+	'</div>'
+			+ '</div>'
+	, props: {
+		userGroupSelectName: {
+			type: String
+			, default: "userGroupId"
+		}
+		, userSelectName: {
+			type: String
+			, default: "userId"
+		}
+		, addFn: {
+			type: Function
+			, default: null
+		}
+	}
+	, data: function() {
+		return {
+			userGroup: []
+			, user: []
+			, filterUser: []
+			, userGroupId: ""
+			, userGroupNm: ""
+			, userIds: []
+		}
+	}
+	, computed: {
+	}
+	, beforeMount: function() {
+		this.$nextTick(function() {
+			this.getUserGroup();
+			this.getUser();
+		});
+	}
+	, mounted: function() {
+	}
+	, methods: {
+		getUserGroup: function() {
+			var cp = this;
+			$.get('/bot/userGroup/getUserGroupUseList', function(data) {
+				cp.userGroup = data.userGroupUseList;
+			});
+		}
+		, getUser: function() {
+			var cp = this;
+			$.get('/bot/user/getUserUseList', function(data) {
+				if (data.userUseList) {
+					cp.user = data.userUseList;
+				}
+			});
+		}
+		, setUserGroupId: function(event) {
+			var userGroupId = this.userGroupId;
+			this.userIds = [];
+			this.filterUser = this.user.filter(function(v) {
+				return v.userGroupId === userGroupId;
+			});
+		}
+		, addUserList: function() {
+			if (this.userGroupId == "") {
+				alert("그룹을 선택해주세요.");
+				return;
+			}
+			if (this.userIds.length <= 0) {
+				alert("사용자를 선택해주세요.");
+				return;
+			}
+			
+			if(typeof(this.addFn) == "function") {
+				this.addFn(this.getData());
+				this.inItData();
+			}
+		}
+		, inItData: function() {
+			this.userInfos = [];
+			this.userGroupId = '';
+			this.setUserGroupId();
+		}
+		, getData: function() {
+			var returnData = {
+				userGroupId: this.userGroupId
+				, userGroupNm: this.getUserGroupNm(this.userGroupId)
+				, userInfos: this.getUserInfo()
+			}
+			return returnData;
+		}
+		, getUserGroupNm: function(userGroupId) {
+			var len = this.userGroup.length;
+			for (var i=0; i<len; i++) {
+				if (userGroupId == this.userGroup[i].userGroupId) {
+					return this.userGroup[i].userGroupNm;
+				}
+			}
+		}
+		, getUserNm: function(userId) {
+			var len = this.user.length;
+			for (var i=0; i<len; i++) {
+				if (userId == this.user[i].userId) {
+					return this.user[i].userNm;
+				}
+			}
+		}
+		, getUserInfo: function() {
+			var userInfos = [];
+			var len = this.userIds.length;
+			for (var i=0; i<len; i++) {
+				var userInfo ={};
+				userInfo.userId = this.userIds[i];
+				userInfo.userNm = this.getUserNm(this.userIds[i]);
+				userInfos.push(userInfo);
+			}
+			return userInfos;
+		}
+	}
+});

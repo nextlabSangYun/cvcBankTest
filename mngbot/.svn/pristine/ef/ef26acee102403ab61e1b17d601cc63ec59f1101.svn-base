@@ -1,0 +1,385 @@
+/**
+ * @title	: QA project service 구현
+ * @package	: kr.co.nextlab.qa.service.impl
+ * @file	: QaProjectServiceImpl.java
+ * @author	: winolonam
+ * @date	: 2018. 07. 10.
+ * @desc	: 
+ */
+package kr.co.nextlab.qa.service.impl;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ejb.access.EjbAccessException;
+import org.springframework.stereotype.Service;
+
+import kr.co.nextlab.comm.service.SequenceService;
+import kr.co.nextlab.qa.mapper.QaProjectMapper;
+import kr.co.nextlab.qa.model.QaModelVerHstVo;
+import kr.co.nextlab.qa.model.QaProjectChasuHstVo;
+import kr.co.nextlab.qa.model.QaProjectCriteria;
+import kr.co.nextlab.qa.model.QaProjectModelVo;
+import kr.co.nextlab.qa.model.QaProjectPartiVo;
+import kr.co.nextlab.qa.model.QaProjectVo;
+import kr.co.nextlab.qa.service.QaProjectService;
+
+@Service
+public class QaProjectServiceImpl implements QaProjectService {
+	
+	@Autowired
+	private QaProjectMapper qaProjectMapper;
+	
+	@Autowired
+	private SequenceService sequenceService;
+
+	/**
+	 * 참여한 프로젝트 리스트 차수 조회
+	 * @param qaProjectVo
+	 * @return 참여한 프로젝트 차수 리스트
+	 */
+	@Override
+	public List<QaProjectVo> selectMyProjectChasuList(QaProjectVo qaProjectVo) {
+		return qaProjectMapper.selectMyProjectChasuList(qaProjectVo);
+	}
+
+	/**
+	 * 프로젝트 진행현황 리스트 조회
+	 * @param qaProjectVo
+	 * @return 프로젝트 진행현황 리스트
+	 */
+	@Override
+	public List<QaProjectVo> selectProjectStatusList(QaProjectVo qaProjectVo) {
+		return qaProjectMapper.selectProjectStatusList(qaProjectVo);
+	}
+	
+	/**
+	 * 참여한 프로젝트 리스트 조회
+	 * @param qaProjectVo
+	 * @return 참여한 프로젝트 리스트
+	 */
+	@Override
+	public List<QaProjectVo> selectMyProjectList(QaProjectVo qaProjectVo) {
+		return qaProjectMapper.selectMyProjectList(qaProjectVo);
+	}
+	
+	/**
+	 * 참여한 프로젝트 overview 리스트 조회
+	 * @param qaProjectVo
+	 * @return 참여한 프로젝트 리스트
+	 */
+	@Override
+	public List<QaProjectVo> selectMyProjectOverviewList(QaProjectVo qaProjectVo) {
+		return qaProjectMapper.selectMyProjectOverviewList(qaProjectVo);
+	}
+
+	/**
+	 * 전체프로젝트 조회
+	 * @param qaProjectCriteria
+	 * @return
+	 */
+	@Override
+	public List<QaProjectVo> selectProjectList(QaProjectCriteria qaProjectCriteria) {
+		return qaProjectMapper.selectProjectList(qaProjectCriteria);
+	}
+
+	/**
+	 * 프로젝트태그 중복 확인
+	 * @param tcPrefix
+	 * @return
+	 */
+	@Override
+	public boolean selectCheckTcPrefix(String tcPrefix) {
+		int cnt = 0;
+		cnt = qaProjectMapper.selectCheckTcPrefix(tcPrefix);
+		if (cnt == 0) {
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * 프로젝트 기본정보 등록
+	 * @param qaProjectVo 프로젝트 정보
+	 * @return
+	 */
+	@Override
+	public boolean insertProject(QaProjectVo qaProjectVo) {
+		/**
+		 * 등록값 체크 용 변수
+		 */
+		int cnt = 0;
+		int cntModel = 0;
+		int cntModelHst = 0;
+		int cntParti = 0;
+		int cntChasu = 0;
+		
+		/**
+		 * 프로젝트 아이디 생성
+		 */
+		qaProjectVo.setPid(sequenceService.getQaProjectId());
+		qaProjectVo.setChasu(1);
+		qaProjectVo.setProjectStatCd("C301");
+		/**
+		 * 기본정보 생성
+		 */
+		cnt = qaProjectMapper.insertProject(qaProjectVo);
+		
+		/**
+		 * 측정모델정보 생성
+		 */
+		for (QaProjectModelVo qaProjectModelVo : qaProjectVo.getModelList()) {
+			qaProjectModelVo.setPid(qaProjectVo.getPid());
+			qaProjectModelVo.setRegId(qaProjectVo.getRegId());
+			qaProjectModelVo.setModId(qaProjectVo.getRegId());
+			cntModel += qaProjectMapper.insertQaProjectModel(qaProjectModelVo);
+			
+			QaModelVerHstVo qaModelVerHstVo = new QaModelVerHstVo();
+			qaModelVerHstVo.setModelSeq(qaProjectModelVo.getModelSeq());
+			qaModelVerHstVo.setModelVer(qaProjectModelVo.getModelVer());
+			qaModelVerHstVo.setRegId(qaProjectVo.getRegId());
+			cntModelHst += qaProjectMapper.insertQaModelVerHst(qaModelVerHstVo);
+		}
+		
+		/**
+		 * 참여자정보 생성
+		 */
+		for (QaProjectPartiVo qaProjectPartiVo : qaProjectVo.getPartiList()) {
+			qaProjectPartiVo.setPid(qaProjectVo.getPid());
+			qaProjectPartiVo.setRegId(qaProjectVo.getRegId());
+			cntParti += qaProjectMapper.insertQaProjectParti(qaProjectPartiVo);
+		}
+		
+		/**
+		 * 차수히스토리 등록
+		 */
+		QaProjectChasuHstVo qaProjectChasuHstVo = new QaProjectChasuHstVo();
+		qaProjectChasuHstVo.setPid(qaProjectVo.getPid());
+		qaProjectChasuHstVo.setRegId(qaProjectVo.getRegId());
+		qaProjectChasuHstVo.setChasuStDtm(qaProjectVo.getProjectStDt());
+		cntChasu = qaProjectMapper.insertQaProjectChasuHst(qaProjectChasuHstVo);
+		
+		/**
+		 * 등록결과 확인
+		 */
+		if (cnt <= 0 
+				|| cntModel != qaProjectVo.getModelList().size()
+				|| cntModelHst != qaProjectVo.getModelList().size()
+				|| cntParti != qaProjectVo.getPartiList().size()
+				|| cntChasu <= 0) {
+			throw new EjbAccessException("새 프로젝트 등록이 실패하였습니다.");
+		}
+		
+		return true;
+	}
+
+	/**
+	 * 프로젝트 기본정보 조회
+	 * @param pid
+	 * @return
+	 */
+	@Override
+	public QaProjectVo selectProjectView(String pid) {
+		return qaProjectMapper.selectProjectView(pid);
+	}
+
+	/**
+	 * 프로젝트 모델 리스트 조회
+	 * @param pid
+	 * @return
+	 */
+	@Override
+	public List<QaProjectModelVo> selectQaProjectModelList(String pid) {
+		return qaProjectMapper.selectQaProjectModelList(pid);
+	}
+
+	/**
+	 * 측정모델 버전 변경이력 리스트 조회
+	 * @param modelSeq
+	 * @return
+	 */
+	@Override
+	public List<QaProjectModelVo> selectProjectModelHstList(Integer modelSeq) {
+		return qaProjectMapper.selectProjectModelHstList(modelSeq);
+	}
+
+	/**
+	 * 프로젝트 참여인력 조회
+	 * @param pid
+	 * @return
+	 */
+	@Override
+	public List<QaProjectPartiVo> selectProjectPartiList(String pid) {
+		return qaProjectMapper.selectProjectPartiList(pid);
+	}
+
+	/**
+	 * 다음 프로젝트 차수로 변경
+	 * @param qaProjectChasuHstVo
+	 * @return
+	 */
+	@Override
+	public boolean updateNextProjectChasuPrc(QaProjectChasuHstVo qaProjectChasuHstVo) {
+		//체크용 변수
+		int updateChk = 0;
+		int insertChk = 0;
+		
+		if(StringUtils.equals(qaProjectChasuHstVo.getChasuStat(), "Y")){
+			//차수변경(차수 -> 수정개발상태)
+			updateChk = qaProjectMapper.updateNextQaProjectChasuHst(qaProjectChasuHstVo);
+			// 등록결과 확인
+			if (updateChk <= 0){
+				throw new EjbAccessException("프로젝트 회차 변경 처리가 실패하였습니다.");
+			}
+		}else{
+			//프로젝트 시스템 관리 차수 업데이트
+			QaProjectVo qaProjectVo = new QaProjectVo();
+			qaProjectVo.setPid(qaProjectChasuHstVo.getPid());
+			qaProjectVo.setChasu(qaProjectChasuHstVo.getChasu() + 1);
+			qaProjectVo.setModId(qaProjectChasuHstVo.getModId());
+			qaProjectMapper.updateNextProjectChasu(qaProjectVo);
+			
+			//차수변경(수정개발상태 -> 차수)
+			qaProjectChasuHstVo.setChasuStDtm(new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+			qaProjectChasuHstVo.setRegId(qaProjectChasuHstVo.getModId());
+			insertChk = qaProjectMapper.insertQaProjectChasuHst(qaProjectChasuHstVo);
+			
+			// 테스트케이스 최종결과 null처리
+			qaProjectMapper.updateLastResultInit(qaProjectChasuHstVo.getPid());
+			
+			// 등록결과 확인
+			if (insertChk <= 0){
+				throw new EjbAccessException("프로젝트 회차 변경 처리가 실패하였습니다.");
+			}
+		}
+		
+		return true;
+	}
+
+	/**
+	 * 프로젝트 useYn 변경
+	 * @param projectVo
+	 * @return
+	 */
+	@Override
+	public boolean updateProjectUseYn(QaProjectVo qaProjectVo) {
+		return qaProjectMapper.updateProjectUseYn(qaProjectVo) > 0;
+	}
+
+	/**
+	 * 프로젝트 상태 변경
+	 * @param qaProjectVo
+	 * @return
+	 */
+	@Override
+	public boolean updateProjectStat(QaProjectVo qaProjectVo) {
+		return qaProjectMapper.updateProjectStat(qaProjectVo) > 0;
+	}
+	
+	/**
+	 * 프로젝트 완료 처리
+	 * @param projectVo 프로젝트 정보
+	 * @return 변경결과
+	 */
+	@Override
+	public boolean completeProject(QaProjectVo qaProjectVo) {
+		return updateProjectStat(qaProjectVo);
+	}
+
+	/**
+	 * 프로젝트 참여자 조회
+	 * @param pid
+	 * @return
+	 */
+	@Override
+	public List<QaProjectPartiVo> selectProjectEditPartiList(String pid) {
+		return qaProjectMapper.selectProjectEditPartiList(pid);
+	}
+	
+	/**
+	 * 프로젝트 기본정보 수정
+	 * @param qaProjectVo 프로젝트 정보
+	 * @return 프로젝트아이디
+	 */
+	@Override
+	public boolean updateProject(QaProjectVo qaProjectVo) {
+		// 체크 용 변수
+		int cnt = 0;
+		int cntModel = 0;
+		int cntModelHst = 0;
+		int cntParti = 0;
+		
+		// 기본정보 변경
+		cnt = qaProjectMapper.updateProject(qaProjectVo);
+		
+		// 프로젝트 차수 히스토리 종료일 업데이트
+		if(StringUtils.equals(qaProjectVo.getChasuStat(), "Y")){
+			cnt += qaProjectMapper.updateProjectChasuHstChausEndDt(qaProjectVo);
+		}
+		
+		// 측정모델정보 생성
+		for (QaProjectModelVo qaProjectModelVo : qaProjectVo.getModelList()) {
+			qaProjectModelVo.setPid(qaProjectVo.getPid());
+			qaProjectModelVo.setRegId(qaProjectVo.getModId());
+			qaProjectModelVo.setModId(qaProjectVo.getModId());
+			cntModel += qaProjectMapper.insertQaProjectModel(qaProjectModelVo);
+			
+			QaModelVerHstVo qaModelVerHstVo = new QaModelVerHstVo();
+			qaModelVerHstVo.setModelSeq(qaProjectModelVo.getModelSeq());
+			qaModelVerHstVo.setModelVer(qaProjectModelVo.getModelVer());
+			qaModelVerHstVo.setRegId(qaProjectVo.getModId());
+			cntModelHst += qaProjectMapper.insertQaModelVerHst(qaModelVerHstVo);
+		}
+		
+		// 참여인력 추가/삭제
+		qaProjectMapper.deleteProjectParti(qaProjectVo.getPid());
+		for (QaProjectPartiVo qaProjectPartiVo : qaProjectVo.getPartiList()) {
+			qaProjectPartiVo.setPid(qaProjectVo.getPid());
+			qaProjectPartiVo.setRegId(qaProjectVo.getModId());
+			cntParti += qaProjectMapper.insertQaProjectParti(qaProjectPartiVo);
+		}
+		
+		// 수정결과 확인
+		if (cnt <= 0
+				|| cntModel != qaProjectVo.getModelList().size()
+				|| cntModelHst != qaProjectVo.getModelList().size()
+				|| cntParti != qaProjectVo.getPartiList().size())
+			throw new EjbAccessException("프로젝트 수정이 실패하였습니다.");
+		
+		return true;
+	}
+
+	/**
+	 * 프로젝트 모델 버전 수정
+	 * @param qaProjectModelVo
+	 * @return
+	 */
+	@Override
+	public boolean updateProjectModelVerPrc(QaProjectModelVo qaProjectModelVo) {
+		int cnt = 0;
+		
+		// 측정모델 버전 수정
+		cnt += qaProjectMapper.updateProjectModelVerPrc(qaProjectModelVo);
+		// 측정모델 버전 이력 등록
+		QaModelVerHstVo qaModelVerHstVo = new QaModelVerHstVo();
+		qaModelVerHstVo.setModelSeq(qaProjectModelVo.getModelSeq());
+		qaModelVerHstVo.setModelVer(qaProjectModelVo.getModelVer());
+		qaModelVerHstVo.setRegId(qaProjectModelVo.getModId());
+		cnt += qaProjectMapper.insertQaModelVerHst(qaModelVerHstVo);
+		
+		return cnt >0;
+	}
+
+	/**
+	 * 프로젝트 측정모델 리스트 상세 조회(모델그룹정보포함)
+	 * @param pid 프로젝트 아이디
+	 * @return 프로젝트 측정모델 리스트
+	 */
+	@Override
+	public List<QaProjectModelVo> selectQaProjectModelDetailList(String pid) {
+		return qaProjectMapper.selectQaProjectModelDetailList(pid);
+	}
+}

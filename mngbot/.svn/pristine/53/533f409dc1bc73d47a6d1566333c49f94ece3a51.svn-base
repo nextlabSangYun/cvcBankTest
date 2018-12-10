@@ -1,0 +1,20 @@
+package kr.co.nextlab.hded.model;
+
+import java.util.Date;
+
+import lombok.Data;
+
+@Data
+public class HeTcResultVo {
+	/**
+	 * 기본정보
+	 */
+	private Integer tcResultSeq;
+	private Integer projectTcSeq;
+	private Integer chasuHstSeq;
+	private String tcResultCd;
+	private String inspectorOpinion;
+	private String tcResultText;
+	private String regId;
+	private Date regDtm;
+}

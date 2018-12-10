@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.nextlab.bot.mapper.BotMapper">
+
+	<select id="selectBotMngList" resultType="botVo" parameterType="botCriteria">
+		SELECT a.bot_sno
+			 , a.bot_nm
+			 , a.bot_type
+			 , a.bot_stat
+			 , a.model_nm
+			 , a.use_yn
+			 , (SELECT user_group_nm FROM tb_user_group WHERE USER_GROUP_ID = b.user_group_id) AS group_nm
+			 , a.mng_id
+			 , (SELECT user_nm FROM tb_user WHERE user_id = a.mng_id) AS mng_nm
+			 , a.reg_id
+			 , a.reg_dtm
+		FROM tb_bot a
+		INNER JOIN tb_user b ON (b.user_id = a.mng_id)
+		WHERE 1=1
+		<if test="botType != null and botType != '' ">
+			AND A.bot_type = #{botType}
+		</if>
+		<if test="useYn != null and useYn != '' ">
+			AND A.use_yn = #{useYn}
+		</if>
+		<if test="botStat != null and botStat != '' ">
+			AND A.bot_stat = #{botStat}
+		</if>
+		ORDER BY reg_dtm desc
+	</select>
+	
+	<select id="selectBotView" resultType="botVo" parameterType="String">
+		SELECT a.bot_sno
+			, a.bot_nm
+			, a.bot_type
+			, a.model_nm
+			, a.use_yn
+			, a.mng_id
+			, a.reg_id
+			, a.reg_dtm
+			, (SELECT user_group_id FROM tb_user WHERE user_id = a.mng_id) user_group_id
+		FROM tb_bot a
+		WHERE a.bot_sno = #{botSno}
+	</select>
+		
+	<insert id="insertBotMng" parameterType="botVo">
+		INSERT INTO tb_bot (
+			bot_sno
+			, bot_nm
+			, bot_type
+			, bot_stat
+			, model_nm
+			, use_yn
+			, mng_id
+			, reg_id
+		)
+		VALUES (
+			#{botSno}
+			, #{botNm}
+			, #{botType}
+			, #{botStat}
+			, #{modelNm}
+			, #{useYn}
+			, #{mngId}
+			, #{regId}
+		)
+	</insert>
+	
+	<update id="updateBotMng" parameterType="botVo" >
+		UPDATE tb_bot
+		SET
+			bot_nm = #{botNm}
+			, bot_type = #{botType}
+			, model_nm = #{modelNm}
+			, use_yn = #{useYn}
+			, mng_id = #{mngId}
+			, mod_id = #{regId}
+			, mod_dtm = GETDATE()
+		WHERE bot_sno = #{botSno}
+	</update>
+	
+	<select id="selectStateHstList"  resultType="BotStatHstVo" parameterType="String" >
+		SELECT	
+			bot_sno
+			, bot_stat
+			, message
+			, reg_dtm
+		FROM tb_bot_stat_hst
+		WHERE bot_sno = #{botSno}
+		ORDER BY reg_dtm DESC 
+	</select>
+	
+	<select id="selectScenarioList"  resultType="scenarioFileVo" parameterType="scenarioFileVo" >
+		SELECT
+			a.seq
+			, a.file_info
+			, a.file_nm
+			, a.file_path
+			, a.org_file_nm
+			, a.reg_info
+			, a.reg_id
+			, a.reg_dtm
+			, CASE WHEN a.reg_id IS NULL THEN a.reg_info
+				   ELSE b.user_nm + ' (' + (SELECT c.user_group_nm FROM tb_user_group c WHERE c.user_group_id = b.user_group_id) + ')'
+			   END AS reg_nm
+		FROM tb_scenario_file a
+		LEFT JOIN tb_user b
+		ON b.user_id = a.reg_id
+		WHERE 1=1
+		<if test="fileNm != null and fileNm != ''">
+			AND (a.file_info LIKE '%' + #{fileNm} + '%'
+				OR a.org_file_nm LIKE '%' + #{fileNm} + '%')
+		</if>
+		ORDER BY a.reg_dtm DESC
+ 	</select>
+ 	
+ 	<insert id="insertScenario" parameterType="scenarioFileVo">
+ 		insert into tb_scenario_file (
+			file_info
+			, file_nm
+			, file_path
+			, org_file_nm
+			, reg_id
+			, reg_dtm
+		) values (
+			#{fileInfo}
+			, #{fileNm}
+			, #{filePath}
+			, #{orgFileNm}
+			, #{regId}
+			, GETDATE()
+		)
+ 	</insert>
+ 	
+ 	<delete id="delScenarioFile" parameterType="scenarioFileVo">
+ 		DELETE FROM tb_scenario_file
+ 		WHERE seq IN <foreach collection="seqList" item="seq" open="(" separator="," close=")">
+						#{seq}
+					</foreach>
+ 	</delete>
+ 	
+ 	<insert id="insertBotStatHst" parameterType="botStatHstVo">
+		INSERT INTO tb_bot_stat_hst (bot_sno, bot_seq, bot_stat, message, reg_dtm)
+		VALUES (#{botSno}, (SELECT ISNULL(CONVERT(INT,MAX(bot_seq)+1), 1) FROM tb_bot_stat_hst WHERE bot_sno = #{botSno}), #{botStat}, #{message}, GETDATE()) 
+	</insert>
+	
+	<update id="updateBotStat" parameterType="botStatHstVo">
+		UPDATE	tb_bot SET
+				bot_stat = #{botStat}
+				<if test="botStat != 'C701'">
+				, last_ping_dtm = GETDATE()
+				</if>
+		WHERE	bot_sno = #{botSno}
+	</update>
+	
+	<update id="updateBotLastPingDtm" parameterType="String">
+		UPDATE	tb_bot SET
+				last_ping_dtm = GETDATE()
+		WHERE	bot_sno = #{botSno}
+	</update>
+</mapper>

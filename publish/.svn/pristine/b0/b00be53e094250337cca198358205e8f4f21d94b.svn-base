@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>CVCBank</title>
+	<link rel="shortcut icon" href="../../images/favicon.ico" type="image/x-icon">
+	<link rel="stylesheet" href="../../css/common.css">
+	<link rel="stylesheet" href="../../css/qa.css">
+	<script src="../../js/jquery-3.2.1.min.js"></script>
+	<script src="../../js/jquery-ui.min.js"></script>
+	<script src="../../js/jquery.form.min.js"></script>
+	<script src="../../js/vue.min.js"></script>
+	<script src="../../js/lodash.min.js"></script>
+	<script src="../../js/calendar.js"></script>
+	<script src="../../js/common.js"></script>
+</head>
+<body>
+<div class="wrap">
+	<!-- 내용 -->
+	<div class="content">
+		<div class="sub_layout has_snb">
+			<div class="cont_wrap">
+				<div class="sort_area">
+					<div class="sel_item">
+						<span class="sort_tit">타입선택</span>
+						<select class="full" name="">
+							<option value="">- 전체 -</option>
+							<option>STB Testing Bot</option>
+							<option>Monitoring Bot</option>
+						</select>
+					</div>
+					<div class="sel_item">
+						<span class="sort_tit">상태</span>
+						<select class="full" name="">
+							<option value="">- 전체 -</option>
+							<option>RUNNING</option>
+							<option>IDLE</option>
+							<option>OFFLINE</option>
+						</select>
+					</div>
+					<button class="btn_default">조회</button>
+				</div>
+				<div class="tb_desc">
+					<p>조회결과 : 2건</p>
+				</div>
+				<div class="g_table">
+					<table>
+						<caption>중요도, 진행사황, 이슈제목 등으로 구성된 표입니다.</caption>
+						<colgroup>
+							<col style="width:4%;">
+							<col>
+							<col>
+							<col style="width:8%;">
+							<col>
+							<col>
+							<col style="width:13%;">
+							<col style="width:6%;">
+						</colgroup>
+						<thead>
+							<tr>
+								<th>No.</th>
+								<th>Bot이름</th>
+								<th>Bot타입</th>
+								<th>상태</th>
+								<th>모델명</th>
+								<th>시리얼번호</th>
+								<th>제어</th>
+								<th>상태이력</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>3</td>
+								<td>
+									<a href="#" class="link"><p class="ellips">STB Station 4호기</p></a>
+								</td>
+								<td>STB Testing Bot</td>
+								<td class="txt_red">OFFLINE</td>
+								<td>BTTSD-QC-MIRS</td>
+								<td>S18B004</td>
+								<td class="btn_control">
+									<button class="smbtn_run" disabled="disabled"><span>Run</span></button>
+									<button class="smbtn_stop" disabled="disabled"><span>Stop</span></button>
+								</td>
+								<td><button class="smbtn_view"></button></td>
+							</tr>
+							<tr>
+								<td>2</td>
+								<td>
+									<a href="#" class="link"><p class="ellips">STB Station 4호기</p></a>
+								</td>
+								<td>STB Testing Bot</td>
+								<td class="txt_green">IDLE</td>
+								<td>BTTSD-QC-MIRS</td>
+								<td>S18B004</td>
+								<td class="btn_control">
+									<button class="smbtn_run"><span>Run</span></button>
+									<button class="smbtn_stop" disabled="disabled"><span>Stop</span></button>
+								</td>
+								<td><button class="smbtn_view"></button></td>
+							</tr>
+							<tr>
+								<td>1</td>
+								<td>
+									<a href="#" class="link"><p class="ellips">STB Station 4호기</p></a>
+								</td>
+								<td>STB Testing Bot</td>
+								<td class="txt_blue">RUNNING</td>
+								<td>BTTSD-QC-MIRS</td>
+								<td>S18B004</td>
+								<td class="btn_control">
+									<button class="smbtn_run" disabled="disabled"><span>Run</span></button>
+									<button class="smbtn_stop"><span>Stop</span></button>
+								</td>
+								<td><button class="smbtn_view"></button></td>
+							</tr>
+							<tr>
+								<td colspan="8">검색 결과가 없습니다.</td>
+							</tr>
+						</tbody>
+					</table>
+					<paginator ref="paginator" :go-fn="getPagingList"></paginator>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+</html>

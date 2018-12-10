@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>Management Bot</title>
+	<link rel="stylesheet" href="../css/common.css">
+	<link rel="stylesheet" href="../css/bot.css">
+	<script src="../js/jquery-3.2.1.min.js"></script>
+	<script src="../js/jquery-ui.min.js"></script>
+	<script src="../js/jquery.form.min.js"></script>
+	<script src="../js/vue.min.js"></script>
+	<script src="../js/lodash.min.js"></script>
+	<script src="../js/calendar.js"></script>
+	<script src="../js/common.js"></script>
+</head>
+<body>
+	<div class="pop_wrap" style="width:480px;">
+		<div class="pop_tit">
+			<p>Bot 상태이력 조회</p>
+		</div>
+		<div class="pop_cont">
+			<!-- 17.12.09 수정 -->
+			<div class="g_table">
+				<table>
+					<caption>상태 이력 나타내는 표 입니다.</caption>
+					<colgroup>
+						<col style="width:35%">
+						<col style="width:25%">
+						<col>
+					</colgroup>
+					<thead>
+						<tr>
+							<th>시간</th>
+							<th>상태</th>
+							<th>메시지</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td class="date">2017.10.14 17:32:11</td>
+							<td>OFFLINE</td>
+							<td>프로그램 종료</td>
+						</tr>
+						<tr>
+							<td class="date">2017.10.14 17:32:11</td>
+							<td>OFFLINE</td>
+							<td>프로그램 종료</td>
+						</tr>
+						<tr>
+							<td class="date">2017.10.14 17:32:11</td>
+							<td>OFFLINE</td>
+							<td>프로그램 종료</td>
+						</tr>
+						<tr>
+							<td class="date">2017.10.14 17:32:11</td>
+							<td>OFFLINE</td>
+							<td>프로그램 종료</td>
+						</tr>
+						<tr>
+							<td class="date">2017.10.14 17:32:11</td>
+							<td>OFFLINE</td>
+							<td>프로그램 종료</td>
+						</tr>
+						<tr>
+							<td class="date">2017.10.14 17:32:11</td>
+							<td>OFFLINE</td>
+							<td>프로그램 종료</td>
+						</tr>
+					</tbody>
+				</table>
+				<div class="pagination">
+					<ol>
+						<li class="btn_first"><button>처음</button></li>
+						<li class="btn_prev"><button>이전</button></li>
+						<li class="num on"><button>1</button></li>
+						<li class="num"><button>2</button></li>
+						<li class="num"><button>3</button></li>
+						<li class="num"><button>4</button></li>
+						<li class="num"><button>5</button></li>
+						<li class="btn_next"><button>다음</button></li>
+						<li class="btn_last"><button>마지막</button></li>
+					</ol>
+				</div>
+			</div>
+		</div>
+		<div class="btn_wrap">
+			<!-- 17.12.09 수정 -->
+			<!-- <button class="g_btn01">이력삭제</button> -->
+			<button class="g_btn02">닫기</button>
+		</div>
+	</div>
+	<script>
+		setPopup(2);
+	</script>
+</body>
+</html>

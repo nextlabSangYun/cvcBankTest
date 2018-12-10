@@ -1,0 +1,54 @@
+/**
+ * @title	: Qa test case 관련 vo
+ * @package	: kr.co.nextlab.qa.model
+ * @file	: QaTcInfotVo.java
+ * @author	: winolonam
+ * @date	: 2018. 07. 19.
+ * @desc	: 
+ */
+package kr.co.nextlab.qa.model;
+
+import java.util.Date;
+
+import lombok.Data;
+
+@Data
+public class QaTcInfotVo {
+	
+	/**
+	 * 기본정보
+	 */
+	private String tcId;
+	private String pid;
+	private String tcCateId;
+	private String lcateId;
+	private String mcateId;
+	private String tcNm;
+	private String tcDiviCd;
+	private String tcImpoCd;
+	private String useYn;
+	private String lastResultCd;
+	private String bigo;
+	private String regId;
+	private Date regDtm;
+	private String modId;
+	private Date modDtm;
+	
+	/**
+	 * 테스트 현황 조회
+	 */
+	private int autoCnt;
+	private int manualCnt;
+	private int tcIngCnt;
+	private int tcTotalCnt;
+	private int xqmsPercent;
+	private int manualPercent;
+	private int ingPercent;
+	
+	/**
+	 * 결함 현황 조회
+	 */
+	private int testFailCnt;
+	private int testFlawCnt;
+	private int flawPercent;
+}

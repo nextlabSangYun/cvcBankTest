@@ -1,0 +1,49 @@
+/**
+ * @title	: xqms 관련vo
+ * @package	: kr.co.nextlab.qa.model
+ * @file	: QaXqmsVo.java
+ * @author	: sangyun.kim
+ * @date	: 2018. 07. 24.
+ * @desc	: 
+ */
+
+package kr.co.nextlab.qa.model;
+
+import java.util.List;
+
+import lombok.Data;
+
+@Data
+public class QaXqmsVo {
+	/**
+	 * 기본정보
+	 */
+	private Integer seq;
+	private String tcId;
+	private String modelId;
+	private String modelVer;
+	private String mac;
+	private String remocon;
+	private Integer chasu;
+	private String tcTypeCd;
+	private String botSno;
+	private String xqmsTypeCd;
+	private String tcResultCd;
+	private String xqmsPerson;
+	private String xqmsDtm;
+	private String modId;
+	private String modDtm;
+	
+	/**
+	 * 첨부파일
+	 */
+	private List<QaXqmsFileVo> fileList;
+	/**
+	 * 결과 일괄등록
+	 */
+	private String [] xqmsSeqArray;
+	private String [] seqArray;
+	private List<QaTcInfotVo> tcArray;
+	private List<QaXqmsVo> xqmsArray;
+	
+}

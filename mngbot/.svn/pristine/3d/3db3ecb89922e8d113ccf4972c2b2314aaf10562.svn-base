@@ -1,0 +1,343 @@
+/**
+ * @title	: 프로젝트 관리 관련 컨트롤러
+ * @package	: kr.co.nextlab.hded.controller
+ * @file	: HdedProjectController.java
+ * @author	: winolonam
+ * @date	: 2018. 05. 02.
+ * @desc	: 
+ */
+package kr.co.nextlab.hded.controller;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.View;
+import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
+
+import kr.co.nextlab.bot.model.MessageVo;
+import kr.co.nextlab.comm.controller.BaseController;
+import kr.co.nextlab.component.MailComponent;
+import kr.co.nextlab.component.MessageComponent;
+import kr.co.nextlab.hded.model.HeProjectCriteria;
+import kr.co.nextlab.hded.model.HeProjectVo;
+import kr.co.nextlab.hded.model.HeSystemChasuHstVo;
+import kr.co.nextlab.hded.service.HdedProjectService;
+import kr.co.nextlab.util.JsonUtil;
+import kr.co.nextlab.util.ObjectUtil;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Controller
+public class HdedProjectController extends BaseController {
+	
+	@Autowired
+	private HdedProjectService hdedProjectService;
+	
+	@Autowired
+	private MessageComponent messageComponent;
+	
+	@Autowired
+	private MailComponent mailComponent;
+	
+	/**
+	 * 프로젝트 폼
+	 * @param model
+	 */
+	@RequestMapping("/hded/project/projectForm")
+	public void projectForm(Model model) {
+	}
+	
+	/**
+	 * 프로젝트 리스트 화면
+	 * @param model
+	 */
+	@RequestMapping("/hded/project/projectList")
+	public void projectList(Model model) {
+		model.addAttribute("startDt", new SimpleDateFormat("yyyy-MM-dd").format(DateUtils.addDays(new Date(), -7)));
+		model.addAttribute("endDt", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+	}
+	
+	/**
+	 * 프로젝트 리스트 조회
+	 * @param model
+	 * @param projectCriteria
+	 * @return
+	 */
+	@RequestMapping("/hded/project/getProjectList")
+	public View getProjectList(Model model, HeProjectCriteria heProjectCriteria) {
+		model.addAttribute("projectList", hdedProjectService.selectProjectList(heProjectCriteria));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * Hded 프로젝트 생성
+	 * @param model
+	 * @param heProjectVo
+	 * @return
+	 */
+	@RequestMapping("/hded/project/regHeProjectPrc")
+	public View regHeProjectPrc(Model model, @RequestBody HeProjectVo heProjectVo){
+		heProjectVo.setRegId(super.getUser().getUserId());
+		heProjectVo.setModId(super.getUser().getUserId());
+		heProjectVo.setProjectStat("C301");
+		boolean save = false;
+		
+		try {
+			// 프로젝트 등록
+			heProjectVo.setPid(hdedProjectService.insertHeProject(heProjectVo));
+			if (StringUtils.isEmpty(heProjectVo.getPid())) model.addAttribute("message", "저장 실패");
+			else {
+				save = true;
+				
+				//CVCBANK@nextlab.co.kr 메일주소 구성원
+				String userId = "U0001";
+				
+				// 구성원
+				String [] partiArray = ObjectUtil.getStringArrayFromList(heProjectVo.getManagerList(), "partiId");
+				
+				// 메시지 알림 등록
+				MessageVo messageVo = messageComponent.setMessageCreateHeProject(heProjectVo, super.getAppId(), super.getUser());
+				messageComponent.sendMessage(messageVo, partiArray);
+				
+				// 메일 발송
+				mailComponent.sendMailUser("/mail/hded/newHeProject", partiArray, "새 프로젝트 구성원 등록 알림", JsonUtil.getJsonStrFromObject(heProjectVo));
+				
+				// CVCBANK@nextlab.co.kr에만 메일전송
+				mailComponent.sendMailUser("/mail/hded/newHeProject", userId, "새프로젝트 구성원 등록알림", JsonUtil.getJsonStrFromObject(heProjectVo));
+			}
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			if (e.getCause() != null) model.addAttribute("message", "저장 실패");
+			else model.addAttribute("message", e.getMessage());
+		}
+		
+		model.addAttribute("save", save);
+		model.addAttribute("pid", heProjectVo.getPid());
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 참여 + 진행중인 프로젝트 조회
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping("/hded/project/getMyProjectProgressList")
+	public View getMyProjectProgressList(Model model) {
+		HeProjectVo heProjectVo = new HeProjectVo();
+		
+		/**
+		 * 관리자 권한인지 체크
+		 */
+		if (StringUtils.equals(super.getAuthId(), "AU009")) {
+			heProjectVo.setMngYn(true);
+		}
+		heProjectVo.setPartiId(super.getUser().getUserId());
+		/**
+		 * 진행중인 프로젝트만 조회
+		 */
+		heProjectVo.setProgressYn(true);
+		model.addAttribute("myProjectProgressList", hdedProjectService.selectMyProjectList(heProjectVo));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 참여 + 전체 프로젝트 리스트 차수 조회
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping("/hded/project/getMyProjectChasuList")
+	public View getMyProjectChasuList(Model model) {
+		HeProjectVo heProjectVo = new HeProjectVo();
+		
+		/**
+		 * 관리자 권한인지 체크
+		 */
+		if (StringUtils.equals(super.getAuthId(), "AU009")) {
+			heProjectVo.setMngYn(true);
+		}
+		heProjectVo.setPartiId(super.getUser().getUserId());
+		/**
+		 * 전체 프로젝트 조회
+		 */
+		model.addAttribute("myProjectList", hdedProjectService.selectMyProjectChasuList(heProjectVo));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * HE 프로젝트 기본 정보 조회
+	 * @param model
+	 * @param pid
+	 * @return
+	 */
+	@RequestMapping("/hded/project/getHeProjectInfoView")
+	public View getHeProjectInfoView(Model model, String pid){
+		//기본 정보
+		model.addAttribute("heProjectView", hdedProjectService.selectHeProjectView(pid));
+		// 기본정보 - 참여인력
+		model.addAttribute("heProjectManagerList", hdedProjectService.selectHeProjectManagerList(pid));
+		// 프로젝트 차수 정보
+		model.addAttribute("heProjectChasuHstList", hdedProjectService.selectHeProjectChasuHstList(pid));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * He 프로젝트 정보 수정 화면 List
+	 * @param model
+	 * @param pid
+	 * @return
+	 */
+	@RequestMapping("/hded/project/getHeProjectEditInfoView")
+	public View getHeProjectEditInfoView(Model model, String pid){
+		//기본 정보
+		model.addAttribute("heProjectView", hdedProjectService.selectHeProjectView(pid));
+		// 기본정보 - 참여인력
+		model.addAttribute("heProjectEditManagerList", hdedProjectService.selectHeProjectEditManagerList(pid));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * HE프로젝트 수정
+	 * @param model
+	 * @param heProjectVo
+	 * @return
+	 */
+	
+	@RequestMapping("/hded/project/modHeProjectPrc")
+	public View modHeProjectPrc(Model model, @RequestBody HeProjectVo heProjectVo){
+		heProjectVo.setModId(super.getUser().getUserId());
+		boolean save = false;
+		
+		try {
+			
+			// 프로젝트 수정
+			save = hdedProjectService.updateHeProject(heProjectVo);
+			if (!save) model.addAttribute("message", "저장 실패");
+			else {
+				// 추가인원이 있는경우 알림처리
+				if (heProjectVo.getAddMemberArray().length > 0) {
+					// 메시지 알림 등록
+					MessageVo messageVo = messageComponent.setMessageCreateHeProject(heProjectVo, super.getAppId(), super.getUser());
+					messageComponent.sendMessage(messageVo, heProjectVo.getAddMemberArray());
+					
+					// 메일 발송
+					mailComponent.sendMailUser("/mail/hded/newHeProject", heProjectVo.getAddMemberArray(), "새 프로젝트 구성원 등록 알림", JsonUtil.getJsonStrFromObject(heProjectVo));
+				}
+			}
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			if (e.getCause() != null) model.addAttribute("message", "저장 실패");
+			else model.addAttribute("message", e.getMessage());
+		}
+		
+		model.addAttribute("save", save);
+		model.addAttribute("pid", heProjectVo.getPid());
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * HE프로젝트 완료처리 변경
+	 * @param model
+	 * @param pid
+	 * @return
+	 */
+	@RequestMapping("/hded/project/modHeProjectCompletePrc")
+	public View modProjectCompletePrc(Model model, String pid, String projectResultCd)
+	{
+		boolean save = false;
+		try {
+			HeProjectVo heProjectVo = new HeProjectVo();
+			heProjectVo.setPid(pid);
+			heProjectVo.setProjectStat("C304");
+			heProjectVo.setProjectResultCd(projectResultCd);
+			heProjectVo.setModId(super.getUser().getUserId());
+			save = hdedProjectService.updateCompleteHeProject(heProjectVo);
+			
+			if (!save) model.addAttribute("message", "저장 실패");
+			else {
+				// 메시지 알람처리
+				heProjectVo = hdedProjectService.selectHeProjectView(pid);
+				String [] partiArray = ObjectUtil.getStringArrayFromList(hdedProjectService.selectHeProjectEditManagerList(pid), "partiId");
+				MessageVo messageVo = messageComponent.setMessageCreateHeProject(heProjectVo, super.getAppId(), super.getUser());
+				messageComponent.sendMessage(messageVo, partiArray);
+			}
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			if (e.getCause() != null) model.addAttribute("message", "저장 실패");
+			else model.addAttribute("message", e.getMessage());
+		}
+		model.addAttribute("save", save);
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * He 프로젝트 시스템 차수 변경
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping("/hded/project/modNextHeProjectSystemChasuPrc")
+	public View modNextHeProjectSystemChasuPrc(Model model, @RequestBody HeProjectVo heProjectVo){
+		boolean save = false;
+		try {
+			HeSystemChasuHstVo heSystemChasuHstVo = new HeSystemChasuHstVo();
+			heSystemChasuHstVo.setPid(heProjectVo.getPid());
+			heSystemChasuHstVo.setSysSeq(heProjectVo.getSysSeq());
+			heSystemChasuHstVo.setChasuStat(heProjectVo.getChasuStat());
+			heSystemChasuHstVo.setProjectEndDt(heProjectVo.getProjectEndDt());
+			heSystemChasuHstVo.setRegId(heProjectVo.getRegId());
+			heSystemChasuHstVo.setModId(super.getUser().getUserId());
+			heSystemChasuHstVo.setChasu(heProjectVo.getChasu());
+			save = hdedProjectService.updateNextSystemChasuPrc(heSystemChasuHstVo);
+			
+			if (!save) model.addAttribute("message", "저장 실패");
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			if (e.getCause() != null) model.addAttribute("message", "저장 실패");
+			else model.addAttribute("message", e.getMessage());
+		}
+		model.addAttribute("save", save);
+		return new MappingJackson2JsonView();
+	}
+	/**
+	 * HE 프로젝트 사용여부 변경
+	 * @param model
+	 * @param vo
+	 * @return
+	 */
+	
+	@RequestMapping("/hded/project/modHeProjectUseYnPrc")
+	public View modHeProjectUseYnPrc(Model model, @RequestBody HeProjectVo heProjectvo){
+		heProjectvo.setModId(super.getUser().getUserId());
+		model.addAttribute("save", hdedProjectService.updateHeProjectUseYn(heProjectvo));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * HE 프로젝트 tc pass rate 조회
+	 * @param model
+	 * @param vo
+	 */
+	@RequestMapping("/hded/project/getTcPassRate")
+	public View getTcPassRate(Model model, String pid) {
+		model.addAttribute("tcPassRateList", hdedProjectService.selectTcPassRate(pid));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 시스템 이름 리스트 조회
+	 * @param model
+	 * @param pid
+	 * @return
+	 */
+	@RequestMapping("/hded/project/getSystemNmList")
+	public View getSystemNmList(Model model, String systemNm) {
+		model.addAttribute("systemNmList", hdedProjectService.selectSystemNmList(systemNm));
+		return new MappingJackson2JsonView();
+	}
+}

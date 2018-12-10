@@ -1,0 +1,496 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.nextlab.bmt.mapper.TcMapper">
+	<select id="selectTcList" parameterType="tcCriteria" resultType="tcVo">
+		SELECT	seq
+				, a.pid
+				, tc_id
+				, tc
+				, big_cate_id
+				, middle_cate_id
+				, small_cate_id
+				, importance
+				, a.reg_dtm
+				, bigo
+				, file_nm
+				, file_path
+				, org_file_nm
+				, last_bmt_result
+				, tc_division
+				, (SELECT TOP(1) tc_cate_nm FROM tb_bmt_tc_category WHERE tc_cate_id = a.big_cate_id ) big_cate_nm
+				, (SELECT TOP(1) tc_cate_nm FROM tb_bmt_tc_category WHERE tc_cate_id = a.middle_cate_id ) middle_cate_nm
+				, (SELECT TOP(1) tc_cate_nm FROM tb_bmt_tc_category WHERE tc_cate_id = a.small_cate_id ) small_cate_nm
+		FROM	tb_bmt_tc_info a
+		WHERE	a.pid =  #{pid}
+			<if test="cateId != null and cateId != '' ">
+				AND a.big_cate_id = #{cateId}
+			</if>
+			<if test="importanceArray != null">
+				AND a.importance IN 
+				<foreach collection="importanceArray" item="array" open="(" separator="," close=")">
+					#{array}
+				</foreach>
+			</if>
+			<if test=" seqArray != null ">
+				AND seq IN
+				<foreach collection="seqArray" item="array" open="(" separator="," close=")">
+					#{array}
+				</foreach>
+			</if>
+			<if test="tc != null and tc != ''">
+				AND a.tc LIKE '%' + REPLACE(REPLACE(REPLACE(#{tc},'[','\['), ']','\]'),'_','\_') + '%' ESCAPE '\'
+			</if>
+			<if test="bmtResult != null and bmtResult != '' ">
+				<choose>
+					<when test="bmtResult == 'NONE' ">
+						AND a.last_bmt_result is null
+					</when>
+					<otherwise>
+						AND a.last_bmt_result = #{bmtResult}
+					</otherwise>
+				</choose>
+			</if>
+			<if test="tcDivision != null and tcDivision != '' ">
+				AND a.tc_division = #{tcDivision}
+			</if>
+			AND (a.use_yn IS NULL OR a.use_yn = 'Y')
+		ORDER BY big_cate_nm, middle_cate_nm, small_cate_nm, tc
+	</select>
+	<!-- 
+	<select id="selectTcCategoryList" parameterType="tcCategoryVo" resultType="tcCategoryVo">
+		SELECT	pid
+				, tc_cate_id
+				, tc_cate_par_id
+				, tc_cate_nm
+				, use_yn
+				, tc_cate_order
+				, reg_dtm
+		FROM	tb_bmt_tc_category
+		WHERE	pid = #{pid}
+				<if test="useYn != null and useYn != '' ">
+					AND use_yn = #{useYn}
+				</if>
+				<if test="tcCateParId != null and tcCateParId != '' ">
+					AND tc_cate_par_id = #{tcCateParId}
+				</if>
+		ORDER BY tc_cate_nm
+	</select>
+	-->
+	<select id="selectTcCategoryList" parameterType="tcCategoryVo" resultType="tcCategoryVo">
+		WITH v_temp AS
+		(
+			SELECT a.tc_cate_nm
+				, a.tc_cate_par_id
+				, a.tc_cate_id
+				, a.use_yn
+				, a.reg_dtm
+				, CONVERT(VARCHAR(100), 'TOP') path
+				, 0 lvl
+				, CONVERT(VARCHAR(100) , a.tc_cate_id) as sort
+				, a.pid
+			FROM tb_bmt_tc_category a
+			WHERE tc_cate_par_id IS NULL
+			UNION ALL
+			SELECT a.tc_cate_nm
+				, a.tc_cate_par_id
+				, a.tc_cate_id
+				, a.use_yn
+				, a.reg_dtm
+				, CONVERT(VARCHAR(100), b.path + ' > ' + a.tc_cate_nm) path
+				, b.lvl+1 lvl
+				, CONVERT(VARCHAR(100), b.sort + '/' + a.tc_cate_id ) as tc_cate_order
+				, a.pid
+			FROM tb_bmt_tc_category a, v_temp b
+			WHERE a.tc_cate_par_id = b.tc_cate_id
+				AND a.pid = #{pid}
+		)
+		SELECT tc_cate_nm
+			, tc_cate_par_id 
+			, tc_cate_id
+			, use_yn
+			, reg_dtm 
+			, path
+			, lvl 
+			, pid
+			, (SELECT COUNT(*) FROM v_temp b WHERE a.tc_cate_id = b.tc_cate_par_id) child
+		FROM v_temp a
+		WHERE 1=1
+		<if test="useYn != null and useYn != '' ">
+			AND use_yn = #{useYn}
+		</if>
+		<if test="tcCateParId != null and tcCateParId != '' ">
+			AND tc_cate_par_id = #{tcCateParId}
+		</if>
+		ORDER BY a.path
+	</select>
+	
+	<select id="selectTc" parameterType="tcCriteria" resultType="tcVo">
+		SELECT	seq
+				, pid
+				, tc_id
+				, tc
+				, big_cate_id
+				, middle_cate_id
+				, small_cate_id
+				, importance
+				, reg_dtm
+				, bigo
+				, file_nm
+				, file_path
+				, org_file_nm
+				, tc_division
+		FROM	tb_bmt_tc_info
+		WHERE	pid = #{pid}
+				AND seq = #{seq}
+				AND (use_yn IS NULL OR use_yn = 'Y')
+	</select>
+	
+	<select id="selectBmtModelList" parameterType="projectBmtModelCriteria" resultType="projectBmtModelVo">
+		SELECT a.pid
+			, a.model_id
+			, a.model_ver
+			, b.model_nm
+			, a.model_seq
+			, a.perform_yn
+		FROM tb_project_bmt_model a
+		INNER JOIN tb_model b 
+			ON a.model_id = b.model_id
+		WHERE b.model_group_id = #{modelGroupId} 
+		<if test=" projectId != '' ">
+			AND a.pid = #{projectId}
+		</if>
+	</select>
+	<!-- 리모콘 조회의 경우 프로젝트 모델 그룹에 등록되지 않으므로 모델 그룹 아이디만으로 조회해옴  -->
+	<select id="selectRemoteModelList" resultType="projectBmtModelVo">
+		SELECT *
+		FROM TB_MODEL
+		WHERE model_group_id = 'MG13' AND use_yn = 'Y'
+	</select>
+	
+	<update id="updateTc" parameterType="tcVo">
+		UPDATE tb_bmt_tc_info
+		SET bigo = #{bigo}
+			, tc = #{tc}
+			, small_cate_id = #{smallCateId}
+			, big_cate_id = #{bigCateId}
+			, middle_cate_id = #{middleCateId}
+			, importance = #{importance}
+			, tc_division = #{tcDivision}
+			, file_nm = #{fileNm}
+			, file_path = #{filePath}
+			, org_file_nm = #{orgFileNm}
+		WHERE seq = #{seq}
+	</update>
+	<update id="updateTcUseYnPrc" parameterType="String">
+		UPDATE tb_bmt_tc_info
+		SET use_yn = 'N'
+		WHERE seq = #{seq}
+	</update>
+	<update id="updateLastBmtResult" parameterType="tcVo">
+		UPDATE	tb_bmt_tc_info	SET
+				last_bmt_result = #{lastBmtResult}
+		WHERE	seq = #{seq}
+	</update>
+	
+	<insert id="insertTcCategory" parameterType="tcCategoryVo">
+			INSERT INTO tb_bmt_tc_category (
+				pid
+				, tc_cate_id
+				, tc_cate_par_id
+				, tc_cate_nm
+			)
+			VALUES (
+				#{pid}
+				, #{tcCateId}
+				, #{tcCateParId}
+				, #{tcCateNm}
+			)			
+	</insert>
+	<update id="updateDelTcCategory" parameterType="tcCategoryVo">
+			UPDATE tb_bmt_tc_category
+			SET use_yn = #{useYn}
+			WHERE tc_cate_id = #{tcCateId} AND pid = #{pid}
+	</update>
+	<update id="updateModTcCategory" parameterType="tcCategoryVo">
+			UPDATE tb_bmt_tc_category
+			SET tc_cate_nm = #{tcCateNm}
+			WHERE tc_cate_id = #{tcCateId} AND pid = #{pid}
+	</update>
+	<insert id="insertRegReport" parameterType="xqmsVo">
+		INSERT INTO tb_xqms (
+			model_seq
+			, xqms_type
+			, prj_chasu
+			, seq
+			, model_id
+			, remocon
+			, testcase
+			, mac
+			, model_ver
+			, person
+			, report_id
+			, pid
+			, bot_sno
+			, xqms_dtm
+			, tc_type
+		)
+		VALUES (
+			#{modelSeq}
+			, #{xqmsType}
+			, (SELECT project_chasu FROM tb_project WHERE pid = #{pid})
+			, #{seq}
+			, #{modelId}
+			, #{remocon}
+			, #{testcase}
+			, #{mac}
+			, #{modelVer}
+			, #{person}
+			, #{reportId}
+			, #{pid}
+			, #{botSno}
+			, GETDATE()
+			, #{tcType}
+		)
+	</insert>
+	<select id="selectReportSeq" parameterType="xqmsVo" resultType="int">
+			SELECT xqms_seq 
+			FROM tb_xqms
+			WHERE report_id = #{reportId}
+	</select>
+	<insert id="insertRegBmtReport" parameterType="xqmsVo">
+			INSERT INTO tb_bmt (
+				xqms_seq
+				, bmt_result
+			)
+			VALUES (
+				#{xqmsSeq}
+				, #{bmtResult}
+			)			
+	</insert>
+	<select id="selectXqmsAttachMaxSeq" parameterType="xqmsVo" resultType="int">
+			SELECT IsNULL(max(seq), 0)+1
+			FROM tb_xqms_attach
+			WHERE xqms_seq = #{xqmsSeq}
+	</select>
+	<insert id="insertXqmsAttachFile" parameterType="xqmsFileVo">
+			INSERT INTO tb_xqms_attach (
+				xqms_seq 
+				, seq 
+				, file_source
+				, file_nm
+				, file_path
+				, org_file_nm
+				, reg_dtm 
+			)
+			VALUES (
+				#{xqmsSeq}
+				, #{seq}
+				, #{fileSource}
+				, #{fileNm}
+				, #{filePath}
+				, #{orgFileNm}
+				, #{regDtm}
+			)			
+	</insert>
+	
+	<insert id="insertTc" parameterType="tcVo">
+			INSERT INTO tb_bmt_tc_info (
+				pid
+				, tc_id
+				, tc
+				, small_cate_id
+				, big_cate_id
+				, middle_cate_id
+				, importance
+				, tc_division
+			)
+			VALUES (
+				#{pid}
+				, #{tcId}
+				, #{tc}
+				, #{smallCateId}
+				, #{bigCateId}
+				, #{middleCateId}
+				, #{importance}
+				, #{tcDivision}
+			)
+	</insert>
+
+	<update id="updateLastBmtResultInit" parameterType="string">
+		UPDATE	tb_bmt_tc_info SET
+				last_bmt_result = null
+		WHERE	pid = #{pid}
+	</update>
+	
+	<select id="selectBmtTcStatList" parameterType="tcVo" resultType="tcVo">
+		SELECT	C.auto_cnt
+				, C.manual_cnt
+				, C.tc_ingCnt
+				, C.tc_totalCnt
+				, ROUND(CASE WHEN ISNULL(CAST(C.tc_totalCnt AS FLOAT),0) = 0 THEN 0 ELSE CAST(C.auto_cnt AS FLOAT) / CAST(C.tc_totalCnt AS FLOAT) END * 100,0) xqms_percent
+				, ROUND(CASE WHEN ISNULL(CAST(C.tc_totalCnt AS FLOAT),0) = 0 THEN 0 ELSE CAST(C.manual_cnt AS FLOAT) / CAST(C.tc_totalCnt AS FLOAT) END * 100,0) manual_percent
+				, ROUND(CASE WHEN ISNULL(CAST(C.tc_totalCnt AS FLOAT),0) = 0 THEN 0 ELSE CAST(C.tc_ingCnt AS FLOAT) / CAST(C.tc_totalCnt AS FLOAT) END * 100,0) ing_percent				
+		FROM (
+				SELECT COUNT(CASE WHEN B.tc_type = 'B401' AND B.last_bmt_result IS NOT NULL THEN 1 ELSE NULL END) auto_cnt
+					, COUNT(CASE WHEN B.tc_type = 'B402' AND B.last_bmt_result IS NOT NULL THEN 1 ELSE NULL END) manual_cnt
+					, COUNT(CASE WHEN B.last_bmt_result IS NULL THEN 1 ELSE NULL END) tc_ingCnt
+					, COUNT(B.seq) tc_totalCnt
+		
+				FROM (
+					SELECT
+						d.seq , d.tc, d.last_bmt_result, e.tc_type 
+					FROM (
+						SELECT
+							a.seq , max(c.XQMS_SEQ) AS xqms_seq
+						FROM tb_bmt_tc_info a
+						LEFT JOIN tb_project b ON (b.pid = a.pid)
+						LEFT JOIN tb_xqms c ON (c.seq = a.seq AND c.prj_chasu = b.project_chasu)
+						WHERE a.pid = #{pid}
+						AND    (b.use_yn IS NULL OR b.use_yn = 'Y')
+						GROUP BY a.seq
+					) A
+					JOIN tb_bmt_tc_info d
+					ON A.seq  = d.seq
+					LEFT JOIN tb_xqms e
+					ON A.xqms_seq = e.xqms_seq
+				) B
+			)C
+	</select>
+	
+	<select id="selectIssueCntList" parameterType="tcVo" resultType="tcVo">
+		SELECT a.chasu
+			, count(case WHEN b.progress_stat = 'B203' THEN 1 ELSE NULL END) comp_cnt
+			, count(case WHEN b.progress_stat = 'B202' THEN 1 ELSE NULL END) ing_cnt
+			, count(case WHEN b.progress_stat = 'B201' THEN 1 ELSE NULL END) open_cnt
+			, count(case WHEN b.progress_stat = 'B204' THEN 1 ELSE NULL END) fw_cnt
+			, count(case WHEN b.progress_stat = 'B205' THEN 1 ELSE NULL END) he_cnt
+			, count(case WHEN b.progress_stat = 'B206' THEN 1 ELSE NULL END) normal_cnt
+			, count(b.issue_id) tot_cnt
+		FROM tb_project_chasu_hst a
+		LEFT JOIN tb_issue b ON (b.pid = a.pid AND b.chasu = a.chasu)
+		WHERE a.pid = #{pid}
+		GROUP BY a.chasu
+		
+	</select>
+	
+	<select id="selectIssueCateCntList" parameterType="String" resultType="tcVo">
+		SELECT a.pid
+			, a.issue_lcate_cd
+			, ISNULL((SELECT code_nm FROM tb_code WHERE CODE_ID = a.issue_lcate_cd), '미분류') as code_nm
+			, COUNT(a.issue_cont) as cd_count
+		FROM tb_issue a
+		WHERE a.pid = #{pid}
+		GROUP BY a.pid, a.issue_lcate_cd
+			
+	</select> 
+	<!-- 
+	<select id="selectIssueCateCntList" parameterType="String" resultType="tcVo">
+		SELECT (SELECT tc_cate_nm FROM tb_bmt_tc_category d WHERE c.big_cate_id = d.tc_cate_id and pid = #{pid}) big_cate_nm
+			, c.big_cate_id
+			, COUNT(a.issue_id) issue_cnt
+		FROM tb_issue_tc a
+		LEFT JOIN tb_issue b on (a.issue_id = b.issue_id)
+		LEFT JOIN tb_bmt_tc_info c on (a.seq = c.seq)
+		WHERE b.pid = #{pid}
+		AND	(c.use_yn IS NULL OR c.use_yn = 'Y')
+		GROUP BY c.big_cate_id
+	</select> -->
+	
+	<delete id="deleteXqmsTmp">
+		TRUNCATE TABLE tb_xqms_tmp
+	</delete>
+	
+	<insert id="insertXqmsTmp" parameterType="xqmsVo">
+		INSERT INTO tb_xqms_tmp 
+		(
+			tmp_seq
+			, model_seq
+			, xqms_type
+			, prj_chasu
+			, seq
+			, model_id
+			, remocon
+			, tc
+			, mac
+			, model_ver
+			, person
+			, report_id
+			, pid
+			, bot_sno
+			, tc_type
+		)
+		VALUES (
+			NEXT VALUE FOR dbo.tmp_seq
+			, #{modelSeq}
+			, #{xqmsType}
+			, (SELECT project_chasu FROM tb_project WHERE pid = #{pid})
+			, #{seq}
+			, #{modelId}
+			, #{remocon}
+			, #{tc}
+			, #{mac}
+			, #{modelVer}
+			, #{person}
+			, #{reportId}
+			, #{pid}
+			, #{botSno}
+			, #{tcType}
+		)
+	</insert>
+	
+	<insert id="insertXqmsByXqmsTmp" parameterType="xqmsVo">
+		INSERT INTO tb_xqms 
+		(
+			tmp_seq
+			, model_seq
+			, xqms_type
+			, prj_chasu
+			, seq
+			, model_id
+			, testcase
+			, yyyymmdd
+			, report_id
+			, pid
+			, bot_sno
+			, tc_type
+			, remocon
+			, mac
+			, model_ver
+			, person
+			, xqms_dtm
+		)
+		SELECT tmp_seq
+			, model_seq
+			, xqms_type
+			, prj_chasu
+			, seq
+			, model_id
+			, tc
+			, CONVERT([char](8),getdate(),(112))
+			, report_id
+			, pid
+			, bot_sno
+			, tc_type
+			, remocon
+			, mac
+			, model_ver
+			, person
+			, GETDATE()
+		FROM tb_xqms_tmp
+	</insert>
+	
+	<insert id="insertBmtByXqmsTmp" parameterType="String">
+		INSERT INTO tb_bmt
+		SELECT b.xqms_seq
+			, #{bmtResult}
+			, GETDATE()
+		FROM tb_xqms_tmp a
+		INNER JOIN tb_xqms b ON (b.tmp_seq = a.tmp_seq)
+	</insert>
+	
+	<update id="updateTcInfoByXqmsTmp" parameterType="String">
+		UPDATE tb_bmt_tc_info
+		SET last_bmt_result = #{bmtResult}
+		WHERE seq IN (SELECT seq FROM tb_xqms_tmp)
+	</update>
+</mapper>

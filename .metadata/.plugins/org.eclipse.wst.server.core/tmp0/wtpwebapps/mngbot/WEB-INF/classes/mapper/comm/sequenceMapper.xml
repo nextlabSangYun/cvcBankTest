@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.nextlab.comm.mapper.SequenceMapper">
+	<select id="getSequenceByIdKey" parameterType="sequenceVo" resultType="sequenceVo">
+		SELECT a.crt_num_id as sequenceId
+			, a.num_len as length
+			, a.crt_num_name as sequenceName
+			, b.crt_num_key as sequenceKey
+			, b.num as next
+		FROM tb_create_number_master a,	tb_create_number_detail b
+		WHERE a.crt_num_id  = b.crt_num_id 
+		AND a.crt_num_id  = #{sequenceId}
+		AND b.crt_num_key = #{sequenceKey}
+	</select>
+	
+	<select id="getSequenceById" parameterType="string" resultType="sequenceVo">
+		SELECT crt_num_id as sequenceId
+			, num_len as length
+			, crt_num_name as sequenceName
+		FROM tb_create_number_master
+		WHERE crt_num_id = #{value}
+	</select>
+	
+	<insert id="insertSequenceDetail" parameterType="sequenceVo">
+		INSERT INTO tb_create_number_detail (crt_num_id, crt_num_key, num) values (#{sequenceId}, #{sequenceKey}, #{next})
+	</insert>
+	
+	<insert id="increaseSequence" parameterType="sequenceVo">
+		UPDATE tb_create_number_detail
+		SET num = num + 1
+		WHERE crt_num_id = #{sequenceId}
+		AND crt_num_key = #{sequenceKey}
+	</insert>
+	
+</mapper>

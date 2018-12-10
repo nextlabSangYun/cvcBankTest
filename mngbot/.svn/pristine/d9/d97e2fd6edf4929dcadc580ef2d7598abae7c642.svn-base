@@ -1,0 +1,680 @@
+<!doctype html>
+<html lang="ko">
+	<head>
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+		<title>스타일</title>
+		<script src="../js/jquery-3.2.1.min.js"></script>
+		<script src="../js/jquery-ui.min.js"></script>
+		<script src="../js/jquery.form.min.js"></script>
+		<script src="../js/vue.min.js"></script>
+		<script src="../js/lodash.min.js"></script>
+		<script src="../js/calendar.js"></script>
+		<script src="../js/common.js"></script>
+		<link rel="stylesheet" href="../css/common.css">
+		<style type="text/css">
+		body{margin:0;padding:10px 10px 30px 10px;letter-spacing:0;box-sizing:border-box;}
+		
+		table{border-collapse:collapse;border-spacing:0;width:100%;}
+		caption{visibility:hidden;width:0;height:0;font-size:0}
+		table th{border:1px solid #d1d1d1;padding:3px 0}
+		table td{border:1px solid #d1d1d1;padding-left:10px;padding:3px 10px}
+		table th.right, table td.right{text-align:right;}
+		table td.center{text-align:center;padding-left:0}
+		table td a{color:#193d79;}
+		.index{background:#fff6dd}
+		.edit{font-weight:bold;}
+		.undone{color:#b90b0b;background-color:#feeeee !important;font-weight:bold}
+		.done{color:#5f8b33;background-color:#eaf5e1 !important;font-weight:bold}
+		.pass{color:#5f8b33;background-color:#eaf5e1 !important;font-weight:bold}
+		.red{color:#e40000;}
+		.red a{color:#e40000;}
+		.gre{color:#006F37}
+		.gre a{color:#006F37;}
+			/* table info */
+			.tbl-info{width:600px; margin-bottom:20px;	border-top:1px solid #ccc;	border-left:1px solid #ccc;}
+			.tbl-info th{background:#e9e9e9; border-bottom:1px solid #ccc;padding:3px 0}
+			.tbl-info td{border-bottom:1px solid #ccc;padding-left:10px;padding:3px 0 3px 10px}
+			.tbl-info tr:hover td{background:none;}
+
+
+			/* tab nav */
+			.tab_nav{margin:10px 0; border-bottom:1px solid #ddd;position:relative; text-align:left;}
+			.tab_nav ul{display:inline-block; margin:0 0 0 3px  !important; padding:0 !important;}
+			.tab_nav ul li{display: inline-block;margin-left:-3px;}
+			.ie7 .tab_nav ul, .lte7 .tab_nav ul li{display:inline;zoom:1;}
+			.tab_nav ul li a{display: inline-block;margin-bottom: -1px; padding: 8px 12px; border: 1px solid #ddd;border-radius: 3px 3px 0 0; border-bottom: 0; font-size: 14px; color: #666; text-decoration: none;}
+			.tab_nav ul li.current a{border:1px solid #bbb; border-bottom:1px solid #ddd; border-radius: 3px 3px 0 0; color: #fff; font-weight: bold; background: #bbb;}
+			.tab_nav .tab_nav_last{position:absolute;top:0;right:0;}
+			.tab_nav .count{position: relative; top: -1px; margin: 0 0 0 5px; padding: 1px 5px 2px 5px; font-size: 10px; font-weight: bold; color: #666; background: #E5E5E5; border-radius: 10px; font:11px verdana, sans-serif; line-height:1.25;}
+
+			.ie6 .tab_nav ul{}
+			.ie6 .tab_nav ul li{float:left;}
+			.ie6 .tab_nav .tab_nav_last ul{float:right;}
+
+			.tab_contents_wrap{width:100%; margin-top:10px;background:#fff;border-top:none;}
+			.hide{display:none;}
+			.source_download{margin:10px 0;list-style-type:disc;margin-left:10px;padding-left:10px;}
+
+			h1 {font-weight:bold;font-size:20px;color:#212121;}
+			h2 {margin:30px 0 15px;padding:10px 15px;border:1px dotted #212121;font-size:15px;}
+
+		</style>
+	</head>
+	<body>
+		<h1>style</h1>
+		<h2>point color</h2>
+		<table>
+			<colgroup>
+				<col style="width:10%;">
+				<col style="width:40%;">
+				<col>
+			</colgroup>
+			<thead>
+				<tr>
+					<th>구분</th>
+					<th>style</th>
+					<th>code</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>상태 표시 색</td>
+					<td>
+						<span class="state01">state01</span>
+					</td>
+					<td>
+<xmp><span class="state01">state01</span></xmp>
+					</td>
+				</tr>
+				<tr>
+					<td>상태 표시 색 02</td>
+					<td>
+						<span class="state02">state02</span>
+					</td>
+					<td>
+<xmp><span class="state02">state02</span></xmp>
+					</td>
+				</tr>
+				<tr>
+					<td>상태 표시 색 03</td>
+					<td>
+						<span class="state03">state03</span>
+					</td>
+					<td>
+<xmp><span class="state03">state03</span></xmp>
+					</td>
+				</tr>
+				<tr>
+					<td>상태 표시 색 04</td>
+					<td>
+						<span class="state04">state04</span>
+					</td>
+					<td>
+<xmp><span class="state04">state04</span></xmp>
+					</td>
+				</tr>
+				<tr>
+					<td>상태 표시 색 05</td>
+					<td>
+						<span class="state05">state05</span>
+					</td>
+					<td>
+<xmp><span class="state05">state05</span></xmp>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		<h2>title</h2>
+		<table>
+			<colgroup>
+				<col style="width:10%;">
+				<col style="width:40%;">
+				<col>
+			</colgroup>
+			<thead>
+				<tr>
+					<th>구분</th>
+					<th>style</th>
+					<th>code</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>컨텐츠 영역 타이틀</td>
+					<td>
+						<div class="content">
+							<p class="cate_tit">카테고리 타이틀</p>
+						</div>
+					</td>
+					<td>
+<xmp><p class="cate_tit">카테고리 타이틀</p></xmp>
+					</td>
+				</tr>
+				<tr>
+					<td>팝업 컨텐츠 타이틀</td>
+					<td>
+						<div class="pop_cont">
+							<p class="info_tit">팝업 컨텐츠 타이틀</p>
+						</div>
+					</td>
+					<td>
+<xmp><p class="info_tit">팝업 컨텐츠 타이틀</p></xmp>
+					</td>
+				</tr>
+				<tr>
+					<td>팝업 컨텐츠 타이틀02</td>
+					<td>
+						<div class="pop_cont">
+							<p class="area_tit">팝업 컨텐츠 타이틀</p>
+						</div>
+					</td>
+					<td>
+<xmp><p class="area_tit">팝업 컨텐츠 타이틀</p></xmp>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		<h2>button</h2>
+		<table>
+			<colgroup>
+				<col style="width:10%;">
+				<col style="width:40%;">
+				<col>
+			</colgroup>
+			<thead>
+				<tr>
+					<th>구분</th>
+					<th>style</th>
+					<th>code</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>버튼1</td>
+					<td>
+						<button class="g_btn01">g_btn01</button>
+					</td>
+					<td>
+<xmp><button class="g_btn01">버튼1</button></xmp>
+					</td>
+				</tr>
+				<tr>
+					<td>버튼2</td>
+					<td>
+						<button class="g_btn02">g_btn02</button>
+					</td>
+					<td>
+<xmp><button class="g_btn02">버튼2</button></xmp>
+					</td>
+				</tr>
+				<tr>
+					<td>버튼3</td>
+					<td>
+						<button class="g_btn03">g_btn03</button>
+					</td>
+					<td>
+<xmp><button class="g_btn03">버튼3</button></xmp>
+					</td>
+				</tr>
+				<tr>
+					<td>다운로드 버튼</td>
+					<td>
+						<button class="g_btn04"><span>엑셀다운로드</span></button>
+					</td>
+					<td>
+<xmp><button class="g_btn03">버튼3</button></xmp>
+					</td>
+				</tr>
+				<tr>
+					<td>테이블 내 작은버튼</td>
+					<td>
+						<button class="tb_btn01">tb_btn01</button>
+					</td>
+					<td>
+<xmp><button class="tb_btn01">tb_btn01</button></xmp>
+					</td>
+				</tr>
+				<tr>
+					<td>테이블 내 작은버튼02</td>
+					<td>
+						<button class="tb_btn02">tb_btn02</button>
+					</td>
+					<td>
+<xmp><button class="tb_btn02">tb_btn02</button></xmp>
+					</td>
+				</tr>
+				<tr>
+					<td>테이블 내 작은버튼03</td>
+					<td>
+						<button class="tb_btn03">tb_btn03</button>
+					</td>
+					<td>
+<xmp><button class="tb_btn03">tb_btn03</button></xmp>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		<h2>component</h2>
+		<table>
+			<colgroup>
+				<col style="width:10%;">
+				<col style="width:40%;">
+				<col>
+			</colgroup>
+			<thead>
+				<tr>
+					<th>구분</th>
+					<th>style</th>
+					<th>code</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>달력</td>
+					<td>
+						<div class="period">
+	 						<input type="text" class="input_date">
+	 						<span class="bar">~</span>
+	 						<input type="text" class="input_date">
+	 					</div>
+					</td>
+					<td>
+<xmp>
+	<div class="period">
+		<input type="text" class="input_date">
+		<span class="bar">~</span>
+		<input type="text" class="input_date">
+	</div>
+</xmp>
+					</td>
+				</tr>
+				<tr>
+					<td>pagination</td>
+					<td>
+						<div class="pagination">
+							<ol>
+								<li class="btn_first"><button>처음</button></li>
+								<li class="btn_prev"><button>이전</button></li>
+								<li class="num on"><button>1</button></li>
+								<li class="num"><button>2</button></li>
+								<li class="num"><button>3</button></li>
+								<li class="num"><button>4</button></li>
+								<li class="num"><button>5</button></li>
+								<li class="btn_next"><button>다음</button></li>
+								<li class="btn_last"><button>마지막</button></li>
+							</ol>
+						</div>
+					</td>
+					<td>
+<xmp><div class="pagination">
+		<ol>
+			<li class="btn_first"><button>처음</button></li>
+			<li class="btn_prev"><button>이전</button></li>
+			<li class="num on"><button>1</button></li>
+			<li class="num"><button>2</button></li>
+			<li class="num"><button>3</button></li>
+			<li class="num"><button>4</button></li>
+			<li class="num"><button>5</button></li>
+			<li class="btn_next"><button>다음</button></li>
+			<li class="btn_last"><button>마지막</button></li>
+		</ol>
+	</div>
+</xmp>
+					</td>
+				</tr>
+				<tr>
+					<td>추가 영역</td>
+					<td>
+						<div class="reg_list">
+							<ul>
+								<li><span>bhx-yh400(10.3.5)</span><button class="del"></button></li>
+								<li><span>bhx-yh400(10.3.5)</span><button class="del"></button></li>
+								<li><span>bhx-yh400(10.3.5)</span><button class="del"></button></li>
+								<li><span>bhx-yh400(10.3.5)</span><button class="del"></button></li>
+								<li><span>bhx-yh400(10.3.5)</span><button class="del"></button></li>
+								<li><span>bhx-yh400(10.3.5)</span><button class="del"></button></li>
+								<li class="gr"><span>bhx-yh400(10.3.5)</span></li>
+							</ul>
+						</div>
+					</td>
+					<td>
+<xmp>
+	<div class="reg_list">
+		<ul>
+			<li><span>bhx-yh400(10.3.5)</span><button class="del"></button></li>
+			<li><span>bhx-yh400(10.3.5)</span><button class="del"></button></li>
+			<li><span>bhx-yh400(10.3.5)</span><button class="del"></button></li>
+			<li><span>bhx-yh400(10.3.5)</span><button class="del"></button></li>
+			<li><span>bhx-yh400(10.3.5)</span><button class="del"></button></li>
+			<li><span>bhx-yh400(10.3.5)</span><button class="del"></button></li>
+		</ul>
+	</div>
+</xmp>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		<h2>tab</h2>
+		<table>
+			<colgroup>
+				<col style="width:10%;">
+				<col style="width:40%;">
+				<col>
+			</colgroup>
+			<thead>
+				<tr>
+					<th>구분</th>
+					<th>style</th>
+					<th>code</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>tab</td>
+					<td>
+						<div class="tab_wrap">
+							<ul class="g_tab">
+								<li><a href="#">탭1</a></li>
+								<li><a href="#">탭2</a></li>
+								<li><a href="#">탭3</a></li>
+							</ul>
+							<div class="tab_con_wrap">
+								<div class="tab_con">
+									<p>탭 컨텐츠1</p>
+								</div>
+								<div class="tab_con">
+									<p>탭 컨텐츠2</p>
+								</div>
+								<div class="tab_con">
+									<p>탭 컨텐츠3</p>
+								</div>
+							</div>
+						</div>
+					</td>
+					<td>
+<xmp><div class="tab_wrap">
+		<ul class="g_tab">
+			<li><a href="#">탭1</a></li>
+			<li><a href="#">탭2</a></li>
+			<li><a href="#">탭3</a></li>
+		</ul>
+		<div class="tab_con_wrap">
+			<div class="tab_con">
+				<p>탭 컨텐츠1</p>
+			</div>
+			<div class="tab_con">
+				<p>탭 컨텐츠2</p>
+			</div>
+			<div class="tab_con">
+				<p>탭 컨텐츠3</p>
+			</div>
+		</div>
+	</div>
+</xmp>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		<h2>table</h2>
+		<table>
+			<colgroup>
+				<col style="width:10%;">
+				<col style="width:40%;">
+				<col>
+			</colgroup>
+			<thead>
+				<tr>
+					<th>구분</th>
+					<th>style</th>
+					<th>code</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>리스트 테이블</td>
+					<td>
+						<div class="g_table">
+							<table>
+								<colgroup>
+									<col style="width:20%">
+									<col style="width:20%">
+									<col>
+								</colgroup>
+								<thead>
+									<tr>
+										<th>col1</th>
+										<th>col2</th>
+										<th>col3</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>cont01</td>
+										<td>cont02</td>
+										<td>cont03</td>
+									</tr>
+									<tr>
+										<td class="l_align">왼쪽정렬</td>
+										<td><a href="#" class="link">링크</a></td>
+										<td>cont03</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</td>
+					<td>
+<xmp>
+	<div class="g_table">
+		<table>
+			<colgroup>
+				<col style="width:20%">
+				<col style="width:20%">
+				<col>
+			</colgroup>
+			<thead>
+				<tr>
+					<th>col1</th>
+					<th>col2</th>
+					<th>col3</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>cont01</td>
+					<td>cont02</td>
+					<td>cont03</td>
+				</tr>
+				<tr>
+					<td class="l_align">왼쪽정렬</td>
+					<td><a href="#" class="link">링크</a></td>
+					<td>cont03</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</xmp>
+					</td>
+				</tr>
+				<tr>
+					<td>정보 테이블</td>
+					<td>
+						<div class="g_table02">
+							<table>
+								<colgroup>
+									<col style="width:120px">
+									<col>
+								</colgroup>
+								<tbody>
+									<tr>
+										<th>구분1</th>
+										<td>cont01</td>
+									</tr>
+									<tr>
+										<th>구분2</th>
+										<td>cont02</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</td>
+					<td>
+<xmp>
+	<div class="g_table02">
+		<table>
+			<colgroup>
+				<col style="width:120px">
+				<col>
+			</colgroup>
+			<tbody>
+				<tr>
+					<th>구분1</th>
+					<td>cont01</td>
+				</tr>
+				<tr>
+					<th>구분2</th>
+					<td>cont02</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</xmp>
+					</td>
+				</tr>
+				<tr>
+					<td>정보 테이블02</td>
+					<td>
+						<div class="g_table03">
+							<table>
+								<colgroup>
+									<col style="width:120px">
+									<col>
+								</colgroup>
+								<tbody>
+									<tr>
+										<th>구분1</th>
+										<td>cont01</td>
+									</tr>
+									<tr>
+										<th>구분2</th>
+										<td>cont02</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</td>
+					<td>
+<xmp>
+	<div class="g_table03">
+		<table>
+			<colgroup>
+				<col style="width:120px">
+				<col>
+			</colgroup>
+			<tbody>
+				<tr>
+					<th>구분1</th>
+					<td>cont01</td>
+				</tr>
+				<tr>
+					<th>구분2</th>
+					<td>cont02</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</xmp>
+					</td>
+				</tr>
+				<tr>
+					<td>테이블 상단 버튼 및 정보</td>
+					<td>
+						
+						<div class="g_table">
+							<div class="tb_desc">
+								<p>조회결과 : 24건</p>
+								<a href="#" class="g_btn01">다운로드</a>
+							</div>
+							<div class="tb_desc">
+								<p>조회결과 : 24건</p>
+								<div class="btn_wrap">
+									<a href="#" class="g_btn01">다운로드</a>
+									<a href="#" class="g_btn02">다운로드</a>
+								</div>
+							</div>
+							<table>
+								<colgroup>
+									<col style="width:20%">
+									<col style="width:20%">
+									<col>
+								</colgroup>
+								<thead>
+									<tr>
+										<th>col1</th>
+										<th>col2</th>
+										<th>col3</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>cont01</td>
+										<td>cont02</td>
+										<td>cont03</td>
+									</tr>
+									<tr>
+										<td class="l_align">왼쪽정렬</td>
+										<td><a href="#" class="link">링크</a></td>
+										<td>cont03</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</td>
+					<td>
+<xmp>
+	<div class="g_table">
+		<div class="tb_desc">
+			<p>조회결과 : 24건</p>
+			<a href="#" class="g_btn01">다운로드</a>
+		</div>
+		<div class="tb_desc">
+			<p>조회결과 : 24건</p>
+			<div class="btn_wrap">
+				<a href="#" class="g_btn01">다운로드</a>
+				<a href="#" class="g_btn02">다운로드</a>
+			</div>
+		</div>
+		<table>
+			<colgroup>
+				<col style="width:20%">
+				<col style="width:20%">
+				<col>
+			</colgroup>
+			<thead>
+				<tr>
+					<th>col1</th>
+					<th>col2</th>
+					<th>col3</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>cont01</td>
+					<td>cont02</td>
+					<td>cont03</td>
+				</tr>
+				<tr>
+					<td class="l_align">왼쪽정렬</td>
+					<td><a href="#" class="link">링크</a></td>
+					<td>cont03</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</xmp>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</body>
+</html>

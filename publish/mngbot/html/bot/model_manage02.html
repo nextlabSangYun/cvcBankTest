@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>Management Bot</title>
+	<link rel="stylesheet" href="../css/common.css">
+	<link rel="stylesheet" href="../css/bot.css">
+	<script src="../js/jquery-3.2.1.min.js"></script>
+	<script src="../js/jquery-ui.min.js"></script>
+	<script src="../js/jquery.form.min.js"></script>
+	<script src="../js/vue.min.js"></script>
+	<script src="../js/lodash.min.js"></script>
+	<script src="../js/calendar.js"></script>
+	<script src="../js/common.js"></script>
+</head>
+<body>
+<div class="wrap">
+	<header>
+		<div class="inner">
+			<a href="index.html" class="syt_name">Management Bot</a>
+			<button class="btn_nav"><span class="icon"></span></button>
+			<div class="btn_right">
+				<button class="btn_notice"><span class="ir">알림</span><span class="new">2</span></button>
+				<button class="btn_setting"><span class="photo" style="background-image:url('../images/common/btn_my.png')"></span>김성민</button>
+			</div>
+		</div>
+	</header>
+	<nav class="nav">
+		<div class="app_list">
+			<p class="cate_tit">Favorites</p>
+			<ul>
+				<li class="fav">
+					<a href="#">
+						<div class="app_icon"><img src="../images/common/app_bmt.png" alt="BMT 프로젝트"></div>
+						<span class="app_name">BMT 프로젝트</span>
+					</a>
+					<button class="btn_fav"></button>
+				</li>
+				<li class="fav">
+					<a href="#">
+						<div class="app_icon"><img src="../images/common/app_live.png" alt="실시간 방송 측정"></div>
+						<span class="app_name">실시간 방송 측정</span>
+					</a>
+					<button class="btn_fav"></button>
+				</li>
+			</ul>
+		</div>
+		<div class="app_list">
+			<p class="cate_tit">All</p>
+			<ul>
+				<li class="fav">
+					<a href="#">
+						<div class="app_icon"><img src="../images/common/app_bmt.png" alt="BMT 프로젝트"></div>
+						<span class="app_name">BMT 프로젝트</span>
+					</a>
+					<button class="btn_fav"></button>
+				</li>
+				<li class="fav">
+					<a href="#">
+						<div class="app_icon"><img src="../images/common/app_live.png" alt="실시간 방송 측정"></div>
+						<span class="app_name">실시간 방송 측정</span>
+					</a>
+					<button class="btn_fav"></button>
+				</li>
+				<li>
+					<a href="#">
+						<div class="app_icon"><img src="../images/common/app_err.png" alt="장애이력관리"></div>
+						<span class="app_name">장애이력관리</span>
+					</a>
+					<button class="btn_fav"></button>
+				</li>
+				<li>
+					<a href="#">
+						<div class="app_icon"><img src="../images/common/app_stat.png" alt="통계분석"></div>
+						<span class="app_name">통계분석</span>
+					</a>
+					<button class="btn_fav"></button>
+				</li>
+				<li>
+					<a href="system_setting_main.html">
+						<div class="app_icon"><img src="../images/common/app_setting.png" alt="시스템설정"></div>
+						<span class="app_name">시스템설정</span>
+					</a>
+					<button class="btn_fav"></button>
+				</li>
+			</ul>
+		</div>
+	</nav>
+	<div class="ly_notice">
+		<div class="notice_list">
+			<p class="cate_tit">Notice</p>
+			<ul>
+				<li>
+					<p class="tit"><a href="#" onclick="showPopupLayer('pop_notice.html'); return false;">시스템 정기점검 공지</a></p>
+					<div class="info">
+						<p class="date">2017년 10월 30일</p>
+						<p class="writer">By 관리자</p>
+					</div>
+				</li>
+				<li>
+					<p class="tit"><a href="#">시스템 정기점검 공지</a></p>
+					<div class="info">
+						<p class="date">2017년 10월 30일</p>
+						<p class="writer">By 관리자</p>
+					</div>
+				</li>
+				<li>
+					<p class="tit"><a href="#">시스템 정기점검 공지</a></p>
+					<div class="info">
+						<p class="date">2017년 10월 30일</p>
+						<p class="writer">By 관리자</p>
+					</div>
+				</li>
+				<li>
+					<p class="tit"><a href="#">시스템 정기점검 공지</a></p>
+					<div class="info">
+						<p class="date">2017년 10월 30일</p>
+						<p class="writer">By 관리자</p>
+					</div>
+				</li>
+				<li>
+					<p class="tit"><a href="#">시스템 정기점검 공지</a></p>
+					<div class="info">
+						<p class="date">2017년 10월 30일</p>
+						<p class="writer">By 관리자</p>
+					</div>
+				</li>
+			</ul>
+			<button class="btn_more" onclick="showPopupLayer('pop_notice_list.html'); return false;">더보기</button>
+		</div>
+		<div class="notice_list">
+			<p class="cate_tit">Received Messages</p>
+			<ul>
+				<li>
+					<p class="tit"><a href="#"  onclick="showPopupLayer('pop_notice.html'); return false;">이슈Update–채널전환 시간 이슈Update–채널전환 시간</a></p>
+					<div class="info">
+						<p class="date">2017년 10월 30일</p>
+						<p class="writer">By 관리자</p>
+					</div>
+				</li>
+				<li>
+					<p class="tit"><a href="#">이슈Update–채널전환 시간 이슈Update–채널전환 시간</a></p>
+					<div class="info">
+						<p class="date">2017년 10월 30일</p>
+						<p class="writer">By 관리자</p>
+					</div>
+				</li>
+				<li>
+					<p class="tit"><a href="#">이슈Update–채널전환 시간 이슈Update–채널전환 시간</a></p>
+					<div class="info">
+						<p class="date">2017년 10월 30일</p>
+						<p class="writer">By 관리자</p>
+					</div>
+				</li>
+				<li>
+					<p class="tit"><a href="#">이슈Update–채널전환 시간 이슈Update–채널전환 시간</a></p>
+					<div class="info">
+						<p class="date">2017년 10월 30일</p>
+						<p class="writer">By 관리자</p>
+					</div>
+				</li>
+				<li>
+					<p class="tit"><a href="#">이슈Update–채널전환 시간 이슈Update–채널전환 시간</a></p>
+					<div class="info">
+						<p class="date">2017년 10월 30일</p>
+						<p class="writer">By 관리자</p>
+					</div>
+				</li>
+			</ul>
+			<button class="btn_more" onclick="showPopupLayer('pop_msg_list.html'); return false;">더보기</button>
+		</div>
+	</div>
+	<div class="ly_my_setting">
+		<ul>
+			<li><a href="#" onclick="showPopupLayer('pop_my_info.html'); return false;">개인정보 수정</a></li>
+			<li class="bg" onclick="showPopupLayer('pop_bg_chg.html'); return false;"><a href="#">배경화면 설정</a></li>
+			<li class="logout"><a href="#">로그아웃</a></li>
+		</ul>
+	</div>
+	<div class="location">
+		<ol>
+			<!-- 17.12.18 수정 -->
+			<li><a href="#"><span class="app_ico"><img src="../images/common/app_setting.png" alt=""></span>시스템 설정 Main</a></li>
+			<li>측정모델 관리</li>
+		</ol>
+	</div>
+	<div class="content">
+		<div class="sub_layout">
+			<!-- 17.12.12 수정 -->
+			<div class="sort_area">
+				<div class="sel_item">
+					<span class="sort_tit">그룹선택</span>
+					<select name="" id="">
+						<option value="">모든 측정모델 분류</option>
+					</select>
+				</div>
+				<div class="sel_item">
+					<span class="sort_tit">그룹선택</span>
+					<input type="radio" id="radio1" name="radio"><label for="radio1">모두보기</label>
+					<input type="radio" id="radio2" name="radio"><label for="radio2">활성모델만 보기</label>
+				</div>
+				<button class="g_btn01">조회</button>
+			</div>
+			
+			<div class="tb_desc">
+				<p>조회결과 : 24건</p>
+				<button class="g_btn01" onclick="showPopupLayer('model_registration02.html'); return false;">측정모델 추가</button>
+			</div>
+			<!-- // 17.12.12 수정 -->
+			<div class="g_table">
+				<table>
+					<caption>측정모델 분류, 측정모델명, 활성화상태로 구성된 표 입니다.</caption>
+					<colgroup>
+						<col style="width:10%;">
+						<col style="width:25%;">
+						<col>
+						<col style="width:25%;">
+					</colgroup>
+					<thead>
+						<tr>
+							<th>No</th>
+							<th>측정모델 분류</th>
+							<th>측정모델명</th>
+							<th>활성화상태 </th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>1</td>
+							<td>셋탑박스</td>
+							<td><a href="#" class="link" onclick="showPopupLayer('model_info_edit02.html'); return false;">BHX-UH200</a></td>
+							<td>활성</td>
+						</tr>
+						<tr>
+							<td>2</td>
+							<td>셋탑박스</td>
+							<td><a href="#" class="link">BHX-UH200</a></td>
+							<td>비활성</td>
+						</tr>
+						<tr>
+							<td>3</td>
+							<td>셋탑박스</td>
+							<td><a href="#" class="link">BHX-UH200</a></td>
+							<td>비활성</td>
+						</tr>
+						<tr>
+							<td>4</td>
+							<td>셋탑박스</td>
+							<td><a href="#" class="link">BHX-UH200</a></td>
+							<td>비활성</td>
+						</tr>
+						<tr>
+							<td>5</td>
+							<td>셋탑박스</td>
+							<td><a href="#" class="link">BHX-UH200</a></td>
+							<td>비활성</td>
+						</tr>
+						<tr>
+							<td>6</td>
+							<td>셋탑박스</td>
+							<td><a href="#" class="link">BHX-UH200</a></td>
+							<td>비활성</td>
+						</tr>
+						<tr>
+							<td>7</td>
+							<td>셋탑박스</td>
+							<td><a href="#" class="link">BHX-UH200</a></td>
+							<td>비활성</td>
+						</tr>
+						<tr>
+							<td>8</td>
+							<td>셋탑박스</td>
+							<td><a href="#" class="link">BHX-UH200</a></td>
+							<td>비활성</td>
+						</tr>
+						<tr>
+							<td>9</td>
+							<td>셋탑박스</td>
+							<td><a href="#" class="link">BHX-UH200</a></td>
+							<td>비활성</td>
+						</tr>
+						<tr>
+							<td>10</td>
+							<td>셋탑박스</td>
+							<td><a href="#" class="link">BHX-UH200</a></td>
+							<td>비활성</td>
+						</tr>
+					</tbody>
+				</table>
+				<div class="pagination">
+					<ol>
+						<li class="btn_first"><button>처음</button></li>
+						<li class="btn_prev"><button>이전</button></li>
+						<li class="num on"><button>1</button></li>
+						<li class="num"><button>2</button></li>
+						<li class="num"><button>3</button></li>
+						<li class="num"><button>4</button></li>
+						<li class="num"><button>5</button></li>
+						<li class="btn_next"><button>다음</button></li>
+						<li class="btn_last"><button>마지막</button></li>
+					</ol>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+</html>

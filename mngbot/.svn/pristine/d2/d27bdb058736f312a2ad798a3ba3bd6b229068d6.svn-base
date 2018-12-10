@@ -1,0 +1,524 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.nextlab.qa.mapper.QaTcMapper">
+	
+	<select id="selectTcStatList" parameterType="String" resultType="qaTcInfotVo">
+		SELECT
+			C.auto_cnt
+			, C.manual_cnt
+			, C.tc_ingCnt
+			, C.tc_totalCnt
+			, ROUND(CASE WHEN ISNULL(CAST(C.tc_totalCnt AS FLOAT),0) = 0 THEN 0 ELSE CAST(C.auto_cnt AS FLOAT) / CAST(C.tc_totalCnt AS FLOAT) END * 100,0) xqms_percent
+			, ROUND(CASE WHEN ISNULL(CAST(C.tc_totalCnt AS FLOAT),0) = 0 THEN 0 ELSE CAST(C.manual_cnt AS FLOAT) / CAST(C.tc_totalCnt AS FLOAT) END * 100,0) manual_percent
+			, ROUND(CASE WHEN ISNULL(CAST(C.tc_totalCnt AS FLOAT),0) = 0 THEN 0 ELSE CAST(C.tc_ingCnt AS FLOAT) / CAST(C.tc_totalCnt AS FLOAT) END * 100,0) ing_percent
+		FROM (
+				SELECT 
+				 	COUNT(CASE WHEN B.tc_type_cd = 'B401' AND B.last_result_cd IS NOT NULL THEN 1 ELSE NULL END) auto_cnt
+					, COUNT(CASE WHEN B.tc_type_cd = 'B402' AND B.last_result_cd IS NOT NULL THEN 1 ELSE NULL END) manual_cnt
+					, COUNT(CASE WHEN B.last_result_cd IS NULL THEN 1 ELSE NULL END) tc_ingCnt
+					, COUNT(B.tc_id) tc_totalCnt
+				FROM (
+					SELECT
+						d.tc_id
+						, d.tc_nm
+						, d.last_result_cd
+						, e.tc_type_cd
+					FROM (
+						SELECT
+							b.tc_id
+							, MAX(c.seq) AS seq
+						FROM tb_qa_project a
+						LEFT JOIN tb_qa_tc_info b
+						ON b.pid = a.pid
+							AND (b.use_yn IS NULL OR b.use_yn = 'Y')
+						LEFT JOIN tb_qa_xqms c
+						ON c.tc_id = b.tc_id 
+							AND c.chasu = a.chasu
+						WHERE a.pid = #{pid}
+						GROUP BY b.tc_id
+					) A
+					JOIN tb_qa_tc_info d
+					ON d.tc_id  = A.tc_id
+					LEFT JOIN tb_qa_xqms e
+					ON e.seq = A.seq
+				) B
+			) C
+	</select>
+	
+	<select id="selectFlawStatList" parameterType="String" resultType="qaTcInfotVo">
+		SELECT
+			A.test_fail_cnt
+			, A.test_flaw_cnt
+			, ROUND(CASE WHEN ISNULL(CAST(A.test_fail_cnt AS FLOAT),0) = 0 THEN 0 ELSE CAST(A.test_flaw_cnt AS FLOAT) / CAST(A.test_fail_cnt AS FLOAT) END * 100,0) flaw_percent
+		FROM (
+				SELECT
+					a.pid
+					, count(c.seq) test_fail_cnt
+					, count(d.seq) test_flaw_cnt
+				FROM tb_qa_project a
+				LEFT JOIN tb_qa_tc_info b
+				ON (b.pid = a.pid
+					AND (b.use_yn IS NULL OR b.use_yn = 'Y'))
+				LEFT JOIN tb_qa_xqms c
+				ON (c.tc_id = b.tc_id
+					AND c.tc_result_cd = 'B302'
+					AND c.chasu = a.chasu)
+				LEFT JOIN tb_qa_xqms_flaw d
+				ON (d.seq = c.seq
+					AND d.jira_link is not null)
+				where a.pid = #{pid}
+				GROUP BY a.pid
+			) A
+	</select>
+	
+	<select id="selectFlawList" parameterType="flawCriteria" resultType="qaTcInfotVo">
+		SELECT
+			a.tc_id
+			, a.tc_nm
+			, b.chasu
+			, b.seq
+			, c.jira_link
+			, c.flaw_desc
+			, b.model_id
+			, (SELECT model_nm FROM tb_model d WHERE d.model_id = b.model_id) AS model_nm
+			, b.model_ver
+			, b.remocon
+			, (SELECT model_nm FROM tb_model d WHERE d.model_id = b.remocon) AS remocon_nm
+			, b.bot_sno
+			, ISNULL((SELECT d.bot_nm FROM tb_bot d where d.bot_sno = b.bot_sno), '수동') AS bot_nm
+		FROM tb_qa_tc_info a
+		JOIN tb_qa_xqms b
+		ON b.tc_id = a.tc_id
+			AND b.tc_result_cd = 'B302'
+		LEFT JOIN tb_qa_xqms_flaw c
+		ON c.seq = b.seq 
+		WHERE pid = #{pid}
+		AND a.use_yn = 'Y'
+		<if test="jiraLinkCd != null and jiraLinkCd != ''">
+			<if test="jiraLinkCd == 'D602'">
+				AND (jira_link IS NOT NULL AND jira_link != '')
+			</if>
+			<if test="jiraLinkCd == 'D603'">
+				AND jira_link IS NULL
+			</if>
+		</if>
+		ORDER BY b.chasu DESC, a.tc_id DESC, b.xqms_dtm DESC 
+	</select>
+	
+	<select id="selectFlawView" parameterType="Integer" resultType="qaTcInfotVo">
+		SELECT
+			a.chasu
+			, b.tc_id
+			, b.tc_nm
+			, a.seq 
+			, c.jira_link
+			, c.flaw_desc
+			, a.model_id
+			, (SELECT model_nm FROM tb_model d WHERE d.model_id = a.model_id) AS model_nm
+			, a.model_ver
+			, a.remocon
+			, (SELECT model_nm FROM tb_model d WHERE d.model_id = a.remocon) AS remocon_nm
+		FROM tb_qa_xqms a
+		JOIN tb_qa_tc_info b
+		ON b.tc_id = a.tc_id
+		LEFT JOIN tb_qa_xqms_flaw c
+		ON c.seq = a.seq
+		WHERE a.seq = #{seq}
+	</select>
+	
+	<insert id="mergeFlaw" parameterType="qaXqmsFlawVo">
+		MERGE tb_qa_xqms_flaw AS a
+		USING (SELECT 'X' AS DUAL) AS b
+		ON a.seq = #{seq}
+		WHEN MATCHED THEN
+			UPDATE SET jira_link = #{jiraLink}
+					 , flaw_desc = #{flawDesc}
+					 , mod_id = #{modId}
+					 , mod_dtm = GETDATE()
+		WHEN NOT MATCHED THEN
+			INSERT (seq, jira_link , flaw_desc, reg_id, reg_dtm, mod_id, mod_dtm)
+			VALUES (#{seq}, #{jiraLink} ,#{flawDesc}, #{regId}, GETDATE(), #{regId}, GETDATE())
+		;
+	</insert>
+	
+	<select id="selectTcCategoryList" parameterType="qaTcCategoryVo" resultType="qaTcCategoryVo">
+		WITH v_temp AS
+		(
+			SELECT a.tc_cate_nm
+				, a.tc_cate_par_id
+				, a.tc_cate_id
+				, a.use_yn
+				, a.reg_dtm
+				, CONVERT(VARCHAR(100), 'TOP') path
+				, 0 lvl
+				, CONVERT(VARCHAR(100) , a.tc_cate_id) as sort
+				, a.pid
+			FROM tb_qa_tc_category a
+			WHERE tc_cate_par_id IS NULL
+			UNION ALL
+			SELECT a.tc_cate_nm
+				, a.tc_cate_par_id
+				, a.tc_cate_id
+				, a.use_yn
+				, a.reg_dtm
+				, CONVERT(VARCHAR(100), b.path + ' > ' + a.tc_cate_nm) path
+				, b.lvl+1 lvl
+				, CONVERT(VARCHAR(100), b.sort + '/' + a.tc_cate_id ) as tc_cate_order
+				, a.pid
+			FROM tb_qa_tc_category a, v_temp b
+			WHERE a.tc_cate_par_id = b.tc_cate_id
+				AND a.pid = #{pid}
+		)
+		SELECT tc_cate_nm
+			, tc_cate_par_id 
+			, tc_cate_id
+			, use_yn
+			, reg_dtm 
+			, path
+			, lvl 
+			, pid
+			, (SELECT COUNT(*) FROM v_temp b WHERE a.tc_cate_id = b.tc_cate_par_id) child
+		FROM v_temp a
+		WHERE 1=1
+		<if test="useYn != null and useYn != '' ">
+			AND use_yn = #{useYn}
+		</if>
+		ORDER BY a.path
+	</select>
+	
+	<insert id="insertTcCategory" parameterType="qaTcCategoryVo">
+		INSERT INTO tb_qa_tc_category (
+			pid
+			, tc_cate_id
+			, tc_cate_par_id
+			, tc_cate_nm
+			, use_yn
+			, tc_cate_order
+			, reg_id
+			, reg_dtm
+			, mod_id
+			, mod_dtm
+		) VALUES (
+			#{pid}
+			, #{tcCateId}
+			, #{tcCateParId}
+			, #{tcCateNm}
+			, 'Y'
+			, (SELECT TOP 1 ISNULL(MAX(a.tc_cate_order), 0) + 1 AS tc_cate_order 
+				FROM tb_qa_tc_category a
+				WHERE a.tc_cate_par_id = #{tcCateParId}
+				AND a.pid = #{pid})
+			, #{regId}
+			, GETDATE()
+			, #{regId}
+			, GETDATE()
+		)
+	</insert>
+	
+	<update id="updateModTcCategory" parameterType="qaTcCategoryVo">
+		UPDATE tb_qa_tc_category
+		SET tc_cate_nm = #{tcCateNm}
+		WHERE tc_cate_id = #{tcCateId}
+		AND pid = #{pid}
+	</update>
+	
+	<update id="updateDelTcCategory" parameterType="tcCategoryVo">
+		UPDATE tb_qa_tc_category
+		SET use_yn = #{useYn}
+		WHERE tc_cate_id = #{tcCateId}
+		AND pid = #{pid}
+	</update>
+	
+	<select id="selectTcList" parameterType="QaTcCriteria" resultType="QaTcInfotVo">
+		SELECT a.tc_id 
+			, a.pid 
+			, a.tc_cate_id 	
+			, b.tc_cate_nm as scate_nm
+			, a.lcate_id
+			, d.tc_cate_nm as lcate_nm
+			, a.mcate_id 
+			, c.tc_cate_nm as mcate_nm
+			, a.tc_nm
+			, a.tc_divi_cd
+			, (SELECT code_nm FROM tb_code WHERE code_id = a.tc_divi_cd) as tc_divi_nm
+			, a.tc_impo_cd 
+			, a.use_yn
+			, a.last_result_cd 
+			, a.bigo 
+			, a.reg_id 
+			, a.reg_dtm 
+			, a.mod_id
+			, a.mod_dtm 
+		FROM tb_qa_tc_info a
+		JOIN tb_qa_tc_category b ON (b.tc_cate_id = a.tc_cate_id)
+		JOIN tb_qa_tc_category c ON (c.tc_cate_id = a.mcate_id)
+		JOIN tb_qa_tc_category d ON (d.tc_cate_id = a.lcate_id)
+		WHERE a.pid = #{pid} AND (a.use_yn IS NULL OR a.use_yn = 'Y')
+			<if test="lcateId != null and lcateId != ''">
+				AND a.lcate_id = #{lcateId}
+			</if>
+			<if test="importanceArray != null">
+				AND a.tc_impo_cd IN
+				<foreach collection="importanceArray" item="array" open="(" separator="," close=")">
+					#{array}
+				</foreach> 
+			</if>
+			<if test="seqArray != null">
+				AND a.tc_id IN
+				<foreach collection="seqArray" item="array" open="(" separator="," close=")">
+					#{array}
+				</foreach>
+			</if>
+			<if test="tcNm != null and tcNm != ''">
+				AND a.tc_nm LIKE '%' + REPLACE(REPLACE(REPLACE(#{tcNm},'[','\['), ']','\]'),'_','\_') + '%' ESCAPE '\'
+			</if>
+			<if test="qaResult != null and qaResult != '' ">
+				<choose>
+					<when test="qaResult == 'NONE' ">
+						AND a.last_result_cd is null
+					</when>
+					<otherwise>
+						AND a.last_result_cd = #{qaResult}
+					</otherwise>
+				</choose>
+			</if>
+			<if test="tcDiviCd != null and tcDiviCd != ''">
+				AND a.tc_divi_cd = #{tcDiviCd}
+			</if>
+		ORDER BY a.reg_dtm DESC
+	</select>
+	
+	<insert id="insertTc" parameterType="QaTcInfotVo">
+		<selectKey keyProperty="tcId" resultType="String" order="BEFORE">
+			SELECT 
+				CASE 
+					WHEN c.tc_id IS NOT NULL THEN b.tc_prefix + REPLICATE('0', 5-LEN((SUBSTRING(c.tc_id,LEN(b.tc_prefix)+1,LEN(c.tc_id))+1)))+CAST(SUBSTRING(c.tc_id,LEN(b.tc_prefix)+1,LEN(c.tc_id))+1 AS VARCHAR)
+					ELSE b.tc_prefix+'00001'
+				END as tc_id
+			FROM(SELECT a.tc_prefix
+				, a.pid
+			FROM tb_qa_project a
+			WHERE a.pid = #{pid})b
+			LEFT JOIN (SELECT max(tc_id) as tc_id, pid FROM tb_qa_tc_info GROUP BY pid) c ON (c.pid = b.pid)
+		</selectKey>
+		INSERT INTO tb_qa_tc_info(
+			tc_id
+			, pid
+			, tc_cate_id
+			, lcate_id
+			, mcate_id
+			, tc_nm
+			, tc_divi_cd
+			, tc_impo_cd
+			, use_yn
+			, reg_id
+			, reg_dtm
+			, mod_id
+			, mod_dtm
+		) VALUES (
+			#{tcId}
+			, #{pid}
+			, #{tcCateId}
+			, #{lcateId}
+			, #{mcateId}
+			, #{tcNm}
+			, #{tcDiviCd}
+			, #{tcImpoCd}
+			, 'Y'
+			, #{regId}
+			, GETDATE()
+			, #{regId}
+			, GETDATE()
+		)
+	</insert>
+	
+	<update id="updateTcUseYnPrc" parameterType="String">
+		UPDATE tb_qa_tc_info
+		SET use_yn = 'N'
+		WHERE tc_id = #{tcId}
+	</update>
+	
+	<select id="selectTc" parameterType="QaTcCriteria" resultType="QaTcInfotVo">
+		SELECT a.tc_id
+			, a.pid
+			, a.tc_cate_id 	
+			, b.tc_cate_nm as scate_nm
+			, a.lcate_id
+			, d.tc_cate_nm as lcate_nm
+			, a.mcate_id 
+			, c.tc_cate_nm as mcate_nm
+			, a.tc_nm
+			, a.tc_divi_cd
+			, a.tc_impo_cd
+			, a.use_yn
+			, a.last_result_cd
+			, a.bigo
+			, a.reg_id
+			, a.reg_dtm
+			, a.mod_id
+			, a.mod_dtm
+			, e.file_nm
+			, e.file_path
+			, e.org_file_nm
+		FROM tb_qa_tc_info a
+		JOIN tb_qa_tc_category b ON (b.tc_cate_id = a.tc_cate_id AND b.pid = a.pid)
+		JOIN tb_qa_tc_category c ON (c.tc_cate_id = a.mcate_id AND c.pid = a.pid)
+		JOIN tb_qa_tc_category d ON (d.tc_cate_id = a.lcate_id AND d.pid = a.pid)
+		LEFT JOIN tb_qa_tc_file e ON (e.tc_id = a.tc_id)
+		WHERE a.pid = #{pid}
+			AND a.tc_id = #{tcId}
+			AND (a.use_yn IS NULL or a.use_yn ='Y')
+	</select>
+	
+	<select id="selectModelList" parameterType="String" resultType="QaProjectModelVo">
+		SELECT c.model_id
+			, c.model_ver
+			, (SELECT model_nm FROM tb_model WHERE model_id = c.model_id) as model_nm
+			, c.model_id+';'+c.model_ver as model_full_nm
+		FROM TB_QA_PROJECT b
+		INNER JOIN tb_qa_project_model c ON (c.pid = b.pid)
+		WHERE b.pid = #{pid};
+	</select>
+	<insert id="insertRegReport" parameterType="QaXqmsVo">
+		INSERT INTO tb_qa_xqms(
+			tc_id
+			, model_id
+			, model_ver
+			, mac
+			, remocon
+			, chasu
+			, tc_type_cd
+			, bot_sno
+			, xqms_type_cd
+			, tc_result_cd
+			, xqms_person
+			, xqms_dtm
+			, mod_id
+			, mod_dtm
+		) VALUES (
+			#{tcId}
+			, #{modelId}
+			, #{modelVer}
+			, #{mac}
+			, #{remocon}
+			, #{chasu}
+			, #{tcTypeCd}
+			, #{botSno}
+			, #{xqmsTypeCd}
+			, #{tcResultCd}
+			, #{xqmsPerson}
+			, GETDATE()
+			, #{modId}
+			, GETDATE()
+		)
+		
+		<selectKey resultType="Integer" keyProperty="seq" order="AFTER">
+			SELECT TOP 1 a.seq 
+			FROM tb_qa_xqms a
+			WHERE a.tc_id = #{tcId}
+			ORDER BY a.seq DESC
+		</selectKey>
+	</insert>
+	<insert id="insertXqmsFile" parameterType="QaXqmsFileVo">
+		INSERT INTO tb_qa_xqms_file(
+			seq
+			, file_seq
+			, file_source_cd
+			, file_nm
+			, file_path
+			, org_file_nm
+		) VALUES (
+			#{seq}
+			, #{fileSeq}
+			, #{fileSourceCd}
+			, #{fileNm}
+			, #{filePath}
+			, #{orgFileNm}
+		)
+	</insert>
+	
+	<update id="updateLastResult" parameterType="QaTcInfotVo">
+		UPDATE tb_qa_tc_info SET
+			last_result_cd = #{lastResultCd}
+		WHERE tc_id = #{tcId}
+	</update>
+	
+	<select id="selectCategoryChk" parameterType="QaTcCategoryVo" resultType="QaTcCategoryVo">
+		SELECT a.pid
+			, a.tc_cate_id
+			, a.tc_cate_nm 
+		FROM tb_qa_tc_category a
+		WHERE a.pid = #{pid}
+			AND a.tc_cate_nm = #{tcCateNm}
+			AND a.tc_cate_par_id = #{tcCateParId};
+	</select>
+	
+	<update id="updateTc" parameterType="QaTcInfotVo">
+		UPDATE tb_qa_tc_info
+		SET pid = #{pid}
+			, bigo = #{bigo}
+			, tc_nm = #{tcNm}
+			, tc_divi_cd = #{tcDiviCd}
+			, tc_cate_id = #{tcCateId}
+			, lcate_id = #{lcateId}
+			, mcate_id = #{mcateId}
+			, tc_impo_cd = #{tcImpoCd}
+			, mod_id = #{modId}
+			, mod_dtm = GETDATE()
+		WHERE tc_id = #{tcId}
+	</update>
+	
+	<delete id="deleteTcFile" parameterType="String">
+		DELETE FROM tb_qa_tc_file
+		WHERE tc_id = #{tcId};
+	</delete>
+	
+	<insert id="insertTcFile" parameterType="QaTcInfotVo">
+		INSERT INTO tb_qa_tc_file(
+			tc_id
+			, seq
+			, file_nm
+			, file_path
+			, org_file_nm
+		) VALUES (
+			#{tcId}
+			, 1
+			, #{fileNm}
+			, #{filePath}
+			, #{orgFileNm}
+		)
+	</insert>
+	
+	<select id="selectCateList" parameterType="String" resultType="QaTcInfotVo">
+		SELECT   a.lcate_id ,
+		         d.tc_cate_nm as lcate_nm 
+		FROM     tb_qa_tc_info a
+		         JOIN tb_qa_tc_category b
+		         ON       (
+		                           b.tc_cate_id = a.tc_cate_id
+		                  )
+		         JOIN tb_qa_tc_category c
+		         ON       (
+		                           c.tc_cate_id = a.mcate_id
+		                  )
+		         JOIN tb_qa_tc_category d
+		         ON       (
+		                           d.tc_cate_id = a.lcate_id
+		                  )
+		WHERE    a.pid = #{pid}
+		AND
+		         (
+		                  a.use_yn IS NULL OR a.use_yn = 'Y'
+		         )
+		GROUP BY a.lcate_id, d.tc_cate_nm;
+	</select>
+	<select id="selectCategoryListChk" parameterType="QaTcCategoryVo" resultType="QaTcCategoryVo">
+		SELECT a.pid
+			, a.tc_cate_id
+			, a.tc_cate_nm 
+		FROM tb_qa_tc_category a
+		WHERE a.pid = #{pid}
+			AND a.tc_cate_nm = #{tcCateNm}
+			AND a.tc_cate_par_id = #{tcCateParId};
+	</select>
+</mapper>

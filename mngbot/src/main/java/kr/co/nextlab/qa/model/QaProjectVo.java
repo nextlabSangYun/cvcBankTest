@@ -1,0 +1,74 @@
+/**
+ * @title	: Qa 프로젝트관리 관련 vo
+ * @package	: kr.co.nextlab.qa.model
+ * @file	: QaProjectVo.java
+ * @author	: winolonam
+ * @date	: 2018. 07. 10.
+ * @desc	: 
+ */
+package kr.co.nextlab.qa.model;
+
+import java.util.Date;
+import java.util.List;
+
+import lombok.Data;
+
+@Data
+public class QaProjectVo {
+	
+	/**
+	 * 기본정보
+	 */
+	private String pid;
+	private String projectNm;
+	private String projectStDt;
+	private String projectEndDt;
+	private Integer chasu;
+	private String tcPrefix;
+	private String predictionQaMm;
+	private String predictionBpMm;
+	private String projectQaMm;
+	private String projectBpMm;
+	private String projectStatCd;
+	private String projectResultCd;
+	private String useYn;
+	private String bigo;
+	private String regId;
+	private Date regDtm;
+	private String modId;
+	private Date modDtm;
+	
+	/**
+	 * 일정관리
+	 */
+	private boolean mngYn;
+	private boolean progressYn;
+	private String partiId;
+	private Integer hstChasu;
+	private String chasuStDtm;
+	private String chasuEdDtm;
+	
+	/**
+	 * 진행 현황
+	 */
+	private String chasuStat;
+	private int testCnt;
+	private int testIngCnt;
+	private int testFailCnt;
+	private int testFlawCnt;
+	private int testPercent;
+	private int flawPercent;
+	
+	/**
+	 * 프로젝트 overview
+	 */
+	private String projectModelInfo;
+	private String projectPartiInfo;
+	
+	/**
+	 * 프로젝트 등록
+	 */
+	private List<QaProjectModelVo> modelList;
+	private List<QaProjectPartiVo> partiList;
+	private String[] addPartiArray;
+}

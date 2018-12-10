@@ -1,0 +1,23 @@
+/**
+ * @title	: 프로젝트 검색조건
+ * @package	: kr.co.nextlab.bmt.model
+ * @file	: ProjectCriteria.java
+ * @author	: jnlee
+ * @date	: 2017. 12. 19.
+ * @desc	: 
+ */
+package kr.co.nextlab.bmt.model;
+
+import lombok.Data;
+
+@Data
+public class ProjectCriteria {
+
+	private String startDt;
+	private String endDt;
+	private boolean chkIng;
+	private String [] modelIdArray;
+	//프로젝트 명 조회
+	private String projectNm;
+	
+}

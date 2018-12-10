@@ -1,0 +1,193 @@
+/**
+ * @title	: 테스트케이스 관련 mapper
+ * @package	: kr.co.nextlab.hded.mapper
+ * @file	: HdedTcMapper.java
+ * @author	: winolonam
+ * @date	: 2018. 06. 05.
+ * @desc	: 
+ */
+package kr.co.nextlab.hded.mapper;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import kr.co.nextlab.hded.model.HeProjectTcVo;
+import kr.co.nextlab.hded.model.HeSystemVo;
+import kr.co.nextlab.hded.model.HeTcCategoryVo;
+import kr.co.nextlab.hded.model.HeTcResultFileVo;
+import kr.co.nextlab.hded.model.HeTcResultVo;
+import kr.co.nextlab.hded.model.HeTcTmplCriteria;
+import kr.co.nextlab.hded.model.HeTcTmplVo;
+
+@Mapper
+public interface HdedTcMapper {
+	
+	/**
+	 * 참여한 프로젝트 리스트 조회
+	 * @param heProjectVo
+	 * @return 참여한 프로젝트 리스트
+	 */
+	public List<HeTcTmplVo> selectTcChangeHistList();
+	
+	/**
+	 * 테스트 케이스 변경 이력 전체 리스트 조회
+	 * @return
+	 */
+	public List<HeTcTmplVo> selectTcChangeHistAllList(HeTcTmplCriteria heTcTmplCriteria);
+	
+	/**
+	 * 해당 그룹 아이디에 속하는 이력 리스트 조회
+	 * @return
+	 */
+	public List<HeTcTmplVo> selectTcChangeHistByGroupIdList(String groupId);
+	
+	/**
+	 * 선택데이터 와 현재데이터 비교 리스트
+	 * @param tcId
+	 * @return
+	 */
+	public List<HeTcTmplVo> selectTcChangeHistDetail(String tcId);
+	
+	/**
+	 * 버킷리스트 조회
+	 * @param criteria
+	 * @return
+	 */
+	public List<HeTcTmplVo> selectBucketList(HeTcTmplCriteria criteria);
+	
+	/**
+	 * TC추가시 버킷리스트 조회
+	 * @param criteria
+	 * @return
+	 */
+	public List<HeTcTmplVo> selectSystemIdBucketList(HeTcTmplCriteria criteria);
+	
+	/**
+	 * 시스템명 체크
+	 * @param systemNm
+	 * @return
+	 */
+	public HeSystemVo selectSysNmChk(String systemNm);
+	
+	/**
+	 * 시스템 추가
+	 * @param hsv
+	 * @return
+	 */
+	public int insertSystem(HeSystemVo heSystemVo);
+	
+	/**
+	 * 카테고리명 유무 체크
+	 * @param heTcCategoryVo
+	 * @return
+	 */
+	public HeTcCategoryVo selectCategoryChk(HeTcCategoryVo heTcCategoryVo);
+	
+	/**
+	 * 카테고리 추가
+	 * @param heTcCategoryVo
+	 * @return
+	 */
+	public int insertHeTcCategory(HeTcCategoryVo heTcCategoryVo);
+	
+	/**
+	 * H/E Tc 등록
+	 * @param heTcTmplVo
+	 * @return
+	 */
+	public int insertBuckTc(HeTcTmplVo heTcTmplVo);
+	
+	/**
+	 * 버킷TC 상세조회
+	 * @param tcId
+	 * @return
+	 */
+	public HeTcTmplVo selectTcView(String tcId);
+	
+	/**
+	 * 기존 Tc 테스트케이스 코드분류 변경
+	 * @param tcId
+	 * @return
+	 */
+	public int updateExistTc(HeTcTmplVo heTcTmplVo);
+	
+	/**
+	 * 프로젝트 테스트케이스 관리 등록
+	 * @param heProjectTcVo
+	 * @return
+	 */
+	public int insertProjectTc(HeProjectTcVo heProjectTcVo);
+	
+	
+	/**
+	 * 프로젝트 TC 리스트 조회
+	 * @param criteria
+	 * @return
+	 */
+	public List<HeProjectTcVo> selectProjectTcList(HeTcTmplCriteria criteria);
+	
+	/**
+	 * 프로젝트 TC 삭제하기
+	 * @param project_tc_seq
+	 * @return
+	 */
+	public boolean updateProjectTcUseYnPrc(String projectTcSeq);
+	
+	/**
+	 * 테스트 결과 등록하기위한 기본정보 조회
+	 * @param projectTcSeq
+	 * @return
+	 */
+	public HeProjectTcVo selectProjectTc(String projectTcSeq);
+	
+	/**
+	 * 테스트 결과 등록하기위한 결과이력 조회
+	 * @param model
+	 * @param projectTcSeq
+	 * @return
+	 */
+	public List<HeTcResultVo> selectProjectTcResult(String projectTcSeq);
+	
+	/**
+	 * tcResult 등록
+	 * @param heTcResultVo
+	 * @return
+	 */
+	public int insertTcResult(HeTcResultVo heTcResultVo);
+	
+	/**
+	 * tbTcResultFile 업데이트
+	 * @param heTcResultFileVo
+	 * @return
+	 */
+	public int insertTcResultFile(HeTcResultFileVo heTcResultFileVo);	
+	
+	/**
+	 * 프로젝트 Tc 테이블 업데이트(last_resutlt_cd)
+	 * @param heProjectTcVo
+	 * @return
+	 */
+	public boolean updateProjectTcResult(HeProjectTcVo heProjectTcVo);
+	
+	/**
+	 * 파일리스트 불러오기
+	 * @param tcResultSeq
+	 * @return
+	 */
+	public List<HeTcResultFileVo> selectProjectTcFileList(Integer tcResultSeq);
+	
+	/**
+	 * 결과자료 조회
+	 * @param tcResultSeq
+	 * @return
+	 */
+	public HeTcResultVo selectTcResultData(String tcResultSeq);
+	
+	/**
+	 * 프로젝트에 속한 테스트케이스의 최종측정결과 전체 초기화(null)처리
+	 * @param pid
+	 * @return
+	 */
+	public int updateLastHdedResultInit(String pid);
+}

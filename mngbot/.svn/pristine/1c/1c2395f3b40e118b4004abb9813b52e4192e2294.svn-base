@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>Management Bot</title>
+	<link rel="stylesheet" href="../css/common.css">
+	<link rel="stylesheet" href="../css/bot.css">
+	<script src="../js/jquery-3.2.1.min.js"></script>
+	<script src="../js/jquery-ui.min.js"></script>
+	<script src="../js/jquery.form.min.js"></script>
+	<script src="../js/vue.min.js"></script>
+	<script src="../js/lodash.min.js"></script>
+	<script src="../js/calendar.js"></script>
+	<script src="../js/common.js"></script>
+</head>
+<body>
+	<div class="pop_wrap" style="width:480px;">
+		<div class="pop_tit">
+			<p>배경화면 설정</p>
+		</div>
+		<div class="pop_cont">
+			<div class="bg_chg_area">
+				<span class="bg_img" style="background-image:url('../images/bot/bg_main.jpg')"></span>
+				<div class="ctrl">
+					<input type="file" id="photo_upload" class="ir">
+					<label for="photo_upload">사진업로드</label>
+					<button class="del">사진삭제</button>
+					<p>16:9 크기의 사진에 최적화되어 있습니다</p>
+				</div>
+			</div>
+		</div>
+		<div class="btn_wrap">
+			<button class="g_btn02" onclick="hidePopupLayer(); return false">닫기</button>
+		</div>
+	</div>
+	<script>
+		setPopup(2);
+	</script>
+</body>
+</html>

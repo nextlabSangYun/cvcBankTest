@@ -1,0 +1,154 @@
+<%@ page contentType="text/html" pageEncoding="UTF-8" %>
+<%@ taglib uri="http://www.nextlab.co.kr/tags/nextlab" prefix="nl"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<div class="pop_wrap" style="width:610px;" id="vueApp">
+	<div class="pop_tit">
+		<p>일괄등록 대상모델 선택</p>
+	</div>
+	<div class="pop_cont">
+		<div class="g_table">
+			<div class="tb_desc">
+				<span class="sort_tit">리모콘</span>
+				<model-select ref="modelSelect" :change-fn="setRemote" model-select-text="- 선택 -" :auto-init="false" model-type="C203"></model-select>
+			</div>
+			<table>
+				<colgroup>
+					<col style="width:7%;">
+					<col>
+					<col style="width:30%;">
+					<col style="width:30%;">
+				</colgroup>
+				<thead>
+					<tr>
+						<th>사용</th>
+						<th>측정모델</th>
+						<th>현재버전</th>
+						<th>MAC정보 (옵션)</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr v-for="(list, index) in modelList" :class="{ 'selected' : param.xqmsArray.indexOf(list) != -1 , 'disable' : param.xqmsArray.indexOf(list) == -1 }">
+						<td @click="chk(list)"><input type="checkbox" :value="list" v-model="param.xqmsArray" @click.stop></td>
+						<td>{{ list.modelNm }}</td>
+						<td>{{ list.modelVer }}</td>
+						<td><Input v-model="list.mac" type=Text class="full" maxlength="12" @keyup="chkMac" @change="chkMac" placeholder="MAC 정보 입력"></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<div class="btn_wrap">
+		<button class="btn_proc" @click="submit">등록</button>
+		<button class="btn_cancel" onclick="hidePopupLayer(); return false">닫기</button>
+	</div>
+</div>
+<script>
+	var cont = new Vue({
+		el: '#vueApp'
+		, data: {
+			modelList: []
+			, pid:'<c:out value="${param.pid}"/>'
+			, param: {
+				xqmsArray: []
+				, tcArray: []
+				, remocon: ''
+				, tcResultCd: ''
+				, chasu:'<c:out value="${param.chasu}"/>'
+			}
+		}
+		, beforeMount: function () {
+			this.getTcList();
+			this.getModelList();
+		}
+		, mounted: function() {
+			setPopup(2);
+		}
+		, updated:function(){
+			setPopup(2);
+		}
+		, methods: {
+			getTcList: function() {
+				this.param.tcResultCd = parent.list.qaResult;
+				
+				var chkTcList = parent.list.getChkTc();
+				var param = {
+					pid: this.pid
+					, seqArray: chkTcList
+				}
+				jQuery.ajaxSettings.traditional = true;
+				$.post('/qa/tc/getTcList', param, function(data){
+					cont.param.tcArray = data.tcList;
+				});
+				
+			}
+			, getModelList: function() {
+				var pid = this.pid
+				$.post('/qa/tc/getModelList', {pid:pid}, function(data) {
+					cont.modelList = data.modelList;
+					cont.modelList.forEach(function(e){
+						e.mac = cont.mac;
+						e.pid = cont.pid;
+					});
+				});
+			}
+			, chkMac: function(event) {
+				event.target.value = event.target.value.replace(/[\W]/g, "");
+			}
+			, setRemote: function(data) {
+				this.param.remocon = data.modelId;
+			}
+			, chk: function(seq) {
+				var _chkArray = this.param.xqmsArray;
+				
+				if (_chkArray.indexOf(seq) == -1) { // 배열에 존재 하지 않으면
+					_chkArray.push(seq);
+				} else if (_chkArray.indexOf(seq) != -1) { // 배열에 존재 하면
+					_chkArray.splice(_chkArray.indexOf(seq), 1);
+				}
+			}
+			, submit: function() {
+				if (this.param.xqmsArray.length == 0) {
+					alert("등록할 대상 모델을 선택해주세요.");
+					return;
+				}
+				
+				if (this.param.remocon == "") {
+					alert("리모콘을 선택해주세요.");
+					return;
+				}
+				
+				for(var key in this.param.xqmsArray){
+					if(this.param.xqmsArray[key].mac.length != 12){
+						alert("맥 어드레스를 - 기호 제외 12문자로 입력해주세요.");
+						return;
+					}
+				}
+				$.ajax({
+					type: "post"
+					, url : "/qa/tc/regReportBatchPrc"
+					, contentType: "application/json"
+					, data : JSON.stringify(this.param)
+					, beforeSend: function() {
+						parent.startLoading();
+					}
+					, success: function(data) {
+						if (data.save) {
+							alert("리포트가 일괄등록 되었습니다.");
+							parent.list.setup();
+							hidePopupLayer();
+						} else if (data.message) {
+							alert(data.message);
+						}
+					}
+					, error: function(xhr, status, error) {
+						alert($(xhr.responseText).text());
+					}
+					, complete: function() {
+						parent.endLoading();
+					}
+				});
+			}
+		}
+	});
+	
+</script>

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>Management Bot</title>
+	<!-- 파비콘 등록 -->
+	<link rel="shortcut icon" href="../images/common/favicon.ico">
+	<link rel="stylesheet" href="../css/common.css">
+	<link rel="stylesheet" href="../css/bot.css">
+	<script src="../js/jquery-3.2.1.min.js"></script>
+	<script src="../js/jquery-ui.min.js"></script>
+	<script src="../js/jquery.form.min.js"></script>
+	<script src="../js/vue.min.js"></script>
+	<script src="../js/lodash.min.js"></script>
+	<script src="../js/calendar.js"></script>
+	<script src="../js/common.js"></script>
+</head>
+<body>
+<!-- 17.12.07 wrap 추가 -->
+<div class="wrap"> 
+	<header>
+		<div class="inner">
+			<!-- 17.12.09 수정 -->
+			<a href="index.html" class="syt_name">Management Bot</a>
+			<button class="btn_nav"><span class="icon"></span></button>
+			<div class="btn_right">
+				<button class="btn_notice"><span class="ir">알림</span><span class="new">2</span></button>
+				<!-- 17.12.14 사진 영역 추가  -->
+				<button class="btn_setting"><span class="photo" style="background-image:url('../images/common/btn_my.png')"></span>김성민</button>
+			</div>
+		</div>
+	</header>
+	<nav class="nav">
+		<div class="app_list">
+			<!-- 17.12.07 타이틀 영역 태그 변경 -->
+			<p class="cate_tit">Favorites</p>
+			<!-- 17.12.07 즐겨찾기 버튼 별도 추가  -->
+			<ul>
+				<li class="fav">
+					<a href="#">
+						<div class="app_icon"><img src="../images/common/app_bmt.png" alt="BMT 프로젝트"></div>
+						<span class="app_name">BMT 프로젝트</span>
+					</a>
+					<!-- 추가 버튼 위치 -->
+					<button class="btn_fav"></button>
+				</li>
+				<li class="fav">
+					<a href="#">
+						<div class="app_icon"><img src="../images/common/app_live.png" alt="실시간 방송 측정"></div>
+						<span class="app_name">실시간 방송 측정</span>
+					</a>
+					<button class="btn_fav"></button>
+				</li>
+			</ul>
+		</div>
+		<div class="app_list">
+			<!-- 17.12.07 타이틀 영역 태그 변경 -->
+			<p class="cate_tit">All</p>
+			<ul>
+				<li class="fav">
+					<a href="#">
+						<div class="app_icon"><img src="../images/common/app_bmt.png" alt="BMT 프로젝트"></div>
+						<span class="app_name">BMT 프로젝트</span>
+					</a>
+					<button class="btn_fav"></button>
+				</li>
+				<li class="fav">
+					<a href="#">
+						<div class="app_icon"><img src="../images/common/app_live.png" alt="실시간 방송 측정"></div>
+						<span class="app_name">실시간 방송 측정</span>
+					</a>
+					<button class="btn_fav"></button>
+				</li>
+				<li>
+					<a href="#">
+						<div class="app_icon"><img src="../images/common/app_err.png" alt="장애이력관리"></div>
+						<span class="app_name">장애이력관리</span>
+					</a>
+					<button class="btn_fav"></button>
+				</li>
+				<li>
+					<a href="#">
+						<div class="app_icon"><img src="../images/common/app_stat.png" alt="통계분석"></div>
+						<span class="app_name">통계분석</span>
+					</a>
+					<button class="btn_fav"></button>
+				</li>
+				<li>
+					<a href="system_setting_main.html">
+						<div class="app_icon"><img src="../images/common/app_setting.png" alt="시스템설정"></div>
+						<span class="app_name">시스템설정</span>
+					</a>
+					<button class="btn_fav"></button>
+				</li>
+			</ul>
+		</div>
+	</nav>
+	<div class="ly_notice">
+		<div class="notice_list">
+			<!-- 17.12.07 타이틀 영역 태그 변경 -->
+			<p class="cate_tit">Notice</p>
+			<ul>
+				<li>
+					<p class="tit"><a href="#">시스템 정기점검 공지</a></p>
+					<div class="info">
+						<p class="date">2017년 10월 30일</p>
+						<p class="writer">By 관리자</p>
+					</div>
+				</li>
+				<li>
+					<p class="tit"><a href="#">시스템 정기점검 공지</a></p>
+					<div class="info">
+						<p class="date">2017년 10월 30일</p>
+						<p class="writer">By 관리자</p>
+					</div>
+				</li>
+			</ul>
+			<!-- 17.12.08 더보기 버튼 추가  -->
+			<button class="btn_more" onclick="showPopupLayer('pop_notice_list.html'); return false;">더보기</button>
+		</div>
+		<div class="notice_list">
+			<!-- 17.12.07 타이틀 영역 태그 변경 -->
+			<p class="cate_tit">Received Messages</p>
+			<ul>
+				<li>
+					<p class="tit"><a href="#">이슈Update–채널전환 시간 이슈Update–채널전환 시간</a></p>
+					<div class="info">
+						<p class="date">2017년 10월 30일</p>
+						<p class="writer">By 관리자</p>
+					</div>
+				</li>
+				<li>
+					<p class="tit"><a href="#">이슈Update–채널전환 시간 이슈Update–채널전환 시간</a></p>
+					<div class="info">
+						<p class="date">2017년 10월 30일</p>
+						<p class="writer">By 관리자</p>
+					</div>
+				</li>
+			</ul>
+			<!-- 17.12.08 더보기 버튼 추가  -->
+			<button class="btn_more" onclick="showPopupLayer('pop_msg_list.html'); return false;">더보기</button>
+		</div>
+	</div>
+	<div class="ly_my_setting">
+		<ul>
+			<li><a href="#" onclick="showPopupLayer('pop_my_info.html'); return false;">개인정보 수정</a></li>
+			<li class="bg" onclick="showPopupLayer('pop_bg_chg.html'); return false;"><a href="#">배경화면 설정</a></li>
+			<li class="logout"><a href="#">로그아웃</a></li>
+		</ul>
+	</div>
+	<div class="pop_notice">
+		<ul>
+			<li>
+				<div class="msg_wrap">
+					<div class="writer">
+						<span class="photo" style="background-image:url('../images/common/img_profile.png')"></span>
+						<span class="name">휴맥스</span>
+					</div>
+					<div class="info">
+						<p class="tit">1프로젝트 Update-기간수정 내용이 긴 경우 </p>
+						<p class="link">다음링크로 업데이트된 내용을 확인하십시오. <a href="#">http://bit.ly/39cE11</a> 다음링크로 업데이트된 내용을 확인하십시오. <a href="#">http://bit.ly/39cE11</a></p>
+					</div>
+					<button class="btn_cls">닫기</button>
+				</div>
+			</li>
+			<li>
+				<div class="msg_wrap">
+					<div class="writer">
+						<span class="photo" style="background-image:url('../images/common/img_profile.png')"></span>
+						<span class="name">휴맥스</span>
+					</div>
+					<div class="info">
+						<p class="tit">1프로젝트 Update-기간수정 내용이 긴 경우 </p>
+						<p class="link">다음링크로 업데이트된 내용을 확인하십시오. <a href="#">http://bit.ly/39cE11</a> 다음링크로 업데이트된 내용을 확인하십시오. <a href="#">http://bit.ly/39cE11</a></p>
+					</div>
+					<button class="btn_cls">닫기</button>
+				</div>
+			</li>
+			<li>
+				<div class="msg_wrap">
+					<div class="writer">
+						<span class="photo" style="background-image:url('../images/common/img_profile.png')"></span>
+						<span class="name">휴맥스</span>
+					</div>
+					<div class="info">
+						<p class="tit">1프로젝트 Update-기간수정 내용이 긴 경우 </p>
+						<p class="link">다음링크로 업데이트된 내용을 확인하십시오. <a href="#">http://bit.ly/39cE11</a> 다음링크로 업데이트된 내용을 확인하십시오. <a href="#">http://bit.ly/39cE11</a></p>
+					</div>
+					<button class="btn_cls">닫기</button>
+				</div>
+			</li>
+		</ul>
+	</div>
+	<div class="content">
+		컨텐츠 영역
+	</div>
+</div>
+<!-- 17.12.27 로딩 영역 추가  -->
+<div class="loading_wrap">
+	<div class="loading">
+		<p class="tit">LOADING</p>
+		<img src="../images/common/loading.gif" alt="">
+		<p class="txt">텍스트를 입력해주세요.</p>
+	</div>
+</div>
+</body>
+</html>

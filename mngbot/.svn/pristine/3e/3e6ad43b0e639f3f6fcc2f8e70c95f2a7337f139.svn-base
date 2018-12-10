@@ -1,0 +1,23 @@
+package kr.co.nextlab.hded.model;
+
+import java.util.Date;
+
+import lombok.Data;
+
+@Data
+public class HeProjectIssueVo {
+	/**
+	 * 기본정보
+	 */
+	private String issueId;
+	private String pid;
+	private Integer sysSeq;
+	private String issueSubject;
+	private String issueCont;
+	private String importance;
+	private String progressStat;
+	private String regId;
+	private Date regDtm;
+	private String modId;
+	private Date modDtm;
+}

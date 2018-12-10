@@ -1,0 +1,543 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.nextlab.bmt.mapper.IssueMapper">
+
+	<select id="selectIssueList" parameterType="issueCriteria" resultType="issueVo">
+		SELECT	a.issue_id
+				, a.pid
+				, a.issue_subject
+				, a.issue_cont
+				, a.progress_stat
+				, a.importance
+				, a.reg_id 
+				, (SELECT user_nm FROM tb_user WHERE user_id = a.reg_id) AS reg_nm
+				, a.reg_dtm
+				, a.issue_lcate_cd
+				, ISNULL((SELECT TOP 1 DATEDIFF(HH, REG_DTM, GETDATE()) as condition FROM dbo.TB_ISSUE_COMMENT b WHERE b.ISSUE_ID = a.ISSUE_ID ORDER BY b.REG_DTM DESC), -1) AS condition
+				, (SELECT COUNT(1) FROM tb_issue_file WHERE issue_id = a.issue_id) AS isYn
+		FROM	tb_issue a
+		WHERE	a.pid = #{pid}
+				AND a.reg_dtm BETWEEN CONVERT(DATETIME,#{startDt}+' 00:00:00') AND CONVERT(DATETIME,#{endDt}+' 23:59:59')
+				<if test=" chkMyIssue ">
+				AND a.reg_id = #{partiId}
+				</if>
+				<if test="issueLcateCd != null and issueLcateCd != ''">
+					AND a.issue_lcate_cd = #{issueLcateCd}
+				</if>
+				<if test="issueId != null and issueId != ''">
+					AND a.issue_id = #{issueId}
+				</if>
+				<if test="importanceArray != null and importanceArray.length > 0">
+					AND a.importance IN 
+					<foreach collection="importanceArray" item="array" open="(" separator="," close=")">
+						#{array}
+					</foreach>
+				</if>
+				<if test="progressStatArray != null and progressStatArray.length > 0">
+					AND a.progress_stat IN 
+					<foreach collection="progressStatArray" item="array" open="(" separator="," close=")">
+						#{array}
+					</foreach>
+				</if>
+				<if test="issueSubject != null and issueSubject != ''">
+					AND (
+						a.issue_subject LIKE '%' + REPLACE(REPLACE(REPLACE(#{issueSubject},'[','\['), ']','\]'),'_','\_') + '%' ESCAPE '\' 
+						OR a.issue_cont LIKE '%' + REPLACE(REPLACE(REPLACE(#{issueSubject},'[','\['), ']','\]'),'_','\_') + '%' ESCAPE '\'
+						)
+				</if>
+				<if test="modelList != null and modelList.size() > 0"> 
+					AND a.ISSUE_ID in (
+							SELECT c.issue_id  
+							FROM dbo.tb_issue c 
+							JOIN dbo.tb_issue_model b ON (c.ISSUE_ID = b.ISSUE_ID) 
+ 							WHERE c.pid = #{pid} 
+							AND  
+							<foreach collection="modelList" item="model" open="(" separator="or" close=")"> 
+ 								(b.model_id = #{model.modelId} and b.model_ver = #{model.modelVer}) 
+ 							</foreach> 							
+						) 
+ 				</if> 
+ 				<if test=" regNm != null and regNm != '' ">
+ 					AND EXISTS (SELECT 1 FROM tb_user b WHERE b.user_id = a.reg_id AND b.user_nm LIKE '%' + REPLACE(REPLACE(REPLACE(#{regNm},'[','\['), ']','\]'),'_','\_') + '%' ESCAPE '\')
+ 				</if>
+		ORDER BY a.issue_id DESC
+	</select>
+	
+	<select id="selectIssueView" parameterType="String" resultType="issueVo">
+		SELECT	issue_id
+				, issue_subject
+				, issue_cont
+				, progress_stat
+				, importance
+				, pid
+				, chasu
+				, reg_id
+				, reg_dtm 
+				, issue_lcate_cd
+		FROM	tb_issue
+		WHERE	issue_id = #{issueId}
+	</select>
+	
+	<select id="selectIssueTcList" parameterType="String" resultType="issueTcVo">
+		SELECT	a.issue_id
+				, b.seq
+				, b.pid
+				, b.tc_id
+				, b.tc
+				, b.big_cate_id
+				, b.middle_cate_id
+				, b.small_cate_id
+				, b.importance
+				, b.tc_division
+		FROM	tb_issue_tc a 
+				JOIN tb_bmt_tc_info b ON (a.seq=b.seq)
+		WHERE	a.issue_id = #{issueId}
+		AND (b.use_yn IS NULL OR b.use_yn = 'Y')
+	</select>
+	
+	<select id="selectIssuePartiList" parameterType="String" resultType="issuePartiVo">
+		SELECT	a.issue_id
+				, a.parti_id
+				, b.user_nm
+				, (SELECT user_group_nm FROM tb_user_group WHERE user_group_id = b.user_group_id) AS user_group_nm
+		FROM	tb_issue_parti a
+				JOIN tb_user b ON (b.user_id = a.parti_id)
+		WHERE	issue_id = #{issueId}
+	</select>
+	
+	<select id="selectIssueFileList" parameterType="String" resultType="issueFileVo">
+		SELECT	issue_id
+				, seq
+				, file_nm
+				, file_path
+				, org_file_nm
+		FROM	tb_issue_file
+		WHERE	issue_id = #{issueId}
+	</select>
+	
+	<select id="selectIssueCommentList" parameterType="String" resultType="issueCommentVo">
+		SELECT	a.seq
+				, a.issue_id
+				, a.comment
+				, a.reg_id
+				, b.user_nm AS reg_nm
+				, (SELECT user_group_nm FROM tb_user_group WHERE user_group_id = b.user_group_id) AS reg_group_nm
+				, a.reg_dtm
+		FROM	tb_issue_comment a
+				JOIN tb_user b ON (b.user_id = a.reg_id)
+		WHERE	issue_id = #{issueId}
+		ORDER BY a.seq DESC
+	</select>
+	
+	<select id="selectIssueCateList" parameterType="String" resultType="issueCateVo">
+		SELECT	a.tc_cate_id
+				, a.issue_id
+				, a.mod_dtm
+				, a.mod_id
+				, b.pid
+				, c.tc_cate_nm
+		FROM	tb_issue_cate a
+				JOIN tb_issue b
+				ON (b.issue_id = a.issue_id)
+				JOIN tb_bmt_tc_category c
+				ON (c.pid = b.pid
+					AND c.tc_cate_id = a.tc_cate_id)
+		WHERE	a.issue_id = #{issueId}
+	</select>
+	
+	<select id="selectIssueCategoryList" parameterType="String" resultType="issueCateVo">
+		SELECT   a.tc_cate_id ,
+		         c.tc_cate_nm
+		FROM     tb_issue_cate a
+		JOIN 	tb_issue b ON (a.issue_id = b.issue_id)
+		JOIN tb_bmt_tc_category c ON (a.tc_cate_id = c.tc_cate_id AND c.pid = b.pid)
+		WHERE    b.pid = #{pid}
+		GROUP by a.tc_cate_id, c.tc_cate_nm
+	</select>
+	
+	<select id="selectIssueModelList" parameterType="String" resultType="issueModelVo">
+		SELECT	a.model_id
+				, a.model_ver
+				, a.issue_id
+				, a.mod_dtm
+				, a.mod_id
+				, b.model_nm
+		FROM	tb_issue_model a
+				JOIN tb_model b
+				ON (b.model_id = a.model_id)
+		WHERE	issue_id = #{issueId}
+	</select>
+	
+	<insert id="insertIssue" parameterType="issueVo">
+		INSERT INTO	tb_issue
+			(issue_id, issue_subject, issue_cont, progress_stat, importance, pid
+			, chasu
+			, reg_id, reg_dtm, issue_lcate_cd)
+		VALUES
+			(#{issueId}, #{issueSubject}, #{issueCont}, #{progressStat}, #{importance}, #{pid}
+			, (SELECT project_chasu FROM tb_project WHERE pid = #{pid})
+			, #{regId}, GETDATE(), #{issueLcateCd})
+	</insert>
+	
+	<insert id="insertIssueTc" parameterType="issueTcVo">
+		INSERT INTO tb_issue_tc (issue_id, seq)
+		VALUES (#{issueId}, #{seq})
+	</insert>
+	
+	<insert id="insertIssueParti" parameterType="issuePartiVo">
+		INSERT INTO tb_issue_parti (issue_id, parti_id, reg_id, reg_dtm)
+		VALUES (#{issueId}, #{partiId}, #{regId}, GETDATE())
+	</insert>
+	
+	<insert id="deleteIssueParti" parameterType="String">
+		DELETE FROM tb_issue_parti 
+		WHERE issue_id = #{issueId}
+	</insert>
+	
+	<insert id="insertIssueFile" parameterType="issueFileVo">
+		INSERT INTO tb_issue_file 
+			(issue_id
+			, seq
+			, file_nm, file_path, org_file_nm)
+		VALUES 
+			(#{issueId}
+			, (SELECT ISNULL(CONVERT(INT,MAX(seq)+1), 1) FROM tb_issue_file WHERE issue_id = #{issueId})
+			, #{fileNm}, #{filePath}, #{orgFileNm})
+	</insert>
+	
+	<insert id="insertIssueComment" parameterType="issueCommentVo">
+		INSERT INTO tb_issue_comment 
+			(issue_id, comment, reg_id, reg_dtm)
+		VALUES
+			(#{issueId}, #{comment}, #{regId}, GETDATE())
+	</insert>
+	
+	<insert id="insertIssueCate" parameterType="issueVo">
+		INSERT INTO tb_issue_cate
+			(tc_cate_id, issue_id, mod_id, mod_dtm)
+		VALUES
+			(#{tcCateId}, #{issueId}, #{regId}, GETDATE())
+	</insert>
+	
+	<insert id="insertIssueModel" parameterType="issueVo">
+		INSERT INTO tb_issue_model
+			(model_id, model_ver, issue_id, mod_id, mod_dtm)
+		VALUES
+			(#{modelId}, #{modelVer}, #{issueId}, #{modId}, GETDATE())
+	</insert>
+	
+	<update id="updateIssueComment" parameterType="issueCommentVo">
+		UPDATE tb_issue_comment SET
+			comment = #{comment}
+			, reg_id = #{regId}
+			, reg_dtm = GETDATE()
+		WHERE seq = #{seq}
+	</update>
+	
+	<update id="updateIssueProgressStat" parameterType="issueVo">
+		UPDATE	tb_issue SET
+				progress_stat = #{progressStat}
+				, mod_id = #{modId}
+				, mod_dtm = GETDATE()
+		WHERE	issue_id = #{issueId}
+	</update>
+	<update id="updateIssueProgressStatComment" parameterType="issueVo">
+		UPDATE	tb_issue SET
+				progress_stat = #{progressStat}
+				, mod_dtm = GETDATE()
+		WHERE	issue_id = #{issueId}
+	</update>
+	<delete id="deleteIssuePrc" parameterType="String">
+		DELETE FROM tb_issue
+		WHERE issue_id = #{issueId}
+	</delete>
+	<delete id="deleteIssueTc" parameterType="String">
+		DELETE FROM tb_issue_tc
+		WHERE issue_id = #{issueId}
+	</delete>
+
+	<delete id="deleteIssueFile" parameterType="String">
+		DELETE FROM tb_issue_file
+		WHERE issue_id = #{issueId}
+	</delete>
+	
+	<delete id="deleteIssueCate" parameterType="String">
+		DELETE FROM tb_issue_cate
+		WHERE issue_id = #{issueId}
+	</delete>
+	
+	<delete id="deleteIssueModel" parameterType="String">
+		DELETE FROM tb_issue_model
+		WHERE issue_id = #{issueId}
+	</delete>
+	
+	<delete id="deleteIssueComment" parameterType="String">
+		DELETE FROM tb_issue_comment
+		WHERE ISSUE_ID = #{issueId}
+	</delete>
+	
+	<update id="updateIssuePrc" parameterType="issueVo">
+		UPDATE	tb_issue SET
+			issue_subject = #{issueSubject}
+			, importance = #{importance}
+			, issue_cont = #{issueCont}
+			, issue_lcate_cd = #{issueLcateCd}
+		WHERE issue_id = #{issueId}
+	</update>
+	
+	<select id="selectCheckVote" parameterType="String" resultType="Integer">
+		SELECT COUNT(*)
+		FROM tb_decision_making
+		WHERE pid = #{pid}
+	</select>
+	
+	<select id="selectCheckVoter" parameterType="voterVo" resultType="Integer">
+		SELECT COUNT(*)
+		FROM tb_voter
+		WHERE pid = #{pid}
+		AND vote_seq = #{voteSeq}
+		AND voter_id = #{voterId}
+	</select>
+	
+	<select id="selectDecisionMaking" parameterType="String" resultType="decisionMakingVo">
+		SELECT 
+			pid
+			, vote_seq
+			, vote_subject
+			, vote_cont
+			, vote_stat
+			, last_result_cd
+			, vote_general_review
+			, reg_id
+			, reg_dtm
+			, mod_id
+			, mod_dtm
+		FROM tb_decision_making
+		WHERE pid = #{pid}
+	</select>
+	
+	<select id="selectVoterList" parameterType="decisionMakingVo" resultType="voterVo">
+		SELECT 
+			a.pid
+			, a.vote_seq
+			, a.voter_id
+			, a.reg_id
+			, a.reg_dtm
+			, b.user_nm
+			, (SELECT user_group_nm FROM tb_user_group WHERE user_group_id = b.user_group_id) AS user_group_nm
+		FROM tb_voter a
+		JOIN tb_user b ON (b.user_id = a.voter_id)
+		WHERE a.pid = #{pid}
+		AND a.vote_seq = #{voteSeq}
+	</select>
+	
+	<select id="selectVoteIssueList" parameterType="decisionMakingVo" resultType="voteIssueVo">
+		SELECT 
+			a.pid
+			, a.vote_seq
+			, a.issue_id
+			, a.use_yn
+			, a.reg_id
+			, a.reg_dtm
+			, b.issue_subject
+			, b.issue_cont
+			, b.importance
+			, STUFF((SELECT ', ' + (SELECT d.tc_cate_nm FROM tb_bmt_tc_category d WHERE d.tc_cate_id = c.tc_cate_id and d.pid = b.pid)
+				FROM tb_issue_cate c
+				WHERE c.issue_id  = b.issue_id
+				FOR XML PATH('')),1,2,'') AS issue_cate
+			, b.issue_lcate_cd
+			, STUFF((SELECT ' | ' + (f.model_nm + '(' + e.model_ver + ')')
+				FROM tb_issue_model e
+				JOIN tb_model f
+				ON e.model_id = f.model_id
+				WHERE e.issue_id  = b.issue_id
+				FOR XML PATH('')),1,3,'') AS issue_model
+			, (SELECT COUNT(*) FROM tb_voter g WHERE g.pid = b.pid AND g.vote_seq = a.vote_seq) AS total_voter_cnt
+			, (SELECT COUNT(*) FROM tb_vote_management h JOIN tb_voter i ON i.voter_id = h.voter_id AND i.pid = h.pid AND i.vote_seq = h.vote_seq WHERE h.pid = b.pid AND h.vote_seq = a.vote_seq AND h.issue_id = b.issue_id AND h.vote_result_cd = 'B301') AS pass_cnt
+			, (SELECT COUNT(*) FROM tb_vote_management h JOIN tb_voter i ON i.voter_id = h.voter_id AND i.pid = h.pid AND i.vote_seq = h.vote_seq WHERE h.pid = b.pid AND h.vote_seq = a.vote_seq AND h.issue_id = b.issue_id AND h.vote_result_cd = 'B302') AS fail_cnt
+		FROM tb_vote_issue a
+		JOIN tb_issue b
+		ON a.issue_id = b.issue_id
+ 		WHERE a.pid = #{pid}
+		AND a.vote_seq = #{voteSeq}
+		AND a.use_yn = 'Y'
+	</select>
+	
+	<select id="selectVoteManagementList" parameterType="voteIssueVo" resultType="voteManagementVo">
+		SELECT 
+			a.pid
+			, a.vote_seq
+			, a.voter_id
+			, a.issue_id
+			, a.vote_comment
+			, a.vote_result_cd
+			, a.reg_id
+			, a.reg_dtm
+			, a.mod_id
+			, a.mod_dtm
+			, b.user_nm
+			, (SELECT user_group_nm FROM tb_user_group WHERE user_group_id = b.user_group_id) AS user_group_nm
+		FROM tb_vote_management a
+		JOIN tb_voter c ON c.voter_id = a.voter_id AND c.pid = a.pid AND c.vote_seq = a.vote_seq
+		JOIN tb_user b ON (b.user_id = a.voter_id)
+		WHERE a.pid = #{pid}
+		AND a.vote_seq = #{voteSeq}
+		AND a.issue_id = #{issueId}
+	</select>
+	
+	<select id="selectIssueListByIssueIds" parameterType="issueCriteria" resultType="issueVo">
+		SELECT	a.issue_id
+				, a.pid
+				, a.issue_subject
+				, a.issue_cont
+				, a.progress_stat
+				, a.importance
+				, a.reg_id 
+				, (SELECT user_nm FROM tb_user WHERE user_id = a.reg_id) AS reg_nm
+				, a.reg_dtm
+				, a.issue_lcate_cd
+		FROM	tb_issue a
+		WHERE	1=1
+		<if test="issueIds != null and issueIds.length > 0">
+			AND a.issue_id IN 
+			<foreach collection="issueIds" item="array" open="(" separator="," close=")">
+				#{array}
+			</foreach>
+		</if>
+		ORDER BY a.issue_id DESC
+	</select>
+	
+	<insert id="insertDecisionMaking" parameterType="decisionMakingVo">
+		<selectKey keyProperty="voteSeq" resultType="int" order="BEFORE">
+			SELECT ISNULL(MAX(vote_seq), 0) + 1 FROM tb_decision_making WHERE pid = #{pid}
+		</selectKey>
+		INSERT INTO tb_decision_making (
+				pid
+				, vote_seq
+				, vote_subject
+				, vote_cont
+				, vote_stat
+				, reg_id
+				, reg_dtm
+				, mod_id
+				, mod_dtm
+		) VALUES (
+				#{pid}
+				, #{voteSeq}
+				, #{voteSubject}
+				, #{voteCont}
+				, #{voteStat}
+				, #{regId}
+				, GETDATE()
+				, #{modId}
+				, GETDATE()
+		)
+	</insert>
+	
+	<insert id="insertVoter" parameterType="voterVo">
+		INSERT INTO tb_voter (
+				pid
+				, vote_seq
+				, voter_id
+				, reg_id
+				, reg_dtm
+		) VALUES (
+				#{pid}
+				, #{voteSeq}
+				, #{voterId}
+				, #{regId}
+				, GETDATE()
+		)
+	</insert>
+	
+	<update id="mergeVoteIssue" parameterType="voteIssueVo">
+		MERGE tb_vote_issue AS a
+		USING (SELECT 'X' AS DUAL) AS b
+		ON a.pid = #{pid} AND a.vote_seq = #{voteSeq} AND a.issue_id = #{issueId}
+		WHEN MATCHED THEN
+			UPDATE SET use_yn = 'Y'
+		WHEN NOT MATCHED THEN
+			INSERT (pid, vote_seq ,issue_id, use_yn, reg_id, reg_dtm)
+			VALUES (#{pid}, #{voteSeq} ,#{issueId}, 'Y', #{regId}, GETDATE())
+		;
+	</update>
+	
+	<update id="mergeVoteManagement" parameterType="voteManagementVo">
+		MERGE tb_vote_management AS a
+		USING (SELECT 'X' AS DUAL) AS b
+		ON a.pid = #{pid} AND a.vote_seq = #{voteSeq} AND a.issue_id = #{issueId} AND a.voter_id = #{voterId}
+		WHEN MATCHED THEN
+			UPDATE SET vote_comment = #{voteComment} , vote_result_cd = #{voteResultCd} , mod_id = #{regId} , mod_dtm = GETDATE()
+		WHEN NOT MATCHED THEN
+			INSERT (pid, vote_seq ,issue_id, voter_id, vote_comment, vote_result_cd, reg_id, reg_dtm, mod_id, mod_dtm)
+			VALUES (#{pid}, #{voteSeq} ,#{issueId}, #{voterId}, #{voteComment}, #{voteResultCd}, #{regId}, GETDATE(), #{regId}, GETDATE())
+		;
+	</update>
+	
+	<update id="updateVoteIssueUseYn" parameterType="voteIssueVo">
+		UPDATE tb_vote_issue
+		SET use_yn = #{useYn}
+		WHERE pid = #{pid}
+		AND vote_seq = #{voteSeq}
+		AND issue_id = #{issueId}
+	</update>
+	
+	<update id="updateDecisionMaking" parameterType="decisionMakingVo">
+		UPDATE tb_decision_making
+		SET vote_subject = #{voteSubject}
+			, vote_cont = #{voteCont}
+			, vote_stat = #{voteStat}
+			, last_result_cd = #{lastResultCd}
+			, vote_general_review = #{voteGeneralReview}
+			, mod_id = #{modId}
+			, mod_dtm = GETDATE()
+		WHERE pid = #{pid}
+		AND vote_seq = #{voteSeq}
+	</update>
+	
+	<delete id="deleteVoter" parameterType="decisionMakingVo">
+		DELETE FROM tb_voter
+		WHERE pid = #{pid}
+		AND vote_seq = #{voteSeq}
+	</delete>
+	<select id="selectProjectNm" parameterType="String" resultType="projectVo">
+		SELECT a.pid
+			, a.project_nm 
+		FROM tb_project a
+		WHERE a.pid = #{pid}
+	</select>
+	
+	<select id="selectVoteMngListExcel" parameterType="String" resultType="voteManagementVo">
+		SELECT
+			c.issue_subject
+			, c.issue_lcate_cd
+			, e.user_nm + '( ' + (SELECT user_group_nm FROM tb_user_group WHERE user_group_id = e.user_group_id) + ')' AS user_nm
+			, d.vote_result_cd
+			, d.vote_comment
+		FROM tb_decision_making a
+		JOIN tb_vote_issue b
+		ON b.pid = a.pid
+			AND b.vote_seq = a.vote_seq
+			AND b.use_yn = 'Y'
+		JOIN tb_issue c
+		ON c.issue_id = b.issue_id
+		JOIN tb_voter f
+		ON f.pid = a.pid 
+			AND f.vote_seq = a.vote_seq
+		JOIN tb_user e
+		ON e.user_id = f.voter_id
+		LEFT JOIN tb_vote_management d 
+		ON d.pid = b.pid 
+			AND d.vote_seq = b.vote_seq 
+			AND d.issue_id = b.issue_id
+			AND d.voter_id = f.voter_id
+		WHERE a.pid = #{pid}
+		ORDER BY b.issue_id, f.voter_id
+	</select>
+	
+	<delete id="deleteIssueTcPrc" parameterType="String">
+		DELETE FROM tb_issue_tc
+		WHERE seq = #{param}
+	</delete>
+</mapper>

@@ -1,0 +1,44 @@
+/**
+ * @title	: Qa tc category 관련 vo
+ * @package	: kr.co.nextlab.qa.model
+ * @file	: QaTcCategoryVo.java
+ * @author	: winolonam
+ * @date	: 2018. 07. 23.
+ * @desc	: 
+ */
+package kr.co.nextlab.qa.model;
+
+import java.util.Date;
+
+import lombok.Data;
+
+@Data
+public class QaTcCategoryVo {
+	
+	/**
+	 * 기본정보
+	 */
+	private String pid;
+	private String tcCateId;
+	private String tcCateParId;
+	private String tcCateNm;
+	private String useYn;
+	private Integer tcCateOrder;
+	private String regId;
+	private Date regDtm;
+	private String modId;
+	private Date modDtm;
+	
+	/**
+	 * 카테고리 리스트
+	 */
+	private String path;
+	private int lvl;
+	private int child;
+	/**
+	 * 파일저장
+	 */
+	private String orgFileNm;
+	private String fileNm;
+	private String filePath;
+}

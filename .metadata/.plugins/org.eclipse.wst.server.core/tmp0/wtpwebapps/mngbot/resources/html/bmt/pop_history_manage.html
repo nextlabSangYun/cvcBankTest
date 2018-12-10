@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>Management Bot</title>
+	<link rel="stylesheet" href="../css/common.css">
+	<link rel="stylesheet" href="../css/bmt.css">
+	<script src="../js/jquery-3.2.1.min.js"></script>
+	<script src="../js/jquery-ui.min.js"></script>
+	<script src="../js/jquery.form.min.js"></script>
+	<script src="../js/vue.min.js"></script>
+	<script src="../js/lodash.min.js"></script>
+	<script src="../js/calendar.js"></script>
+	<script src="../js/common.js"></script>
+</head>
+<body>
+	<div class="pop_wrap win_pop">
+		<div class="pop_tit">
+			<p>측정이력 관리</p>
+		</div>
+		<div class="pop_cont">
+			<div class="sort_area">
+				<div class="sel_item">
+					<span class="sort_tit">대분류</span>
+					<select name="" id="">
+						<option value="">선택</option>
+					</select>
+				</div>
+				<div class="sel_item sel01">
+					<span class="sort_tit">측정모델</span>
+					<select name="" id="">
+						<option value="">모델선택</option>
+					</select>
+					<div class="reg_list">
+						<ul>
+							<li><span>bhx-yh400(10.3.5)</span><button class="del"></button></li>
+							<li><span>bhx-yh400(10.3.5)</span><button class="del"></button></li>
+							<li><span>bhx-yh400(10.3.5)</span><button class="del"></button></li>
+							<li><span>bhx-yh400(10.3.5)</span><button class="del"></button></li>
+							<li><span>bhx-yh400(10.3.5)</span><button class="del"></button></li>
+							<li><span>bhx-yh400(10.3.5)</span><button class="del"></button></li>
+						</ul>
+					</div>
+				</div>
+				<div class="sel_item">
+					<span class="sort_tit">중요도</span>
+					<input type="checkbox" id="chk1"><label for="chk1">Major</label>
+					<input type="checkbox" id="chk2"><label for="chk2">Minor</label>
+					<input type="checkbox" id="chk3"><label for="chk3">Critical</label>
+				</div>
+				<div class="sel_item">
+					<span class="sort_tit">기간</span>
+					<div class="period">
+						<input type="text" class="input_date"><span class="bar">~</span><input type="text" class="input_date">
+					</div>
+				</div>
+				<button class="g_btn01">조회</button>
+			</div>
+			<div class="tb_desc">
+				<p>조회결과 : 24건</p>
+				
+			</div>
+			<div class="tab_wrap">
+				<ul class="g_tab">
+					<li><a href="#">BMT</a></li>
+				</ul>
+				<div class="tab_con_wrap">
+					<div class="tab_con">
+						<div class="tb_desc r_align">
+							<button class="g_btn03">선택삭제</button>
+						</div>
+						<div class="g_table">
+							<table>
+								<caption>츨정일시, 구분, Test Case 이름 등으로 구성된 표 입니다.</caption>
+								<colgroup>
+									<col style="width:4%;">
+									<col style="width:12%;">
+									<col style="width:6%;">
+									<col style="width:8.5%;">
+									<col style="width:10%;">
+									<col>
+									<col style="width:6%;">
+									<col style="width:10%;">
+									<col style="width:6%;">
+									<col style="width:7%;">
+									<col style="width:4%;">
+									<col style="width:4%;">
+								</colgroup>
+								<thead>
+									<tr>
+										<th rowspan="2"><input type="checkbox"></th>
+										<th rowspan="2">측정일시</th>
+										<th colspan="3">구분</th>
+										<th rowspan="2">Test Case 이름</th>
+										<th rowspan="2">중요도</th>
+										<th rowspan="2">측정모델</th>
+										<th rowspan="2">S/W 버전</th>
+										<th rowspan="2">측정 담당자</th>
+										<th rowspan="2" colspan="2">측정 결과</th>
+									</tr>
+									<tr>
+										<th>대분류</th>
+										<th>중분류</th>
+										<th>소분류</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td><input type="checkbox"></td>
+										<td>2017년 4월 28일<br>09:33:23</td>
+										<td>홈</td>
+										<td>마이 Btv</td>
+										<td>최근시청 VOD</td>
+										<td>콘텐츠 제목 / 속성정보 / 평점 정보 제공</td>
+										<td>Minor</td>
+										<td>BHX-UH400</td>
+										<td>5.4.2</td>
+										<td>박재현</td>
+										<td><span class="state04">PASS</span></td>
+										<td><button class="btn_edit"></button></td>
+									</tr>
+									<tr>
+										<td><input type="checkbox"></td>
+										<td>2017년 4월 28일<br>09:33:23</td>
+										<td>홈</td>
+										<td>마이 Btv</td>
+										<td>최근시청 VOD</td>
+										<td>콘텐츠 제목 / 속성정보 / 평점 정보 제공</td>
+										<td>Minor</td>
+										<td>BHX-UH400</td>
+										<td>5.4.2</td>
+										<td>박재현</td>
+										<td><span class="state01">FAIL</span></td>
+										<td><button class="btn_edit"></button></td>
+									</tr>
+									<tr>
+										<td><input type="checkbox"></td>
+										<td>2017년 4월 28일<br>09:33:23</td>
+										<td>홈</td>
+										<td>마이 Btv</td>
+										<td>최근시청 VOD</td>
+										<td>콘텐츠 제목 / 속성정보 / 평점 정보 제공</td>
+										<td>Minor</td>
+										<td>BHX-UH400</td>
+										<td>5.4.2</td>
+										<td>박재현</td>
+										<td><span class="state04">PASS</span></td>
+										<td><button class="btn_edit"></button></td>
+									</tr>
+									<tr>
+										<td><input type="checkbox"></td>
+										<td>2017년 4월 28일<br>09:33:23</td>
+										<td>홈</td>
+										<td>마이 Btv</td>
+										<td>최근시청 VOD</td>
+										<td>콘텐츠 제목 / 속성정보 / 평점 정보 제공</td>
+										<td>Minor</td>
+										<td>BHX-UH400</td>
+										<td>5.4.2</td>
+										<td>박재현</td>
+										<td><span class="state01">FAIL</span></td>
+										<td><button class="btn_edit"></button></td>
+									</tr>
+									<tr>
+										<td><input type="checkbox"></td>
+										<td>2017년 4월 28일<br>09:33:23</td>
+										<td>실시간</td>
+										<td>Wing UI 채널</td>
+										<td>이어보기 팝업</td>
+										<td>콘텐츠 제목 / 속성정보 / 평점 정보 제공</td>
+										<td>Minor</td>
+										<td>BHX-UH400</td>
+										<td>5.4.2</td>
+										<td>박재현</td>
+										<td><span class="state04">PASS</span></td>
+										<td><button class="btn_edit"></button></td>
+									</tr>
+								</tbody>
+							</table>
+							<div class="pagination">
+								<ol>
+									<li class="btn_first"><button>처음</button></li>
+									<li class="btn_prev"><button>이전</button></li>
+									<li class="num on"><button>1</button></li>
+									<li class="num"><button>2</button></li>
+									<li class="num"><button>3</button></li>
+									<li class="num"><button>4</button></li>
+									<li class="num"><button>5</button></li>
+									<li class="btn_next"><button>다음</button></li>
+									<li class="btn_last"><button>마지막</button></li>
+								</ol>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="btn_wrap02">
+			<button class="g_btn02" onclick="self.close();">닫기</button>
+		</div>
+	</div>
+	<script>
+		setPopup(2);
+	</script>
+</body>
+</html>

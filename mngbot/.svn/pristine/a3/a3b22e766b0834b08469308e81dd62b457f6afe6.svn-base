@@ -1,0 +1,47 @@
+/**
+ * @title	: H/E 프로젝트관리 관련 vo
+ * @package	: kr.co.nextlab.hded.model
+ * @file	: HeProjectVo.java
+ * @author	: winolonam
+ * @date	: 2018. 06. 04.
+ * @desc	: 
+ */
+package kr.co.nextlab.hded.model;
+
+import java.util.Date;
+
+import lombok.Data;
+
+@Data
+public class HeProjectVo {
+	
+	/**
+	 * 기본정보
+	 */
+	private String pid;
+	private String projectNm;
+	private String projectStat;
+	private String proejctResultCd;
+	private Date projectStDt;
+	private Date projectEndDt;
+	private String bigo;
+	private String regId;
+	private Date regDtm;
+	private String modId;
+	private Date modDtm;
+	
+	/**
+	 * 참여 + 진행중인 프로젝트 조회
+	 */
+	private boolean mngYn;
+	private String partiId;
+	private boolean progressYn;
+	private Integer sysSeq;
+	private String systemId;
+	private String systemStat;
+	private String systemResultCd;
+	private Integer chasu;
+	private Date chasuStDtm;
+	private Date chasuEdDtm;
+	private String systemNm;
+}

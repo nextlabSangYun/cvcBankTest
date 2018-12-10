@@ -1,0 +1,54 @@
+/**
+ * @title	: Bot관리 관련 Service
+ * @package	: kr.co.nextlab.bot.service
+ * @file	: BotMgService.java
+ * @author	: owl16
+ * @date	: 2017. 12. 8.
+ * @desc	: 
+ */
+package kr.co.nextlab.bot.service;
+
+import java.util.List;
+
+import kr.co.nextlab.bot.model.BotCriteria;
+import kr.co.nextlab.bot.model.BotStatHstVo;
+import kr.co.nextlab.bot.model.BotVo;
+
+public interface BotService {
+
+	/**
+	 * Bot관리 리스트 조회
+	 * @param botCriteria
+	 * @return
+	 */
+	public List<BotVo> selectBotMngList(BotCriteria botCriteria);
+		
+	/**
+	 * Bot관리 상세조회
+	 * @param botSno
+	 * @return
+	 */
+	public BotVo selectBotView(String botSno);
+	
+	/**
+	 * bot관리 등록
+	 * @param botVo
+	 * @return
+	 */
+	public int insertBotMng(BotVo botVo);
+	
+	/**
+	 * bot관리 수정
+	 * @param botVo
+	 * @return
+	 */
+	public int updateBotMng(BotVo botVo);
+	
+	/**
+	 * bot 상태이력 목록 조회
+	 * @return
+	 */
+	public List<BotStatHstVo> selectStateHstList(String botSno);
+	
+
+}

@@ -1,0 +1,413 @@
+/**
+ * @title	: 이슈관리 controller
+ * @package	: kr.co.nextlab.bmt.controller
+ * @file	: IssueController.java
+ * @author	: jnlee
+ * @date	: 2018. 1. 4.
+ * @desc	: 
+ */
+package kr.co.nextlab.bmt.controller;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.lang3.time.DateUtils;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.View;
+import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
+
+import kr.co.nextlab.annotation.security.Auth;
+import kr.co.nextlab.bmt.model.IssueCommentVo;
+import kr.co.nextlab.bmt.model.IssueCriteria;
+import kr.co.nextlab.bmt.model.IssueVo;
+import kr.co.nextlab.bmt.service.IssueService;
+import kr.co.nextlab.bmt.service.ProjectService;
+import kr.co.nextlab.bmt.service.TcService;
+import kr.co.nextlab.bot.model.MessageVo;
+import kr.co.nextlab.comm.controller.BaseController;
+import kr.co.nextlab.component.MessageComponent;
+import kr.co.nextlab.excel.ExcelDownloadView;
+import kr.co.nextlab.excel.ExcelHeader;
+import kr.co.nextlab.excel.ExcelResource;
+import kr.co.nextlab.util.ObjectUtil;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Controller
+public class IssueController extends BaseController {
+	
+	@Autowired
+	private IssueService issueService;
+	
+	@Autowired
+	private ProjectService projectService;
+	
+	@Autowired
+	private MessageComponent messageComponent;
+	
+	@Autowired
+	private TcService tcService;
+	
+	/**
+	 * 이슈 리스트 화면
+	 * @param model
+	 */
+	@RequestMapping("/bmt/issue/issueList")
+	public void issueList(Model model, String pid, String bigCateId, String issueId) {
+		model.addAttribute("startDt", new SimpleDateFormat("yyyy-MM-dd").format(DateUtils.addDays(new Date(), -7)));
+		model.addAttribute("endDt", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+		model.addAttribute("projectView", projectService.selectProjectView(pid));
+		model.addAttribute("bigCateList", tcService.selectIssueCateCntList(pid));
+	}
+	
+
+	/**
+	 * bmt 측정이력 엑셀다운로드
+	 * @param model
+	 * @param criteria 검색조건
+	 * @return bmt 측정이력 엑셀
+	 */
+	@RequestMapping("/bmt/issue/getIssueExcel")
+	public ExcelDownloadView getIssueExcel(Model model, IssueCriteria criteria, HttpServletResponse response) {
+		criteria.setPartiId(super.getUser().getUserId());
+		List<IssueVo> list = issueService.selectIssueList(criteria);
+		for(int i=0 ; i<list.size(); i++){
+			list.get(i).setModelList(issueService.selectIssueModelList(list.get(i).getIssueId()));
+		}
+		ExcelHeader[] headers = new ExcelHeader[] {
+			new ExcelHeader("importance", "중요도", "", "B100", HorizontalAlignment.CENTER)
+			, new ExcelHeader("progressStat", "진행상황", "", "B200", HorizontalAlignment.CENTER)
+			, new ExcelHeader("issueSubject", "이슈제목")
+			, new ExcelHeader("issueCont", "이슈내용", HorizontalAlignment.LEFT, true)
+			, new ExcelHeader("regNm", "등록자", HorizontalAlignment.CENTER)
+			, new ExcelHeader("regDtm", "등록일시", HorizontalAlignment.CENTER)
+		};
+		
+		return new ExcelDownloadView(new ExcelResource(list, headers),"이슈내역.xlsx");
+	}
+	
+	/**
+	 * 이슈 리스트 조회
+	 * @param model
+	 * @param projectCriteria
+	 * @return
+	 */
+	@RequestMapping("/bmt/issue/getIssueList")
+	public View getIssueList(Model model,@RequestBody IssueCriteria criteria) {
+		criteria.setPartiId(super.getUser().getUserId());
+		String pid = criteria.getPid();
+		List<IssueVo> issueList = issueService.selectIssueList(criteria);
+		for(int i=0 ; i<issueList.size(); i++){
+			issueList.get(i).setModelList(issueService.selectIssueModelList(issueList.get(i).getIssueId()));
+		}
+		model.addAttribute("issueList", issueList);
+		model.addAttribute("issueCateList", issueService.selectIssueCategoryList(pid));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 이슈 상세조회
+	 * @param model
+	 * @param issueId 이슈아이디
+	 */
+	@Auth(url={"/bmt/issue/issueList"})
+	@RequestMapping("/bmt/issue/issueView")
+	public void issueView(Model model, String issueId) {
+		model.addAttribute("issueView", issueService.selectIssueView(issueId));
+	}
+
+	/**
+	 * 이슈 상세조회
+	 * @param model
+	 * @param projectCriteria
+	 * @return
+	 */
+	@RequestMapping("/bmt/issue/getIssueView")
+	public View getIssueView(Model model, String issueId) {
+		// 상세정보 조회
+		IssueVo issueVo = issueService.selectIssueView(issueId);
+		if (issueVo!=null) {
+			// tc, parti, file, 코멘트 리스트 조회
+			issueVo.setTcList(issueService.selectIssueTcList(issueId));
+			issueVo.setPartiList(issueService.selectIssuePartiList(issueId));
+			issueVo.setFileList(issueService.selectIssueFileList(issueId));
+			issueVo.setCommentList(issueService.selectIssueCommentList(issueId));
+			issueVo.setCateList(issueService.selectIssueCateList(issueId));
+			issueVo.setModelList(issueService.selectIssueModelList(issueId));
+		}
+		model.addAttribute("issueView", issueVo);
+		model.addAttribute("projectView", projectService.selectProjectView(issueVo.getPid()));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 이슈 등록
+	 * @param model
+	 * @param issueId 이슈아이디
+	 */
+	@Auth(url={"/bmt/tc/tcList"})
+	@RequestMapping("/bmt/issue/issueForm")
+	public void issueForm(Model model) {
+	}
+	
+	/**
+	 * 이슈 등록
+	 * @param model
+	 * @param issueVo 이슈 등록 정보
+	 * @return
+	 */
+	@Auth(url={"/bmt/tc/tcList"})
+	@RequestMapping(value="/bmt/issue/regIssuePrc")
+	public View regIssuePrc(Model model, @RequestBody IssueVo issueVo)
+	{
+		issueVo.setRegId(super.getUser().getUserId());
+		boolean save = false;
+		try {
+			// 이슈등록
+			save = issueService.insertIssue(issueVo);
+			if (!save) model.addAttribute("message", "저장 실패");
+			else {
+				// 구성원
+				String [] partiArray = ObjectUtil.getStringArrayFromList(issueVo.getPartiList(), "partiId");
+				
+				// 메시지 알림 등록
+				MessageVo messageVo = messageComponent.setMessageCreateIssue(issueVo, super.getAppId(), super.getUser());
+				messageComponent.sendMessage(messageVo, partiArray);
+			}
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			if (e.getCause() != null) model.addAttribute("message", "저장 실패");
+			else model.addAttribute("message", e.getMessage());
+		}
+		model.addAttribute("save", save);
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 이슈 할당 대상 수정 처리
+	 * @param model
+	 * @param issueVo 이슈 할당 대상 정보
+	 * @return
+	 */
+	@Auth(url={"/bmt/issue/issueList"})
+	@RequestMapping(value="/bmt/issue/modIssuePartiPrc")
+	public View modIssuePartiPrc(Model model, @RequestBody IssueVo issueVo)
+	{
+		issueVo.setModId(super.getUser().getUserId());
+		boolean save = false;
+		try {
+			// 이슈 할당 대상 수정
+			save = issueService.updateIssuePartiList(issueVo);
+			if (!save) model.addAttribute("message", "저장 실패");
+			else {
+				// 메시지 알림 등록
+				String [] partiArray = issueVo.getAddPartiArray();
+				issueVo = issueService.selectIssueView(issueVo.getIssueId());
+				MessageVo messageVo = messageComponent.setMessageCreateIssue(issueVo, super.getAppId(), super.getUser());
+				messageComponent.sendMessage(messageVo, partiArray);
+			}
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			if (e.getCause() != null) model.addAttribute("message", "저장 실패");
+			else model.addAttribute("message", e.getMessage());
+		}
+		model.addAttribute("save", save);
+		return new MappingJackson2JsonView();
+	}
+	/**
+	 * 이슈 코메트 수정
+	 * @param model
+	 * @param pid 프로젝트 아이디
+	 * @return
+	 */
+	@Auth(url={"/bmt/issue/issueList"})
+	@RequestMapping(value="/bmt/issue/modIssueCommentPrc")
+	public View modIssueCommentPrc(Model model, IssueCommentVo issueCommentVo){
+		issueCommentVo.setRegId(super.getUser().getUserId());
+		boolean save = false;
+		try {
+			// 코멘트 수정
+			save = issueService.updateIssueComment(issueCommentVo);
+			
+			if (!save) 
+				model.addAttribute("message", "저장 실패");
+			else {
+				model.addAttribute("commentList",issueService.selectIssueCommentList(issueCommentVo.getIssueId()));
+				
+				// 메시지 알림 등록
+				IssueVo issueVo = issueService.selectIssueView(issueCommentVo.getIssueId());
+				String [] partiArray = ObjectUtil.getStringArrayFromList(issueService.selectIssuePartiList(issueCommentVo.getIssueId()), "partiId");
+				MessageVo messageVo = messageComponent.setMessageIssueComment(issueVo, super.getAppId(), super.getUser());
+				messageComponent.sendMessage(messageVo, partiArray);
+			}
+
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			if (e.getCause() != null) model.addAttribute("message", "저장 실패");
+			else model.addAttribute("message", e.getMessage());
+		}
+		model.addAttribute("save", save);
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 이슈 코멘트 추가
+	 * @param model
+	 * @param pid 프로젝트아이디
+	 * @return
+	 */
+	@Auth(url={"/bmt/issue/issueList"})
+	@RequestMapping(value="/bmt/issue/regIssueCommentPrc")
+	public View regIssueCommentPrc(Model model, String issueId, String comment, String issueStat, IssueCommentVo issueCommentVo, IssueVo issueVo)
+	{
+		issueCommentVo.setRegId(super.getUser().getUserId());
+		issueCommentVo.setIssueId(issueId);
+		issueCommentVo.setComment(comment);
+		issueVo.setIssueId(issueCommentVo.getIssueId());
+		issueVo.setProgressStat(issueStat);
+		boolean save = false;
+		try {
+			// 코멘트 등록
+			save = issueService.insertIssueComment(issueCommentVo, issueVo);
+				
+			if (!save) 
+				model.addAttribute("message", "저장 실패");
+			else {
+				model.addAttribute("commentList",issueService.selectIssueCommentList(issueCommentVo.getIssueId()));
+				
+				// 메시지 알림 등록
+				issueVo= issueService.selectIssueView(issueCommentVo.getIssueId());
+				String [] partiArray = ObjectUtil.getStringArrayFromList(issueService.selectIssuePartiList(issueCommentVo.getIssueId()), "partiId");
+				MessageVo messageVo = messageComponent.setMessageIssueComment(issueVo, super.getAppId(), super.getUser());
+				messageComponent.sendMessage(messageVo, partiArray);
+			}
+
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			if (e.getCause() != null) model.addAttribute("message", "저장 실패");
+			else model.addAttribute("message", e.getMessage());
+		}
+		model.addAttribute("save", save);
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 이슈 완료 처리
+	 * @param model
+	 * @param issueId 이슈아이디
+	 * @return
+	 */
+	@Auth(url={"/bmt/issue/issueList"})
+	@RequestMapping(value="/bmt/issue/modIssueCompletePrc")
+	public View modIssueCompletePrc(Model model, IssueVo issueVo)
+	{
+		issueVo.setModId(super.getUser().getUserId());
+		boolean save = false;
+		try {
+			// 진행상태 변경(완료처리)
+			issueVo.setProgressStat("B203");
+			save = issueService.updateIssueProgressStat(issueVo);
+			
+			if (!save) 
+				model.addAttribute("message", "저장 실패");
+			else {
+				// 메시지 알림 등록
+				issueVo = issueService.selectIssueView(issueVo.getIssueId());
+				String [] partiArray = ObjectUtil.getStringArrayFromList(issueService.selectIssuePartiList(issueVo.getIssueId()), "partiId");
+				MessageVo messageVo = messageComponent.setMessageCompleteIssue(issueVo, super.getAppId(), super.getUser());
+				messageComponent.sendMessage(messageVo, partiArray);
+			}
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			if (e.getCause() != null) model.addAttribute("message", "저장 실패");
+			else model.addAttribute("message", e.getMessage());
+		}
+		model.addAttribute("save", save);
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 이슈 재오픈 처리
+	 * @param model
+	 * @param issueId 이슈아이디
+	 * @return
+	 */
+	@Auth(url={"/bmt/issue/issueList"})
+	@RequestMapping(value="/bmt/issue/modIssueRecallPrc")
+	public View modIssueRecallPrc(Model model,String issueId, String progressStat,IssueVo issueVo)
+	{
+		issueVo.setModId(super.getUser().getUserId());
+		issueVo.setIssueId(issueId);
+		boolean save = false;
+		try {
+			// 진행상태 변경(처리중)
+			issueVo.setProgressStat(progressStat);
+			save = issueService.updateIssueProgressStat(issueVo);
+			
+			if (!save) 
+				model.addAttribute("message", "저장 실패");
+			else {
+				// 메시지 알림 등록
+				issueVo = issueService.selectIssueView(issueVo.getIssueId());
+				String [] partiArray = ObjectUtil.getStringArrayFromList(issueService.selectIssuePartiList(issueVo.getIssueId()), "partiId");
+				MessageVo messageVo = messageComponent.setMessageRecallIssue(issueVo, super.getAppId(), super.getUser());
+				messageComponent.sendMessage(messageVo, partiArray);
+			}
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			if (e.getCause() != null) model.addAttribute("message", "저장 실패");
+			else model.addAttribute("message", e.getMessage());
+		}
+		model.addAttribute("save", save);
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 이슈 내역 삭제
+	 * @param model
+	 * @param issueId
+	 * @return
+	 */
+	@RequestMapping("/bmt/issue/delIssuePrc")
+	public View delIssuePrc(Model model, String param)
+	{
+		boolean del = false;
+		String[] params = param.split(";");
+		del = issueService.deleteIssuePrc(params);
+		model.addAttribute("del", del);
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 이슈 수정 하기
+	 * @param model
+	 * @param issueVo
+	 * @return
+	 */
+	@Auth(url={"/bmt/issue/issueList"})
+	@RequestMapping(value="/bmt/issue/modIssuePrc")
+	public View modIssuePrc(Model model, @RequestBody IssueVo issueVo){
+		issueVo.setModId(super.getUser().getUserId());
+		boolean save = false;
+		try {
+			save = issueService.updateIssuePrc(issueVo);
+			if (!save) 
+				model.addAttribute("message", "저장 실패");
+		} catch (Exception e) {
+			// TODO: handle exception
+			log.error(e.getMessage());
+			if (e.getCause() != null) model.addAttribute("message", "저장 실패");
+			else model.addAttribute("message", e.getMessage());
+		}
+		model.addAttribute("save", save);
+		return new MappingJackson2JsonView();
+	}
+}

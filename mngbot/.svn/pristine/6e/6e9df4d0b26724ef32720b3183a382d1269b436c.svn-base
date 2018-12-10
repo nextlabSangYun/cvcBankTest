@@ -1,0 +1,139 @@
+<%@ page contentType="text/html" pageEncoding="UTF-8" %>
+<%@ taglib uri="http://www.nextlab.co.kr/tags/nextlab" prefix="nl"%>
+<div class="content" id="appData">
+	<div class="sub_layout has_snb">
+		<div class="cont_wrap">
+			<div class="sort_area">
+				<div class="sel_item">
+					<span class="sort_tit">타입선택</span>
+					<nl:select cssClass="full"  v-model = "criteria.botType">
+						<nl:option value="">전체</nl:option>
+						<nl:options codeType="C500" />
+					</nl:select>
+				</div>
+				<div class="sel_item">
+					<span class="sort_tit">상태</span>
+					<nl:select cssClass="full"  v-model="criteria.botStat">
+						<nl:option value="">전체</nl:option>
+						<nl:options codeType="C700" />
+					</nl:select>
+				</div>
+				<button class="g_btn01" @click="getList()">조회</button>
+			</div>
+			
+			<div class="tb_desc">
+				<p>조회결과 : {{botList.length | number}}건</p>
+			</div>
+			<div class="g_table">
+				<table>
+					<caption>중요도, 진행사황, 이슈제목 등으로 구성된 표입니다.</caption>
+					<colgroup>
+						<col style="width:4%;">
+						<col>
+						<col>
+						<col style="width:8%;">
+						<col>
+						<col>
+						<col style="width:13%;">
+						<col style="width:6%;">
+					</colgroup>
+					<thead>
+						<tr>
+							<th>No.</th>
+							<th>Bot이름</th>
+							<th>Bot타입</th>
+							<th>상태</th>
+							<th>모델명</th>
+							<th>시리얼번호</th>
+							<th>제어</th>
+							<th>상태이력</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr v-for="(list,idx) in pagingList">
+							<td>{{getFirstPage - idx}}</td>
+							<td>
+								<a href="#" class="link" @click="showPopupLayer('/bot/bot/qaBotMngForm?botSno=' + list.botSno); return false;"><p class="ellips">{{list.botNm}}</p></a>
+							</td>
+							<td>{{list.botType | code(codeNm)}}</td>
+							<td><span :class="list.statClass">{{list.botStat | code(statCodeNm)}}</span></td>
+							<td>{{list.modelNm}}</td>
+							<td>{{list.botSno}}</td>
+							<td class="btn_control">
+								<button v-if="list.botStat == 'C702'" class="smbtn_run" @click="btnRun"><span>Run</span></button>
+								<button v-else class="smbtn_run" disabled="disabled"><span>Run</span></button>
+								<button v-if="list.botStat == 'C703'" class="smbtn_stop" @click="btnStop"><span>Stop</span></button>
+								<button v-else class="smbtn_stop" disabled="disabled"><span>Stop</span></button>
+							</td>
+							<td><button class="btn_show" @click="showPopupLayer('/bot/bot/botStatHstList?botSno=' + list.botSno); return false;"></button></td>
+						</tr>
+						<tr v-if="pagingList.length == 0">
+							<td colspan="8">검색 결과가 없습니다.</td>
+						</tr>
+					</tbody>
+				</table>
+				<paginator ref="paginator" :go-fn="getPagingList"></paginator>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+
+var list = new Vue({
+	el: '#appData'
+	, data: {
+		botList: []
+		, pagingList: []
+		, codeNm: '<nl:codeListJson codeType="C500" />'
+		, statCodeNm: '<nl:codeListJson codeType="C700" />'
+		, criteria: {
+			botType:""
+			, botStat:""
+		}
+	}
+	, beforeMount: function() {
+		this.$nextTick(function() {
+			this.getList();
+		});
+	}
+	, computed: {
+		getFirstPage: function(){
+			return this.$refs.paginator.pageNumDesc;
+		}
+	}
+	, methods: {
+		getList: function() {
+			$.post('/bot/bot/getBotMngList',list.criteria ,function(data){
+				list.botList = data.botList
+				for(var i=0; i < data.botList.length; i++){
+					if(data.botList[i].botStat == "C701"){
+						list.botList[i].statClass = "state01";
+					}
+					if(data.botList[i].botStat == "C702"){
+						list.botList[i].statClass = "state02";
+					}
+					if(data.botList[i].botStat == "C703"){
+						list.botList[i].statClass = "state03";
+					}
+				}
+				list.getPagingList();
+				list.goPage(1);
+			});
+		}
+		, getPagingList: function () {
+			this.pagingList = this.$refs.paginator.pagingList(this.botList);
+		}
+		, goPage: function(page){
+			this.$refs.paginator.goPage(page);
+		}
+		, btnRun: function() {
+			alert('개발중');
+		}
+		, btnStop: function() {
+			alert('개발중');
+		}
+	}
+});
+
+</script>

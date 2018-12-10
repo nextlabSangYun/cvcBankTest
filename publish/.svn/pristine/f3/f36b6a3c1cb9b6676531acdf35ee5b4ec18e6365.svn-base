@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>CVCBank</title>
+	<link rel="shortcut icon" href="../../images/favicon.ico" type="image/x-icon">
+	<link rel="stylesheet" href="../../css/common.css">
+	<link rel="stylesheet" href="../../css/bmt.css">
+	<script src="../../js/jquery-3.2.1.min.js"></script>
+	<script src="../../js/jquery-ui.min.js"></script>
+	<script src="../../js/jquery.form.min.js"></script>
+	<script src="../../js/vue.min.js"></script>
+	<script src="../../js/lodash.min.js"></script>
+	<script src="../../js/calendar.js"></script>
+	<script src="../../js/common.js"></script>
+</head>
+<body>
+<div class="pop_wrap" style="width: 1080px;">
+	<div class="pop_tit">
+		<p>이슈 이력 보기</p>
+	</div>
+	<div class="pop_cont">
+		<p class="cate_tit">코멘트</p>
+		<div class="search_area with_select">
+			<select>
+				<option value="">-- 그룹선택 --</option>
+				<option>H/E 이슈</option>
+				<option>차기 F/W 적용</option>
+				<option>정상 시나리오</option>
+			</select>
+			<textarea class="issue_comment"></textarea>
+			<button class="g_btn01">등록</button>
+		</div>
+	</div>
+</div>
+</body>
+</html>

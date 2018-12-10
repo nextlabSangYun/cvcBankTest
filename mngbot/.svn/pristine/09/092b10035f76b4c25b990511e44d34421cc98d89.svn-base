@@ -1,0 +1,13 @@
+package kr.co.nextlab.hded.model;
+
+import lombok.Data;
+
+@Data
+public class HeProjectIssueTcVo {
+	/**
+	 * 기본정보
+	 */
+	private String issueId;
+	private Integer projectTcSeq;
+	
+}

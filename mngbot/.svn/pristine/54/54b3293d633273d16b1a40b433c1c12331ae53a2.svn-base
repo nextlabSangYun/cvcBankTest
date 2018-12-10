@@ -1,0 +1,338 @@
+/**
+ * @title	: (엑셀 다운로드)엑셀 다운로드 엑셀뷰 생성
+ * @package	: kr.co.nextlab.excel
+ * @file	: ExcelDownloadView.java
+ * @desc	: 
+ */
+package kr.co.nextlab.excel;
+
+import java.lang.reflect.Method;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.hssf.util.HSSFColor.HSSFColorPredefined;
+import org.apache.poi.ss.usermodel.BorderStyle;
+import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.springframework.web.servlet.view.document.AbstractXlsxView;
+
+import kr.co.nextlab.comm.model.GubunVo;
+import kr.co.nextlab.component.CodeComponent;
+import kr.co.nextlab.tag.GubunTagNote;
+import kr.co.nextlab.util.SiteUtil;
+
+public class ExcelDownloadView extends AbstractXlsxView {
+
+	private final List<ExcelResource> excelResource;
+
+	private String fileName;
+
+	private final static String METHOD_PREFIX_GET = "get";
+
+	private final static String METHOD_PREFIX_IS = "is";
+
+	private final static String BOOLEAN_TYPE = "BOOLEAN";
+
+	public ExcelDownloadView(List<ExcelResource> excelResource) {
+		this.excelResource = excelResource;
+	}
+
+	public ExcelDownloadView(List<ExcelResource> excelResource, String fileName) {
+		this.excelResource = excelResource;
+		this.fileName = fileName;
+	}
+	
+	public ExcelDownloadView(ExcelResource excelResource) {
+		List<ExcelResource> list = new ArrayList<ExcelResource>();
+		list.add(excelResource);
+		this.excelResource = list;
+	}
+
+	public ExcelDownloadView(ExcelResource excelResource, String fileName) {
+		List<ExcelResource> list = new ArrayList<ExcelResource>();
+		list.add(excelResource);
+		this.excelResource = list;
+		this.fileName = fileName;
+	}
+
+	/**
+	 * header를 생성한다.
+	 * @param headerStyle
+	 * @param headerNum
+	 * @param header
+	 * @param headerName
+	 * @return
+	 */
+	private int createHeader(XSSFCellStyle headerStyle, int headerNum, XSSFRow header, String headerName) {
+		XSSFCell cell = header.createCell(headerNum++);
+		cell.setCellValue(headerName);
+		setCellStyle(cell, headerStyle);
+
+		return headerNum;
+	}
+
+	/**
+	 * cell style
+	 * @param row
+	 * @param style
+	 */
+	private void setCellStyle(XSSFCell cell, XSSFCellStyle style) {
+		cell.setCellStyle(style);
+	}
+
+	/**
+	 * header명에서 getter명을 가져온다.
+	 * @param headerName
+	 */
+	private String setMethodNamesList(String headerName) {
+		return METHOD_PREFIX_GET + Character.toUpperCase(headerName.charAt(0)) + headerName.substring(1);
+	}
+
+	public List<ExcelResource> getExcelResource() {
+		return excelResource;
+	}
+
+	/**
+	 * boolean일때는 getter가 'is'로 시작하므로 메소드명을 'get'으로 변경시켜준다.
+	 * @param method
+	 * @param realMethodName
+	 * @return
+	 */
+	private String checkBoolAndReplaceMethodName(Method method) {
+		String realMethodName = method.getName();
+		Class<?> returnType = method.getReturnType();
+		String typeName = returnType.getSimpleName();
+
+		if (BOOLEAN_TYPE.equals(StringUtils.upperCase(typeName))) {
+			realMethodName = realMethodName.replaceFirst(METHOD_PREFIX_IS, METHOD_PREFIX_GET);
+		}
+
+		return realMethodName;
+	}
+
+	/**
+	 * excel row를 생성한다
+	 * @param cellNum
+	 * @param row
+	 * @param cellValue
+	 * @param style
+	 * @param gubunKey
+	 * @param userYn
+	 */
+	private void createRow(int cellNum, XSSFRow row, Object cellValue, XSSFCellStyle style, String gubunKey,
+			String codeKey, boolean userYn) {
+		XSSFCell cell = row.createCell(cellNum);
+
+		if (cellValue instanceof Boolean) {
+			if (StringUtils.isEmpty(gubunKey)) {
+				cell.setCellValue((Boolean) cellValue);
+			} else {
+				String value = this.getGubunOptionData(gubunKey, cellValue.toString());
+				if (StringUtils.isEmpty(value)) {
+					cell.setCellValue((Boolean) cellValue);
+				} else {
+					cell.setCellValue(value);
+				}
+			}
+		} else if (cellValue instanceof Date) {
+			cell.setCellValue(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format((Date) cellValue));
+		} else if (cellValue instanceof Integer) {
+			cell.setCellValue((Integer) cellValue);
+		} else if (cellValue instanceof Double) {
+			cell.setCellValue((Double) cellValue);
+		} else if (cellValue instanceof Float) {
+			cell.setCellValue((Float) cellValue);
+		} else {
+			if (cellValue != null) {
+				if (BooleanUtils.isTrue(userYn)) {// 유저핸들러 값 조회
+					String value = this.getUserData(cellValue.toString());
+					if (StringUtils.isEmpty(value)) {
+						cell.setCellValue(cellValue.toString());
+					} else {
+						cell.setCellValue(value);
+					}
+				} else if (StringUtils.isNotEmpty(codeKey)) {// 코드값사용
+					String value = this.getOptionData(codeKey, cellValue.toString());
+					if (StringUtils.isEmpty(value)) {
+						cell.setCellValue(cellValue.toString());
+					} else {
+						cell.setCellValue(value);
+					}
+				} else if (StringUtils.isEmpty(gubunKey)) {
+					cell.setCellValue(cellValue.toString());
+				} else { // 구분 tag 사용
+					String value = this.getGubunOptionData(gubunKey, cellValue.toString());
+					if (StringUtils.isEmpty(value)) {
+						cell.setCellValue(cellValue.toString());
+					} else {
+						cell.setCellValue(value);
+					}
+				}
+			}
+		}
+		setCellStyle(cell, style);
+	}
+
+	private String getUserData(String userId) {
+		return "";
+	}
+
+	private String getOptionData(String codeTypw, String codeId) {
+		CodeComponent codeComponent = new CodeComponent();
+		if (StringUtils.isEmpty(codeId))
+			return "";
+		return codeComponent.getCodeName(codeTypw, codeId);
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private String getGubunOptionData(String gubunKey, String value) {
+		GubunTagNote note = GubunTagNote.getInstance();
+		String methodName = gubunKey;
+
+		if (!StringUtils.isEmpty(methodName)) {
+			try {
+				char ch = methodName.charAt(0);
+				String getMethod = "get"
+						+ methodName.replaceFirst(String.valueOf(ch), String.valueOf(Character.toUpperCase(ch)));
+
+				Method method = note.getClass().getMethod(getMethod, new Class[] {});
+				Object o = method.invoke(note, new Object[] {});
+
+				if (o instanceof List && ((List) o).size() > 0 && ((List) o).get(0) instanceof GubunVo) {
+					for (GubunVo parameter : (List<GubunVo>) o) {
+						if (StringUtils.equals(value, parameter.getKey())) {
+							return parameter.getValue();
+						}
+					}
+				}
+			} catch (Exception e) {
+				// ignore
+			}
+		}
+		return null;
+	}
+
+	@Override
+	protected void buildExcelDocument(Map<String, Object> model, Workbook workbook, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		
+		XSSFSheet sheet = null;
+		for (ExcelResource er : excelResource) {
+			
+			if (StringUtils.isNotEmpty(er.getSheetNm()))
+				sheet = (XSSFSheet) workbook.createSheet(er.getSheetNm());
+			else
+				sheet = (XSSFSheet) workbook.createSheet();
+	
+			List<?> list = er.getList();
+			
+			List<ExcelHeader> headerList = er.getHeaders();
+			
+			sheet.setDefaultColumnWidth(20);
+			sheet.setDisplayGridlines(true);
+	
+			XSSFCellStyle headerStyle = (XSSFCellStyle) workbook.createCellStyle();
+			headerStyle.setBorderTop(BorderStyle.THIN);
+			headerStyle.setBorderBottom(BorderStyle.THIN);
+			headerStyle.setBorderLeft(BorderStyle.THIN);
+			headerStyle.setBorderRight(BorderStyle.THIN);
+			headerStyle.setAlignment(HorizontalAlignment.CENTER);
+			headerStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+			
+			headerStyle.setFillBackgroundColor(HSSFColorPredefined.BLACK.getIndex());
+			headerStyle.setFillForegroundColor(HSSFColorPredefined.BLACK.getIndex());
+			headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+	
+			Font font = workbook.createFont(); // 폰트 객체 생성
+			font.setColor(IndexedColors.WHITE.index);
+			headerStyle.setFont(font);
+	
+			XSSFCellStyle cellStyle = null;
+	
+			int headerNum = 0;
+			XSSFRow header = sheet.createRow(0);
+			for (ExcelHeader excelHeader : headerList) {
+				headerNum = createHeader(headerStyle, headerNum, header, excelHeader.getDisplayName());
+			}
+	
+			int rowNum = 1;
+			List<String> mergeCellList = new ArrayList<String>();
+			for (Object o : list) {
+				XSSFRow row = sheet.createRow(rowNum++);
+				int cellNum = 0;
+				for (ExcelHeader excelHeader : headerList) {
+					String methodName = this.setMethodNamesList(excelHeader.getHeader());
+					Method[] methods = o.getClass().getMethods();
+					
+					cellStyle = (XSSFCellStyle) workbook.createCellStyle();
+					cellStyle.setBorderTop(BorderStyle.THIN);
+					cellStyle.setBorderBottom(BorderStyle.THIN);
+					cellStyle.setBorderLeft(BorderStyle.THIN);
+					cellStyle.setBorderRight(BorderStyle.THIN);
+					cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+					cellStyle.setAlignment(excelHeader.getHorizontalAlignment());
+					cellStyle.setWrapText(excelHeader.isWrapText());
+					
+					for (Method method : methods) {
+						String realMethodName = checkBoolAndReplaceMethodName(method);
+						if (StringUtils.equals(methodName, realMethodName)) {
+							Object cellValue = method.invoke(o);
+							
+							if (er.isMerge()) {
+								if (StringUtils.equals(excelHeader.getHeader(), er.getMergeName())) {
+									mergeCellList.add(cellValue.toString());
+								}
+							}
+							
+							createRow(cellNum++, row, cellValue, cellStyle, excelHeader.getGubunKey(),
+									excelHeader.getCodeKey(), excelHeader.isUserYn());
+							break;
+						}
+					}
+				}
+			}
+			
+			if (er.isMerge()) {
+				if (mergeCellList.size() >= 1) {
+					int strNum = 1;
+					String tempStr = mergeCellList.get(0);
+					for (int i=0; i<mergeCellList.size(); i++) {
+						if (!StringUtils.equals(tempStr, mergeCellList.get(i))) {
+							if (strNum != i) {
+								sheet.addMergedRegion(new CellRangeAddress(strNum, i, er.getMergeCellStrNum(), er.getMergeCellEndNum()));
+							}
+							strNum = i + 1;
+						}
+						tempStr = mergeCellList.get(i);
+					}
+					
+					if (strNum < mergeCellList.size()) {
+						sheet.addMergedRegion(new CellRangeAddress(strNum, mergeCellList.size(), er.getMergeCellStrNum(), er.getMergeCellEndNum()));
+					}
+				}
+			}
+		}
+
+		if (StringUtils.isNotEmpty(fileName)) {
+			SiteUtil.setResponseHeader(response, fileName);
+		}
+	}
+	
+}

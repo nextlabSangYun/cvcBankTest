@@ -1,0 +1,128 @@
+/**
+ * @title	: bmt접수 관련 Mapper
+ * @package	: kr.co.nextlab.bmt.mapper
+ * @file	: RequestMapper.java
+ * @author	: winolonam
+ * @date	: 2018. 04. 18.
+ * @desc	: 
+ */
+package kr.co.nextlab.bmt.mapper;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import kr.co.nextlab.bmt.model.BmtRequestVo;
+import kr.co.nextlab.bmt.model.ReqCommentVo;
+import kr.co.nextlab.bmt.model.ReqFileVo;
+import kr.co.nextlab.bmt.model.ReqManagerVo;
+import kr.co.nextlab.bmt.model.RequestCriteria;
+
+@Mapper
+public interface RequestMapper {
+	
+	/**
+	 * bmt 요청 등록
+	 * @param bmtRequestVo
+	 * @return
+	 */
+	public int insertRequest(BmtRequestVo bmtRequestVo);
+	
+	/**
+	 * bmt 요청 수정
+	 * @param bmtRequestVo
+	 * @return
+	 */
+	public int updateRequest(BmtRequestVo bmtRequestVo);
+	
+	/**
+	 * bmt 파일 등록
+	 * @param reqFileVo
+	 * @return
+	 */
+	public int insertReqFile(ReqFileVo reqFileVo);
+	
+	/**
+	 * bmt 당당자 등록
+	 * @param reqManagerVo
+	 * @return
+	 */
+	public int insertReqManager(ReqManagerVo reqManagerVo);
+	
+	/**
+	 * bmt 요청 리스트 조회
+	 * @param requestCriteria
+	 * @return
+	 */
+	public List<BmtRequestVo> selectRequestList(RequestCriteria requestCriteria);
+	
+	/**
+	 * bmt 요청 파일 리스트 조회
+	 * @param reqId
+	 * @return
+	 */
+	public List<ReqFileVo> selectReqFileList(String reqId);
+	
+	/**
+	 * bmt 요청 상세 조회
+	 * @param reqId
+	 * @return
+	 */
+	public BmtRequestVo selectBmtRequestDetail(String reqId);
+	
+	/**
+	 * bmt 승인시 상제 조회
+	 * @param reqId
+	 * @return
+	 */
+	public BmtRequestVo selectReqView(String reqId);
+	
+	/**
+	 * bmt 요청 담당자 조회
+	 * @param reqId
+	 * @return
+	 */
+	public List<ReqManagerVo> selectReqManagerList(String reqId);
+	
+	/**
+	 * bmt 요청 파일 삭제
+	 * @param reqId
+	 * @return
+	 */
+	public int deleteReqFile(String reqId);
+	
+	/**
+	 * bmt 요청 담당자 삭제
+	 * @param reqId
+	 * @return
+	 */
+	public int deleteReqManager(String reqId);
+	
+	/**
+	 * bmt 요청 상태값 변경
+	 * @param bmtRequestVo
+	 * @return
+	 */
+	public int updateReqProgrssStat(BmtRequestVo bmtRequestVo);
+	
+	/**
+	 * bmt 요청 코멘트 리스트 조회
+	 * @param reqId
+	 * @return
+	 */
+	public List<ReqCommentVo> selectReqCommentList(String reqId);
+	
+	/**
+	 * bmt 요청 코멘트 등록
+	 * @param reqCommentVo
+	 * @return
+	 */
+	public int insertReqComment(ReqCommentVo reqCommentVo);
+	
+	/**
+	 * btm 요청 코멘트 수정
+	 * @param reqCommentVo
+	 * @return
+	 */
+	public int updateReqComment(ReqCommentVo reqCommentVo);
+}

@@ -1,0 +1,115 @@
+<%@ page contentType="text/html" pageEncoding="UTF-8" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://www.nextlab.co.kr/tags/nextlab" prefix="nl"%>
+<div class="content">
+	<div class="sub_layout">
+		<div class="sort_area">
+			<div class="sel_item full">
+				<span class="sort_tit">대상기간</span>
+				<div class="con_col2">
+					<div class="period">
+						<input type="text" class="input_date" v-model="criteria.startDt" name="startDt">
+						<span class="bar">~</span>
+						<input type="text" class="input_date" v-model="criteria.endDt" name="endDt">
+					</div>
+					<div class="chk_area">
+						<input type="checkbox" id="chk" v-model="criteria.chkIng"><label for="chk">진행중인 프로젝트만 조회</label>
+					</div>
+				</div>
+			</div>
+			<div class="sel_item full">
+				<span class="sort_tit">시스템</span>
+				<div class="case">
+					<input type="text" placeholder="시스템명을 입력하세요.">
+				</div>
+			</div>
+			<div class="sel_item full">
+				<span class="sort_tit">분류</span>
+				<div class="case">
+					<input type="text" placeholder="대분류를 입력하세요.">
+					<input type="text" placeholder="중분류를 입력하세요.">
+					<input type="text" placeholder="소분류를 입력하세요.">
+				</div>
+			</div>
+			<div class="sel_item full">
+				<span class="sort_tit">T.C명</span>
+				<div class="case">
+					<input type="text" class="full" placeholder="Test Case 명을 입력하세요.">
+				</div>
+			</div>
+			<button class="g_btn01">조회</button>
+		</div>
+		<div class="tb_desc">
+			<p>조회결과 : {{ projectList.length | number(0) }}건</p>
+		</div>
+		<div class="g_table">
+			<table>
+				<caption>프로젝트 이름, 기간, 진행상태, 바로가기로 구성된 표 입니다.</caption>
+				<colgroup>
+					<col style="width:5%;">
+					<col>
+					<col style="width:13%;">
+					<col style="width:10%;">
+					<col style="width:10%;">
+					<col style="width:10%;">
+					<col style="width:13%;">
+					<col style="width:13%;">
+				</colgroup>
+				<thead>
+					<tr>
+						<th>No.</th>
+						<th>프로젝트명</th>
+						<th>기간</th>
+						<th>시스템</th>
+						<th>차수</th>
+						<th>진행상태</th>
+						<th>최초 작성</th>
+						<th>최종 수정</th>
+					</tr>
+				</thead>
+				<tbody>
+<!-- 					<tr v-for="(list, idx) in pagingList"> -->
+					<tr>
+						<td>100</td>
+						<td><p class="ellips"><a href="#" class="link">프로젝트명</a></p></td>
+						<td>2018-05-29 ~<br/>2018-05-29</td>
+						<td>SCS</td>
+						<td>1차 (대기중)</td>
+						<td>진행중</td>
+						<td>홍길동<br/>(2018-04-05 12:35:56)</td>
+						<td>홍길동<br/>(2018-04-05 12:35:56)</td>
+					</tr>
+<!-- 					<tr v-if="pagingList.length==0"> -->
+					<tr>
+						<td colspan="8">검색된 프로젝트가 없습니다.</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+<script>
+	var list = new Vue({
+		el: '.sub_layout'
+		, data: {
+			projectList: []
+			, pagingList: []
+			, criteria: {
+				startDt: '<c:out value="${startDt}"/>'
+				, endDt: '<c:out value="${endDt}"/>'
+				, chkIng: false
+			}
+			, codeListC300: '<nl:codeListJson codeType="C300" />'
+			, codeListD100: '<nl:codeListJson codeType="D100" />'
+		}
+		, beforeMount: function() {
+			this.$nextTick(function() {
+			});
+		}
+		, mounted: function() {
+		}
+		, methods: {
+		}
+	});
+</script>

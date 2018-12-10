@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>Management Bot</title>
+	<link rel="stylesheet" href="../css/common.css">
+	<link rel="stylesheet" href="../css/bmt.css">
+	<script src="../js/jquery-3.2.1.min.js"></script>
+	<script src="../js/jquery-ui.min.js"></script>
+	<script src="../js/jquery.form.min.js"></script>
+	<script src="../js/vue.min.js"></script>
+	<script src="../js/lodash.min.js"></script>
+	<script src="../js/calendar.js"></script>
+	<script src="../js/common.js"></script>
+</head>
+<body>
+	<div class="pop_wrap win_pop">
+		<div class="pop_tit">
+			<p>1/2 – Test Case 선택</p>
+		</div>
+		<div class="pop_cont">
+			<div class="sort_area col1">
+				<span class="sort_tit">대분류</span>
+				<select name="" id="">
+					<option value="">선택</option>
+				</select>
+			</div>
+			<div class="g_table">
+				<table>
+					<colgroup>
+						<col style="width:11%">
+						<col style="width:11%">
+						<col style="width:13%">
+						<col style="width:8%">
+						<col>
+						<col style="width:10%">
+					</colgroup>
+					<thead>
+						<tr>
+							<th colspan="3">구분</th>
+							<th rowspan="2">중요도</th>
+							<th rowspan="2">상세정보</th>
+							<th rowspan="2">이력</th>
+						</tr>
+						<tr>
+							<th>대분류</th>
+							<th>중분류</th>
+							<th>소분류</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td class="l_align">홈</td>
+							<td class="l_align">마이 Btv</td>
+							<td class="l_align">최근시청 VOD</td>
+							<td>minor</td>
+							<td class="l_align"><a href="pop_tc_add2.html" class="link">콘텐츠 제목 / 속성정보 / 평점 정보 제공</a></td>
+							<td><button class="tb_btn02"><span class="history">이력</span></button></td>
+						</tr>
+						<tr>
+							<td class="l_align">홈</td>
+							<td class="l_align">마이 Btv</td>
+							<td class="l_align">최근시청 VOD</td>
+							<td>minor</td>
+							<td class="l_align"><a href="#" class="link">콘텐츠 제목 / 속성정보 / 평점 정보 제공</a></td>
+							<td><button class="tb_btn02"><span class="history">이력</span></button></td>
+						</tr>
+						<tr>
+							<td class="l_align">홈</td>
+							<td class="l_align">마이 Btv</td>
+							<td class="l_align">최근시청 VOD</td>
+							<td>minor</td>
+							<td class="l_align"><a href="#" class="link">콘텐츠 제목 / 속성정보 / 평점 정보 제공</a></td>
+							<td><button class="tb_btn02"><span class="history">이력</span></button></td>
+						</tr>
+						<tr>
+							<td class="l_align">홈</td>
+							<td class="l_align">마이 Btv</td>
+							<td class="l_align">최근시청 VOD</td>
+							<td>minor</td>
+							<td class="l_align"><a href="#" class="link">콘텐츠 제목 / 속성정보 / 평점 정보 제공</a></td>
+							<td><button class="tb_btn02"><span class="history">이력</span></button></td>
+						</tr>
+						<tr>
+							<td class="l_align">홈</td>
+							<td class="l_align">마이 Btv</td>
+							<td class="l_align">최근시청 VOD</td>
+							<td>minor</td>
+							<td class="l_align"><a href="#" class="link">콘텐츠 제목 / 속성정보 / 평점 정보 제공</a></td>
+							<td><button class="tb_btn02"><span class="history">이력</span></button></td>
+						</tr>
+						<tr>
+							<td class="l_align">홈</td>
+							<td class="l_align">마이 Btv</td>
+							<td class="l_align">최근시청 VOD</td>
+							<td>minor</td>
+							<td class="l_align"><a href="#" class="link">콘텐츠 제목 / 속성정보 / 평점 정보 제공</a></td>
+							<td><button class="tb_btn02"><span class="history">이력</span></button></td>
+						</tr>
+
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<div class="btn_wrap02">
+			<button class="g_btn02" onclick="self.close();">닫기</button>
+		</div>
+	</div>
+	<script>
+		setPopup(2);
+	</script>
+</body>
+</html>

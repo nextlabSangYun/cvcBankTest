@@ -1,0 +1,184 @@
+/**
+ * @title	: 메일 컨트롤러
+ * @package	: kr.co.nextlab.comm.controller
+ * @file	: MailController.java
+ * @author	: jnlee
+ * @date	: 2017. 11. 5.
+ * @desc	: 
+ */
+package kr.co.nextlab.comm.controller;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.View;
+import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
+
+import kr.co.nextlab.annotation.security.Access;
+import kr.co.nextlab.bmt.model.BmtRequestVo;
+import kr.co.nextlab.bmt.model.DecisionMakingVo;
+import kr.co.nextlab.bmt.model.ProjectVo;
+import kr.co.nextlab.bmt.model.XqmsVo;
+import kr.co.nextlab.bot.model.UserVo;
+import kr.co.nextlab.comm.model.MailVo;
+import kr.co.nextlab.component.MailComponent;
+import kr.co.nextlab.hded.model.HeProjectVo;
+import kr.co.nextlab.util.PropertyUtil;
+
+@Controller
+public class MailController extends BaseController {
+
+	@Autowired
+	private MailComponent mailComponent;
+	
+	/**
+	 * 메일 전송
+	 * @param model
+	 * @param mailVo templete, to, subject
+	 * @return 전송결과 result-(true/false)
+	 */
+	@RequestMapping("/mail/send")
+	public View send(Model model, MailVo mailVo) {
+		mailComponent.setTemplete(mailVo.getTemplete());
+		mailComponent.setTo(mailVo.getTo());
+		mailComponent.setSubject(mailVo.getSubject());
+		mailComponent.setJsonParam(mailVo.getJsonParam()); 
+		model.addAttribute("result", mailComponent.sendMail());
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 새프로젝트 등록
+	 * @param model
+	 */
+	@Access
+	@RequestMapping("/mail/bmt/newProject")
+	public void bmtNewProject(Model model, String userNm, @RequestBody ProjectVo proejctVo) {
+		model.addAttribute("nowDate", new SimpleDateFormat("yyyy.MM.dd").format(new Date()));
+		model.addAttribute("proejctVo", proejctVo);
+		model.addAttribute("userNm", userNm);
+	}
+	
+	/**
+	 * HE 새프로젝트 등록
+	 * @param model
+	 */
+	@Access
+	@RequestMapping("/mail/hded/newHeProject")
+	public void hdedNewProject(Model model, String userNm, @RequestBody HeProjectVo heProjectVo) {
+		model.addAttribute("nowDate", new SimpleDateFormat("yyyy.MM.dd").format(new Date()));
+		model.addAttribute("projectStDt", new SimpleDateFormat("yyyy.MM.dd").format(heProjectVo.getProjectStDt()));
+		model.addAttribute("projectEtDt", new SimpleDateFormat("yyyy.MM.dd").format(heProjectVo.getProjectEndDt()));
+		model.addAttribute("heProjectVo", heProjectVo);
+		model.addAttribute("userNm", userNm);
+	}
+	
+	/**
+	 * BMT 요청
+	 * @param model
+	 */
+	@Access
+	@RequestMapping("/mail/bmt/bmtRequetProject")
+	public void bmtRequetNewProject(Model model, String userNm, @RequestBody BmtRequestVo bmtRequestVo) {
+		model.addAttribute("nowDate", new SimpleDateFormat("yyyy.MM.dd").format(new Date()));
+		model.addAttribute("regDate", new SimpleDateFormat("yyyy-MM-dd hh:mm a").format(new Date()));
+		model.addAttribute("bmtRequestVo", bmtRequestVo);
+		model.addAttribute("userNm", userNm);
+	}
+	
+	/**
+	 * BMT 승인 
+	 * @param model
+	 */
+	@Access
+	@RequestMapping("/mail/bmt/bmtRequestApprovalProject")
+	public void bmtRequestApprovalProject(Model model, String userNm, @RequestBody BmtRequestVo bmtRequestVo) {
+		model.addAttribute("nowDate", new SimpleDateFormat("yyyy.MM.dd").format(new Date()));
+		model.addAttribute("regDate", new SimpleDateFormat("yyyy-MM-dd hh:mm a").format(new Date()));
+		model.addAttribute("bmtRequestVo", bmtRequestVo);
+		model.addAttribute("userNm", userNm);
+	}
+	/**
+	 * BMT 반려 
+	 * @param model
+	 */
+	@Access
+	@RequestMapping("/mail/bmt/bmtRequestReturnProject")
+	public void bmtRequestReturnProject(Model model, String userNm, @RequestBody BmtRequestVo bmtRequestVo) {
+		model.addAttribute("nowDate", new SimpleDateFormat("yyyy.MM.dd").format(new Date()));
+		model.addAttribute("regDate", new SimpleDateFormat("yyyy-MM-dd hh:mm a").format(new Date()));
+		model.addAttribute("bmtRequestVo", bmtRequestVo);
+		model.addAttribute("userNm", userNm);
+	}
+	
+	/**
+	 * 임시 메일폼 (테스트용)
+	 * @param model
+	 */
+	@Access
+	@RequestMapping("/mail/testForm")
+	public void testMailForm(Model model, String userNm) {
+		model.addAttribute("data", "컨트롤러 저장 데이터");
+	}
+	
+
+	/**
+	 * 성능평가 결과 전송
+	 * @param model
+	 */
+	@Access
+	@RequestMapping("/mail/bmt/performResult")
+	public void bmtPerformResult(Model model,@RequestBody List<XqmsVo> list) {
+		model.addAttribute("nowDate", new SimpleDateFormat("yyyy.MM.dd").format(new Date()));
+		model.addAttribute("list", list);
+	}
+	
+	/**
+	 * 임시 비밀번호 받기 메일 폼
+	 * @param model
+	 */
+	@Access
+	@RequestMapping("/mail/bot/tempPwd")
+	public void tempPwd(Model model, @RequestBody UserVo userVo){
+		model.addAttribute("nowDate", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+		model.addAttribute("userVo",userVo);
+	}
+	
+	/**
+	 * 계정승인요청 메일 폼
+	 * @param model
+	 */
+	@Access
+	@RequestMapping("/mail/bot/newUser")
+	public void newUser(Model model, @RequestBody UserVo vo){
+		String pattern = "^(01\\d{1}|02|0\\d{1,2})(\\d{3,4})(\\d{4})";
+		
+		model.addAttribute("nowDate", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+		model.addAttribute("phone", vo.getPhone().replaceAll(pattern, "$1-$2-$3"));
+		model.addAttribute("vo",vo);
+	}
+	
+	/**
+	 * 의사결정 메일 폼
+	 * @param model
+	 * @param userNm
+	 * @param decisionMakingVo
+	 */
+	@Access
+	@RequestMapping("mail/bmt/bmtIssueDecisionMaking")
+	public void bmtIssueDecision(Model model, String userNm, @RequestBody DecisionMakingVo decisionMakingVo){
+		model.addAttribute("nowDate", new SimpleDateFormat("yyyy.MM.dd").format(new Date()));
+		model.addAttribute("decisionMakingVo", decisionMakingVo);
+		model.addAttribute("userNm", userNm);
+		String url = PropertyUtil.getProperty("site.cookie.domain") + ":" + PropertyUtil.getProperty("site.port") + "/bmt/issue/decisionMaking?pid=" + decisionMakingVo.getPid();
+		model.addAttribute("url", url);
+		String voteCont = decisionMakingVo.getVoteCont().replace("\n", "<br>");
+		model.addAttribute("voteCont", voteCont);
+	}
+}

@@ -1,0 +1,604 @@
+/**
+ * @title	: 프로젝트 관리 관련 컨트롤러
+ * @package	: kr.co.nextlab.bmt.controller
+ * @file	: ProjectController.java
+ * @author	: jnlee
+ * @date	: 2017. 12. 18.
+ * @desc	: 
+ */
+package kr.co.nextlab.bmt.controller;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.View;
+import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
+
+import kr.co.nextlab.annotation.security.Auth;
+import kr.co.nextlab.bmt.model.ProjectBmtModelVo;
+import kr.co.nextlab.bmt.model.ProjectChasuHstVo;
+import kr.co.nextlab.bmt.model.ProjectCriteria;
+import kr.co.nextlab.bmt.model.ProjectModelVerHstVo;
+import kr.co.nextlab.bmt.model.ProjectVo;
+import kr.co.nextlab.bmt.model.TcVo;
+import kr.co.nextlab.bmt.service.ProjectService;
+import kr.co.nextlab.bmt.service.TcService;
+import kr.co.nextlab.bot.model.MessageVo;
+import kr.co.nextlab.comm.controller.BaseController;
+import kr.co.nextlab.component.MailComponent;
+import kr.co.nextlab.component.MessageComponent;
+import kr.co.nextlab.util.JsonUtil;
+import kr.co.nextlab.util.ObjectUtil;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Controller
+public class ProjectController extends BaseController {
+	
+	@Autowired
+	private ProjectService projectService; 
+	
+	@Autowired
+	private MessageComponent messageComponent;
+	
+	@Autowired
+	private MailComponent mailComponent;
+	
+	@Autowired
+	private TcService tcService;	
+	
+	/**
+	 * 프로젝트 리스트 화면
+	 * @param model
+	 */
+	@RequestMapping("/bmt/project/projectList")
+	public void projectList(Model model) {
+		model.addAttribute("startDt", new SimpleDateFormat("yyyy-MM-dd").format(DateUtils.addDays(new Date(), -7)));
+		model.addAttribute("endDt", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+	}
+	
+	/**
+	 * 프로젝트 리스트 조회
+	 * @param model
+	 * @param projectCriteria
+	 * @return
+	 */
+	@RequestMapping("/bmt/project/getProjectList")
+	public View getProjectList(Model model, ProjectCriteria projectCriteria) {
+		model.addAttribute("projectList", projectService.selectProjectList(projectCriteria));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 프로젝트 폼
+	 * @param model
+	 */
+	@RequestMapping("/bmt/project/projectForm")
+	public void projectForm(Model model) {
+	}
+	
+	/**
+	 * 새 프로젝트 등록
+	 * @param model
+	 * @param projectVo
+	 * @return
+	 */
+	@Auth(url={"/bmt/project/projectForm"})
+	@RequestMapping(value="/bmt/project/regProjectPrc")
+	public View regProjectPrc(Model model, @RequestBody ProjectVo projectVo)
+	{
+		projectVo.setRegId(super.getUser().getUserId());
+		projectVo.setProjectResult("D101");
+		boolean save = false;
+		try {
+			// 프로젝트 등록
+			projectVo.setPid(projectService.insertProject(projectVo));
+			if (StringUtils.isEmpty(projectVo.getPid())) model.addAttribute("message", "저장 실패");
+			else {
+				save = true;
+				
+				//CVCBANK@nextlab.co.kr 메일주소 구성원
+				String userId = "U0001";
+				
+				// 구성원
+				String [] partiArray = ObjectUtil.getStringArrayFromList(projectVo.getPartiList(), "partiId");
+				
+				// 메시지 알림 등록
+				MessageVo messageVo = messageComponent.setMessageCreateProject(projectVo, super.getAppId(), super.getUser());
+				messageComponent.sendMessage(messageVo, partiArray);
+				
+				// 메일 발송
+				mailComponent.sendMailUser("/mail/bmt/newProject", partiArray, "새 프로젝트 구성원 등록 알림", JsonUtil.getJsonStrFromObject(projectVo));
+				
+				// CVCBANK@nextlab.co.kr에만 메일전송
+				mailComponent.sendMailUser("/mail/bmt/newProject", userId, "새프로젝트 구성원 등록알림", JsonUtil.getJsonStrFromObject(projectVo));
+			}
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			if (e.getCause() != null) model.addAttribute("message", "저장 실패");
+			else model.addAttribute("message", e.getMessage());
+		}
+		model.addAttribute("save", save);
+		model.addAttribute("pid", projectVo.getPid());
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 프로젝트 수정
+	 * @param model
+	 * @param projectVo
+	 * @return
+	 */
+	@Auth(url={"/bmt/project/projectForm"})
+	@RequestMapping(value="/bmt/project/modProjectPrc")
+	public View modProjectPrc(Model model, @RequestBody ProjectVo projectVo)
+	{
+		projectVo.setModId(super.getUser().getUserId());
+		boolean save = false;
+		try {
+			// 프로젝트 수정
+			save = projectService.updateProject(projectVo);
+			if (!save) model.addAttribute("message", "저장 실패");
+			else {
+				// 추가인원이 있는경우 알림처리
+				if (projectVo.getAddPartiArray().length > 0) {
+					// 등록된 측정 모델리스트 조회
+					projectVo.setModelList(projectService.selectProjectBmtModelList(projectVo.getPid()));
+					
+					// 메시지 알림 등록
+					MessageVo messageVo = messageComponent.setMessageCreateProject(projectVo, super.getAppId(), super.getUser());
+					messageComponent.sendMessage(messageVo, projectVo.getAddPartiArray());
+					
+					// 메일 발송
+					mailComponent.sendMailUser("/mail/bmt/newProject", projectVo.getAddPartiArray(), "새 프로젝트 구성원 등록 알림", JsonUtil.getJsonStrFromObject(projectVo));
+				}
+			}
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			if (e.getCause() != null) model.addAttribute("message", "저장 실패");
+			else model.addAttribute("message", e.getMessage());
+		}
+		model.addAttribute("save", save);
+		model.addAttribute("pid", projectVo.getPid());
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 프로젝트 다음차수로 변경
+	 * @param model
+	 * @param pid
+	 * @return
+	 */
+	@Auth(url={"/bmt/projectMng"})
+	@RequestMapping(value="/bmt/project/modNextProjectChasuPrc")
+	public View modNextProjectChasuPrc(Model model, String pid)
+	{
+		boolean save = false;
+		try {
+			ProjectChasuHstVo projectChasuHstVo = new ProjectChasuHstVo();
+			projectChasuHstVo.setPid(pid);
+			projectChasuHstVo.setRegId(super.getUser().getUserId());
+			save = projectService.updateNextProjectChasuPrc(projectChasuHstVo);
+			
+			if (!save) model.addAttribute("message", "저장 실패");
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			if (e.getCause() != null) model.addAttribute("message", "저장 실패");
+			else model.addAttribute("message", e.getMessage());
+		}
+		model.addAttribute("save", save);
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 프로젝트 완료처리 변경
+	 * @param model
+	 * @param pid
+	 * @return
+	 */
+	@Auth(url={"/bmt/projectMng"})
+	@RequestMapping(value="/bmt/project/modProjectCompletePrc")
+	public View modProjectCompletePrc(Model model, String pid, String projectResult)
+	{
+		boolean save = false;
+		try {
+			ProjectVo projectVo = new ProjectVo();
+			projectVo.setPid(pid);
+			projectVo.setProjectStat("C304");
+			projectVo.setProjectResult(projectResult);
+			projectVo.setModId(super.getUser().getUserId());
+			save = projectService.completeProject(projectVo);
+			
+			if (!save) model.addAttribute("message", "저장 실패");
+			else {
+				// 메시지 알람처리
+				projectVo = projectService.selectProjectView(pid);
+				String [] partiArray = ObjectUtil.getStringArrayFromList(projectService.selectProjectPartiList(pid), "partiId");
+				MessageVo messageVo = messageComponent.setMessageCompleteProject(projectVo, super.getAppId(), super.getUser());
+				messageComponent.sendMessage(messageVo, partiArray);
+			}
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			if (e.getCause() != null) model.addAttribute("message", "저장 실패");
+			else model.addAttribute("message", e.getMessage());
+		}
+		model.addAttribute("save", save);
+		return new MappingJackson2JsonView();
+	}
+
+	/**
+	 * 프로젝트 진행중으로 변경(재시작)
+	 * @param model
+	 * @param pid
+	 * @return
+	 */
+	@Auth(url={"/bmt/projectMng"})
+	@RequestMapping(value="/bmt/project/modProjectRestartPrc")
+	public View modProjectRestartPrc(Model model, String pid)
+	{
+		boolean save = false;
+		try {
+			ProjectVo projectVo = new ProjectVo();
+			projectVo.setPid(pid);
+			projectVo.setProjectStat("C301");
+			projectVo.setProjectResult("D101");
+			projectVo.setModId(super.getUser().getUserId());
+			save = projectService.updateProjectStat(projectVo);
+			
+			if (!save) model.addAttribute("message", "저장 실패");
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			if (e.getCause() != null) model.addAttribute("message", "저장 실패");
+			else model.addAttribute("message", e.getMessage());
+		}
+		model.addAttribute("save", save);
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 참여 + 진행중인 프로젝트 리스트 조회
+	 * @param model
+	 * @return 참여 + 진행중인 프로젝트 리스트
+	 */
+	@RequestMapping("/bmt/project/getMyProjectProgressList")
+	public View getMyProjectProgressList(Model model) {
+		ProjectVo vo = new ProjectVo();
+		
+		// 관리자 권한인지 체크
+		if (StringUtils.equals(super.getAuthId(), "AU002")) {
+			vo.setMngYn(true);
+		}
+		vo.setPartiId(super.getUser().getUserId());
+		// 진행중인 프로젝트만
+		vo.setProgressYn(true);
+		model.addAttribute("myProjectProgressList", projectService.selectMyProjectList(vo));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 참여 + 전체 프로젝트 리스트 조회
+	 * @param model
+	 * @return 참여 + 전체 프로젝트 리스트
+	 */
+	@RequestMapping("/bmt/project/getMyProjectList")
+	public View getMyProjectList(Model model) {
+		ProjectVo vo = new ProjectVo();
+		
+		// 관리자 권한인지 체크
+		if (StringUtils.equals(super.getAuthId(), "AU002")) {
+			vo.setMngYn(true);
+		}
+		vo.setPartiId(super.getUser().getUserId());
+		// 전체 프로젝트 조회
+		model.addAttribute("myProjectList", projectService.selectMyProjectList(vo));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 참여 + 전체 프로젝트 리스트 조회
+	 * @param model
+	 * @return 참여 + 전체 프로젝트 리스트
+	 */
+	@RequestMapping("/bmt/project/getMyProjectOverviewList")
+	public View getMyProjectOverviewList(Model model) {
+		ProjectVo vo = new ProjectVo();
+		// 관리자 권한인지 체크
+		if (StringUtils.equals(super.getAuthId(), "AU002")) {
+			vo.setMngYn(true);
+		}
+		vo.setPartiId(super.getUser().getUserId());
+		// 전체 프로젝트 조회
+		model.addAttribute("myProjectOverviewList", projectService.selectMyProjectList(vo));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 프로젝트 기본정보 조회
+	 * @param model
+	 * @param pid 프로젝트 아이디
+	 * @return 프로젝트 기본정보
+	 */
+	@RequestMapping("/bmt/project/getProjectView")
+	public View getProjectView(Model model, String pid) {
+		// 기본정보
+		model.addAttribute("projectView", projectService.selectProjectView(pid));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 프로젝트 기본정보 조회
+	 * @param model
+	 * @param pid 프로젝트 아이디
+	 * @return 프로젝트 기본정보
+	 */
+	@RequestMapping("/bmt/project/getProjectInfoView")
+	public View getProjectInfoView(Model model, String pid) {
+		// 기본정보
+		model.addAttribute("projectView", projectService.selectProjectView(pid));
+		// 기본정보 - 참여인력
+		model.addAttribute("projectPartiList", projectService.selectProjectPartiList(pid));
+		// 기본정보 - 테이블 정보
+		model.addAttribute("projectTableList",projectService.selectProjectTableList(pid));
+		// 측정환경 - 측정모델
+		model.addAttribute("projectBmtModelList", projectService.selectProjectBmtModelList(pid));
+		// 기본정보 - BMT 요청서 정보
+		model.addAttribute("projectBmtRequestList", projectService.selectProjectBmtRequestList(pid));
+
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 프로젝트 기본정보 조회
+	 * @param model
+	 * @param pid 프로젝트 아이디
+	 * @return 프로젝트 기본정보
+	 */
+	@RequestMapping("/bmt/project/getProjectBmtList")
+	public View getProjectBmtList(Model model, String ps) {
+		// 기본정보 - BMT 요청서
+		model.addAttribute("projectBmtReqList", projectService.selectProjectBmtReqList(ps));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 프로젝트 기본정보 조회
+	 * @param model
+	 * @param pid 프로젝트 아이디
+	 * @return 프로젝트 기본정보
+	 */
+	@RequestMapping("/bmt/project/getProjectEditInfoView")
+	public View getProjectEditInfoView(Model model, String pid) {
+		// 기본정보
+		model.addAttribute("projectView", projectService.selectProjectView(pid));
+		// 기본정보 - 참여인력
+		model.addAttribute("projectPartiList", projectService.selectProjectEditPartiList(pid));
+		// 기본정보 - 테이블 정보
+		model.addAttribute("projectTableList",projectService.selectProjectTableList(pid));
+		// 측정환경 - 측정모델
+		model.addAttribute("projectBmtModelList", projectService.selectProjectBmtModelList(pid));
+		// 기본정보 - BMT 요청서 정보
+		model.addAttribute("projectBmtRequestList", projectService.selectProjectBmtRequestList(pid));
+
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 측정모델 버전 변경이력 리스트 화면
+	 * @param model
+	 * @param pid 프로젝트 아이디
+	 */
+	@Auth(url={"/bmt/projectMain"})
+	@RequestMapping("/bmt/project/projectModelHstList")
+	public void projectModelHistoyList(Model model, String modelSeq) { }
+	
+	/**
+	 * 측정모델 버전 변경이력 리스트 조회
+	 * @param model
+	 * @param pid 프로젝트 아이디
+	 * @return 측정모델 버전 변경이력 리스트
+	 */
+	@RequestMapping("/bmt/project/getProjectModelHstList")
+	public View getProjectModelHistoyList(Model model, String modelSeq) {
+		model.addAttribute("projectModelHstList", projectService.selectProjectModelHstList(modelSeq));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 측정환경설정 폼
+	 * @param model
+	 * @param pid 프로젝트 아이디
+	 */
+	@RequestMapping("/bmt/project/measureSettingForm")
+	public void measureSettingForm(Model model, String pid) {
+		model.addAttribute("projectView", projectService.selectProjectView(pid));
+	}
+	
+	/**
+	 * 측정모델 버전 정보 조회
+	 * @param model
+	 * @param pid 프로젝트 아이디
+	 * @return 측정모델 버전 정보
+	 */
+	@RequestMapping("/bmt/project/getProjectBmtModelList")
+	public View getProjectBmtModelList(Model model, String pid) {
+		model.addAttribute("projectBmtModelList", projectService.selectProjectBmtModelList(pid));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 측정모델 상세 리스트 조회
+	 * @param model
+	 * @param pid 프로젝트 아이디
+	 * @return 측정모델 버전 정보
+	 */
+	@RequestMapping("/bmt/project/selectProjectBmtModelDetailList")
+	public View selectProjectBmtModelDetailList(Model model, String pid) {
+		model.addAttribute("modelList", projectService.selectProjectBmtModelDetailList(pid));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 측정모델 버전 변경
+	 * @param model
+	 * @param vo 측정모델 버전
+	 * @return 측정모델 버전 변경 여부
+	 */
+	@Auth(url={"/bmt/project/measureSettingForm"})
+	@RequestMapping("/bmt/project/modProjectBmtModelVerPrc")
+	public View modProjectBmtModelVerPrc(Model model, ProjectModelVerHstVo vo) {
+		vo.setRegId(super.getUser().getUserId());
+		model.addAttribute("save", projectService.updateProjectBmtModelVer(vo));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 측정모델의 버전 성능평가 패스
+	 * @param model
+	 * @param criteria
+	 * @return 측정모델의 버전 성능평가 패스 여부
+	 */
+	@Auth(url={"/bmt/perform/performList"})
+	@RequestMapping("/bmt/project/modPerformYnPrc")
+	public View modPerformYnPrc(Model model, ProjectBmtModelVo vo) {
+		model.addAttribute("save", projectService.updatePerformYn(vo));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 프로젝트 진행현황 리스트 조회
+	 * @param model
+	 * @return 프로젝트 진행현황 리스트
+	 */
+	@RequestMapping("/bmt/project/getProjectStatusList")
+	public View getProjectStatusList(Model model) {
+		ProjectVo vo = new ProjectVo();
+		// 관리자 권한인지 체크
+		if (StringUtils.equals(super.getAuthId(), "AU002")) {
+			vo.setMngYn(true);
+		}
+		vo.setPartiId(super.getUser().getUserId());
+		// 프로젝트 진행현황 조회
+		model.addAttribute("projectStatusList", projectService.selectProjectStatusList(vo));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 연결구성 변경이력 리스트 화면
+	 * @param model
+	 * @param pid 프로젝트 아이디
+	 */
+	@Auth(url={"/bmt/projectMain"})
+	@RequestMapping("/bmt/project/joinCompHstList")
+	public void joinCompHstList(Model model, String pid) { }
+	
+	/**
+	 * 연결구성 변경이력 리스트 조회
+	 * @param model
+	 * @param pid
+	 */
+	@RequestMapping("/bmt/project/getJoinCompHstList")
+	public View getJoinCompHstList(Model model, String pid) {
+		model.addAttribute("joinCompHstList", projectService.selectJoinComposeHst(pid));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * BMT 테스트 현황 조회
+	 * @param model
+	 * @param vo
+	 */
+	@RequestMapping("/bmt/project/getBmtTcChartList")
+	public View getChartDateList(Model model, TcVo vo) {
+		model.addAttribute("bmtTcChartList", tcService.selectBmtTcStatList(vo));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 해당 프로젝트 차수 별 이슈 개수 조회
+	 * @param model
+	 * @param vo
+	 * @return
+	 */
+	@RequestMapping("/bmt/project/getIssueDataList")
+	public View getIssueDataList(Model model, TcVo vo) {
+		model.addAttribute("issueCntList", tcService.selectIssueCntList(vo));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 연결구성폼
+	 * @param model
+	 * @param pid 프로젝트아이디
+	 */
+	@Auth(url={"/bmt/projectMain"})
+	@RequestMapping("/bmt/project/joinComposeForm")
+	public void joinComposeForm(Model model, String pid) {
+	}
+	
+	/**
+	 * 연결구성수정
+	 * @param model
+	 * @param projectVo 프로젝트 정보
+	 */
+	@Auth(url={"/bmt/projectMain"})
+	@RequestMapping("/bmt/project/modJoinComposePrc")
+	public View modJoinComposePrc(Model model, ProjectVo projectVo) {
+		boolean save = false;
+		try {
+			projectVo.setModId(super.getUser().getUserId());
+			save = projectService.updateJoinCompose(projectVo);
+			if (!save) model.addAttribute("message", "저장 실패");
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			if (e.getCause() != null) model.addAttribute("message", "저장 실패");
+			else model.addAttribute("message", e.getMessage());
+		}
+		model.addAttribute("save", save);
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 프로젝트 사용여부 변경
+	 * @param model
+	 * @param vo
+	 * @return
+	 */
+	@Auth(url={"/bmt/projectMng"})
+	@RequestMapping(value="/bmt/project/modProjectUseYnPrc")
+	public View modProjectUseYnPrc(Model model, ProjectVo vo){
+		vo.setModId(super.getUser().getUserId());
+		model.addAttribute("save", projectService.updateProjectUseYn(vo));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 해당 프로젝트의 카테고리별 이슈건수 리스트 조회
+	 * @param model
+	 * @param pid 프로젝트 아이디
+	 * @return 해당 프로젝트의 카테고리별 이슈건수 리스트
+	 */
+	@RequestMapping("/bmt/project/getIssueCateDataList")
+	public View getIssueCateDataList(Model model, TcVo vo) {
+		model.addAttribute("issueCateCntList", tcService.selectIssueCateCntList(vo.getPid()));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 해당 프로젝트의 참여한 참여인력 리스트 조회
+	 * @param model
+	 * @param pid 프로젝트 아이디
+	 * @return 해당 프로젝트의 참여한 참여인력 리스트
+	 */
+	@RequestMapping("/bmt/project/getProjectPartiList")
+	public View getProjectPartiList(Model model, String pid) {
+		model.addAttribute("projectPartiList", projectService.selectProjectPartiList(pid));
+		return new MappingJackson2JsonView();
+	}
+}

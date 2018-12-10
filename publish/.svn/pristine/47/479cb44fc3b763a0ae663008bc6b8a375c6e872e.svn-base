@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>DIMS</title>    
+    <link href="../css/style.css" rel="stylesheet">    
+</head>
+<body class="sub">
+
+	<div class="wrapper">
+	
+		<div class="right_box">
+			<div class="content_top">
+				<h2><img src="../images/bullet_title.png" alt=""><span>부속물 신품 등록</span></h2>
+				<ul class="path_list">
+					<li><a href="#"><img src="../images/icon_home.png" alt="home"></a></li>
+					<li><a href="#">물류센터</a></li>
+					<li><a href="#">입고관리</a></li>
+					<li><a href="#">부속물신품등록</a></li>
+				</ul>
+			</div><!-- end content_top -->
+			<div class="content_middle">
+				<div class="height20"></div>
+				<section>
+					<div class="detailsearch_wrap table">	
+						<div class="detailsearch">
+							<table>
+								<colgroup>
+									<col width="15%">
+									<col width="35%">
+									<col width="15%">
+									<col width="35%">
+								</colgroup>
+								<tr>
+									<th>입고일</th>                                
+									<td colspan="3">
+										<div class="datepicker_wrap"><input type="text" class="datepicker"></div>
+										
+										<span class="datepicker_txt">~</span>
+										
+										<div class="datepicker_wrap"><input type="text" class="datepicker"></div>						
+										
+										<button type="button" class="btn_item grey">오늘</button>
+										
+										<button type="button" class="btn_item">1주일</button>
+										
+										<button type="button" class="btn_item">1개월</button>
+									</td>
+								</tr>
+								<tr>
+									<th>분류</th>
+									<td>
+										<div class="select_wrap full">
+											<select id="">
+												<option value="hide">선택</option>
+												<option value="">전체</option>
+												<option value="">분류1</option>
+												<option value="">분류2</option>
+											</select>
+										</div> 
+									</td>
+									<th>작업상태</th>
+									<td>
+										<div class="select_wrap full">
+											<select>
+												<option value="hide">선택</option>
+												<option value="">전체</option>
+												<option value="">진행중</option>
+												<option value="">완료</option>
+												<option value="">미완료</option>
+											</select>
+										</div> 
+									</td>
+								</tr>
+								<tr>
+									<th>납품사</th>
+									<td>
+										<input type="text" class="dims_input" id="" name="" placeholder="납품사명을 입력하세요">
+									</td>
+									<th class="temp"></th>										
+									<td class="temp"></td>
+								</tr>								
+							</table>
+						</div>						
+						<!-- end.detailsearch -->
+						<div class="btn_wrap">							
+							<button type="submit" class="search btn_search">검색</button>						
+							<button type="button" class="reset btn_reset">초기화</button>
+						</div>					
+					</div><!-- end .detailsearch_wrap -->
+				</section>
+				<div class="height20"></div>
+				<section>
+					<div class="table_top_wrap">
+						<div class="count">Total <span>2,000</span> 건</div>	
+						<div class="button_wrap">					
+							<button type="button" class="btn_tbl white thin exceldownload">엑셀 다운로드</button>
+							<div class="select_wrap">
+								<select>
+									<option value="hide">선택</option>
+									<option value="">10개씩 보기</option>
+									<option value="">20개씩 보기</option>
+								</select>
+							</div>
+						</div>				
+					</div><!-- end .table_option_wrap -->		
+					
+					<div class="table_vertical">
+						<table summary="검색결과">
+							<caption>검색결과</caption>
+							<colgroup>                        
+								<col width="55"><col width="125"><col width="125">
+								<col style="width: calc(100% - 680px)/3;"><col style="width: calc(100% - 680px)/3;"><col style="width: calc(100% - 680px)/3;">
+								<col width="125"><col width="125"><col width="125">						
+							</colgroup>
+							<thead>
+								<tr>								
+									<th scope="col">No.</th>
+									<th scope="col">등록일</th>
+									<th scope="col">입고일</th>
+									<th scope="col">납품사</th>
+									<th scope="col">분류</th>
+									<th scope="col">제품명</th>
+									<th scope="col">박스수량</th>
+									<th scope="col">수량</th>
+									<th scope="col">작업상태</th>		
+								</tr>
+							</thead> 
+							<tbody> 
+								<tr>
+									<td>10</td>
+									<td>2018-03-12</td>
+									<td>2018-03-12</td>
+									<td>(주)넥스트랩</td>
+									<td>리모컨</td>
+									<td>UHD용 리모컨</td>
+									<td>5</td>
+									<td>25,000</td>
+									<td>입고대기</td>
+								</tr>
+								<tr>
+									<td>9</td>
+									<td>2018-03-12</td>
+									<td>2018-03-12</td>
+									<td>(주)넥스트랩</td>
+									<td>리모컨</td>
+									<td>UHD용 리모컨</td>
+									<td>2</td>
+									<td>25,000</td>
+									<td>입고대기</td>
+								</tr>
+								<tr>
+									<td>8</td>
+									<td>2018-03-12</td>
+									<td>2018-03-12</td>
+									<td>(주)넥스트랩</td>
+									<td>리모컨</td>
+									<td>UHD용 리모컨</td>
+									<td>5</td>
+									<td>25,000</td>
+									<td>입고대기</td>
+								</tr>
+								<tr>
+									<td>7</td>
+									<td>2018-03-12</td>
+									<td>2018-03-12</td>
+									<td>(주)넥스트랩</td>
+									<td>리모컨</td>
+									<td>UHD용 리모컨</td>
+									<td>7</td>
+									<td>25,000</td>
+									<td>입고대기</td>
+								</tr>
+								<tr>
+									<td>6</td>
+									<td>2018-03-12</td>
+									<td>2018-03-12</td>
+									<td>(주)넥스트랩</td>
+									<td>리모컨</td>
+									<td>UHD용 리모컨</td>
+									<td>5</td>
+									<td>25,000</td>
+									<td>입고완료</td>
+								</tr>
+								<tr>
+									<td>5</td>
+									<td>2018-03-12</td>
+									<td>2018-03-12</td>
+									<td>(주)넥스트랩</td>
+									<td>리모컨</td>
+									<td>UHD용 리모컨</td>
+									<td>5</td>
+									<td>25,000</td>
+									<td>입고대기</td>
+								</tr>
+								<tr>
+									<td>4</td>
+									<td>2018-03-12</td>
+									<td>2018-03-12</td>
+									<td>(주)넥스트랩</td>
+									<td>리모컨</td>
+									<td>UHD용 리모컨</td>
+									<td>5</td>
+									<td>25,000</td>
+									<td>입고완료</td>
+								</tr>
+								<tr>
+									<td>3</td>
+									<td>2018-03-12</td>
+									<td>2018-03-12</td>
+									<td>(주)넥스트랩</td>
+									<td>리모컨</td>
+									<td>UHD용 리모컨</td>
+									<td>5</td>
+									<td>25,000</td>
+									<td>입고대기</td>
+								</tr>
+								<tr>
+									<td>2</td>
+									<td>2018-03-12</td>
+									<td>2018-03-12</td>
+									<td>(주)넥스트랩</td>
+									<td>리모컨</td>
+									<td>UHD용 리모컨</td>
+									<td>5</td>
+									<td>25,000</td>
+									<td>입고완료</td>
+								</tr>
+								<tr>
+									<td>1</td>
+									<td>2018-03-12</td>
+									<td>2018-03-12</td>
+									<td>(주)넥스트랩</td>
+									<td>리모컨</td>
+									<td>UHD용 리모컨</td>
+									<td>5</td>
+									<td>25,000</td>
+									<td>입고대기</td>
+								</tr>
+							</tbody> 
+						</table>						
+					</div><!-- end table_wrap -->
+					<div class="table_bottom_wrap">
+						<div class="paginate">
+							<a href="#" class="pre"><img src="../images/icon_paging_prev.png" alt=""></a>
+							<a href="#">1</a>
+							<a href="#">2</a>
+							<a href="#">3</a>
+							<a href="#">4</a>
+							<a href="#">5</a>
+							<strong>6</strong>
+							<a href="#">7</a>
+							<a href="#">8</a>
+							<a href="#">9</a>
+							<a href="#">10</a>
+							<a href="#" class="next"><img src="../images/icon_paging_next.png" alt=""></a>
+						</div><!-- end paginate -->	
+						<div class="button_wrap right">					
+							<button type="button" class="btn_tbl white">등록</button>
+						</div>
+					</div>
+					<!-- end.table_bottom_wrap -->
+				</section>				
+            </div><!-- end.content_middle -->
+            
+			
+		</div><!-- end right_box -->
+	</div><!-- end .wrapper -->	
+  
+    <script src="../js/lib/jquery-3.2.1.min.js"></script>
+    <script src="../js/lib/jquery-ui.min.js"></script>	
+	<script src="../js/ui.js"></script>
+	<script src="../js/lib/prefixfree.min.js"></script>		
+	<script src="../js/lib/jquery.form.min.js"></script>
+	<script src="../js/lib/calendar.js"></script>    
+</body>
+</html>

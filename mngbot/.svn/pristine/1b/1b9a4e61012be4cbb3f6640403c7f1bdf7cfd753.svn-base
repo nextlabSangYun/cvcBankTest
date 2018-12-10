@@ -1,0 +1,54 @@
+/**
+ * @title	: Bot관리 관련 Mapper
+ * @package	: kr.co.nextlab.bot.mapper
+ * @file	: BotMgMapper.java
+ * @author	: owl16
+ * @date	: 2017. 12. 8.
+ * @desc	: 
+ */
+package kr.co.nextlab.bot.mapper;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import kr.co.nextlab.bot.model.BotCriteria;
+import kr.co.nextlab.bot.model.BotStatHstVo;
+import kr.co.nextlab.bot.model.BotVo;
+
+@Mapper
+public interface BotMapper {
+	
+	/**
+	 * bot관리 리스트 조회
+	 * @param botCriteria
+	 * @return
+	 */
+	public List<BotVo> selectBotMngList(BotCriteria botCriteria);
+	
+	/**
+	 * bot 관리 등록
+	 * @param botVo
+	 * @return
+	 */
+	public int insertBotMng(BotVo botVo);
+	
+	/** bot 관리 수정
+	 * @param botVo
+	 * @return
+	 */
+	public int updateBotMng(BotVo botVo);
+	
+	/** bot 관리 상세
+	 * @param botSno
+	 * @return
+	 */
+	public BotVo selectBotView(String botSno);
+
+	/**
+	 * bot 상태이력 목록 조회
+	 * @return
+	 */
+	public List<BotStatHstVo> selectStateHstList(String botSno);
+
+}

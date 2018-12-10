@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.nextlab.bot.mapper.BotMapper">
+
+	<select id="selectBotMngList" resultType="botVo" parameterType="botCriteria">
+		SELECT a.bot_sno
+			 , a.bot_nm
+			 , a.bot_type
+			 , a.bot_stat
+			 , a.model_nm
+			 , a.use_yn
+			 , (SELECT user_group_nm FROM tb_user_group WHERE USER_GROUP_ID = b.user_group_id) AS group_nm
+			 , a.mng_id
+			 , (SELECT user_nm FROM tb_user WHERE user_id = a.mng_id) AS mng_nm
+			 , a.reg_id
+			 , a.reg_dtm
+		FROM tb_bot a
+		INNER JOIN tb_user b ON (b.user_id = a.mng_id)
+		WHERE 1=1
+		<if test="botType != null and botType != '' ">
+			AND A.bot_type = #{botType}
+		</if>
+		<if test="useYn != null and useYn != '' ">
+			AND A.use_yn = #{useYn}
+		</if>
+		ORDER BY reg_dtm desc
+	</select>
+	
+	<select id="selectBotView" resultType="botVo" parameterType="String">
+		SELECT a.bot_sno
+			, a.bot_nm
+			, a.bot_type
+			, a.model_nm
+			, a.use_yn
+			, a.mng_id
+			, a.reg_id
+			, a.reg_dtm
+			, (SELECT user_group_id FROM tb_user WHERE user_id = a.mng_id) user_group_id
+		FROM tb_bot a
+		WHERE a.bot_sno = #{botSno}
+	</select>
+		
+	<insert id="insertBotMng" parameterType="botVo">
+		INSERT INTO tb_bot (
+			bot_sno
+			, bot_nm
+			, bot_type
+			, bot_stat
+			, model_nm
+			, use_yn
+			, mng_id
+			, reg_id
+		)
+		VALUES (
+			#{botSno}
+			, #{botNm}
+			, #{botType}
+			, #{botStat}
+			, #{modelNm}
+			, #{useYn}
+			, #{mngId}
+			, #{regId}
+		)
+	</insert>
+	
+	<update id="updateBotMng" parameterType="botVo" >
+		UPDATE tb_bot
+		SET
+			bot_nm = #{botNm}
+			, bot_type = #{botType}
+			, model_nm = #{modelNm}
+			, use_yn = #{useYn}
+			, mng_id = #{mngId}
+			, mod_id = #{regId}
+			, mod_dtm = GETDATE()
+		WHERE bot_sno = #{botSno}
+	</update>
+	
+	<select id="selectStateHstList"  resultType="BotStatHstVo" parameterType="String" >
+		SELECT	
+			bot_sno
+			, bot_stat
+			, message
+			, reg_dtm
+		FROM tb_bot_stat_hst
+		WHERE bot_sno = #{botSno}
+		ORDER BY reg_dtm DESC 
+	</select>
+</mapper>

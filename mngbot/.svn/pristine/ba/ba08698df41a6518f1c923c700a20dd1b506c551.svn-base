@@ -1,0 +1,97 @@
+/**
+ * @title	: 프로젝트 관리 관련 컨트롤러
+ * @package	: kr.co.nextlab.hded.controller
+ * @file	: HdedProjectController.java
+ * @author	: winolonam
+ * @date	: 2018. 05. 02.
+ * @desc	: 
+ */
+package kr.co.nextlab.hded.controller;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.View;
+import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
+
+import kr.co.nextlab.comm.controller.BaseController;
+import kr.co.nextlab.hded.model.HeProjectVo;
+import kr.co.nextlab.hded.service.HdedProjectService;
+
+@Controller
+public class HdedProjectController extends BaseController {
+	
+	@Autowired
+	private HdedProjectService hdedProjectService;
+	
+	/**
+	 * 프로젝트 폼
+	 * @param model
+	 */
+	@RequestMapping("/hded/project/projectForm")
+	public void projectForm(Model model) {
+	}
+	
+	/**
+	 * 프로젝트 리스트 화면
+	 * @param model
+	 */
+	@RequestMapping("/hded/project/projectList")
+	public void projectList(Model model) {
+		model.addAttribute("startDt", new SimpleDateFormat("yyyy-MM-dd").format(DateUtils.addDays(new Date(), -7)));
+		model.addAttribute("endDt", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+	}
+	
+	/**
+	 * 참여 + 진행중인 프로젝트 조회
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping("/hded/project/getMyProjectProgressList")
+	public View getMyProjectProgressList(Model model) {
+		HeProjectVo heProjectVo = new HeProjectVo();
+		
+		/**
+		 * 관리자 권한인지 체크
+		 */
+		if (StringUtils.equals(super.getAuthId(), "AU009")) {
+			heProjectVo.setMngYn(true);
+		}
+		heProjectVo.setPartiId(super.getUser().getUserId());
+		/**
+		 * 진행중인 프로젝트만 조회
+		 */
+		heProjectVo.setProgressYn(true);
+		model.addAttribute("myProjectProgressList", hdedProjectService.selectMyProjectList(heProjectVo));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 참여 + 전체 프로젝트 리스트 차수 조회
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping("/hded/project/getMyProjectChasuList")
+	public View getMyProjectChasuList(Model model) {
+		HeProjectVo heProjectVo = new HeProjectVo();
+		
+		/**
+		 * 관리자 권한인지 체크
+		 */
+		if (StringUtils.equals(super.getAuthId(), "AU009")) {
+			heProjectVo.setMngYn(true);
+		}
+		heProjectVo.setPartiId(super.getUser().getUserId());
+		/**
+		 * 전체 프로젝트 조회
+		 */
+		model.addAttribute("myProjectList", hdedProjectService.selectMyProjectChasuList(heProjectVo));
+		return new MappingJackson2JsonView();
+	}
+}

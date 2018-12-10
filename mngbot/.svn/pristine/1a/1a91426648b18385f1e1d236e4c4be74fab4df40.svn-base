@@ -1,0 +1,596 @@
+<%@ page contentType="text/html" pageEncoding="UTF-8" %>
+<%@ taglib uri="http://www.nextlab.co.kr/tags/nextlab" prefix="nl"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<link href="/css/kendo.common-material.min.css" rel="stylesheet">
+<link href="/css/kendo.material.min.css" rel="stylesheet">
+<script type="text/javascript" src="/js/kendo.all.min.js"></script>
+<div class="content">
+	<div class="sub_layout has_snb">
+		<div class="cont_wrap">
+			<p class="cate_tit"></p>
+			<div class="g_table04">
+				<table>
+					<caption>기간, 현재상태, 참여인력 등을 확인할 수 있는 표 입니다.</caption>
+					<colgroup>
+						<col style="width:170px;">
+						<col>
+					</colgroup>
+					<tbody>
+						<tr>
+							<th>프로젝트명</th>
+							<td>{{ projectView.projectNm }}</td>
+						</tr>
+						<tr>
+							<th>기간</th>
+							<td>{{ projectView.projectStDt }} ~ {{ projectView.projectEndDt }}</td>
+						</tr>
+						<tr>
+							<th>요청서</th>
+							<td v-if="reqId">({{reqId}}) {{reqSubject}}</td>
+							<td v-else></td>
+						</tr>
+						<tr>
+							<th>등급</th>
+							<td>{{ projectView.projectGrade | code(projectGradeNm) }}</td>
+						</tr>
+						<tr>
+							<th>테이블정보</th>
+							<td >{{tableList}}</td>
+						</tr>
+						<tr>
+							<th>차수</th>
+							<td v-if="projectView.chasuWaitYn == 'Y'">{{ projectView.projectChasu }}차 (대기중)</td>
+							<td v-else>{{ projectView.projectChasu }}차</td>
+						</tr>
+						<tr>
+							<th>현재상태</th>
+							<td>{{ projectView.projectStat | code(projectStatNm) }}</td>
+						</tr>
+						<tr>
+							<th>검증결과</th>
+							<td>{{projectView.projectResult | code(codeListD100)}}</td>
+						</tr>
+						<tr>
+							<th>참여인력</th>
+							<td>
+								<div class="g_table inner">
+									<table>
+										<thead>
+											<tr>
+												<th>그룹명</th>
+												<th>참여자</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr v-for="(list, index) in projectPartiList">
+												<td>{{ list.userGroupNm }}</td>
+												<td>{{ list.userNm }}</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<th>체크리스트</th>
+							<td><a @click="getFileDown(projectView)" class="link">{{ projectView.orgFileNm }}</a> {{projectView.tcBatchMsg}}</td>
+						</tr>
+						<tr>
+							<th>개선 및 수정사항</th>
+							<td><div class="txt" v-html="projectView.improveField"></div></td>
+						</tr>
+						<tr>
+							<th>비고</th>
+							<td>{{ projectView.bigo }}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<p class="cate_tit">측정환경</p>
+			<div class="g_table04">
+				<table>
+					<caption>측정모델, 현재 연결구성 확인 표 입니다.</caption>
+					<colgroup>
+						<col style="width:170px;">
+						<col>
+					</colgroup>
+					<tbody>
+						<tr>
+							<th>테스트측정모델</th>
+							<td>
+								<button v-for="(list, index) in projectBmtModelList" class="tb_btn02_home" @click="goShowPopupLayer('/bmt/project/projectModelHstList?modelSeq='+list.modelSeq); return false;">{{ list.modelNm }}({{ list.modelVer }})</button>
+							</td>
+						</tr>
+						<tr>
+							<th>비교측정모델</th>
+							<td>
+								<button v-for="(list, index) in projectBmtCompareModelList" class="tb_btn02_home" @click="goShowPopupLayer('/bmt/project/projectModelHstList?modelSeq='+list.modelSeq); return false;">{{ list.modelNm }}({{ list.modelVer }})</button>
+							</td>
+						</tr>
+						<tr>
+							<th>현재 연결구성</th>
+							<td :class="{has_btn:projectView.nowJoinCompose}">
+								<button v-if="projectView.nowJoinCompose" class="tb_btn02" @click="goShowPopupLayer('/bmt/project/joinCompHstList?pid='+pid); return false;">이력 보기</button>
+								<div class="frame" id="diagram"></div>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="btm_con con_col2">
+				<div class="l_cont">
+					<p class="cate_tit">TESTCASE 진행현황</p>
+					<div class="prj_sch_chart">
+						<div class="chartPointer" id="tcChart"></div>
+					</div>
+				</div>
+				<div class="r_cont">
+					<p class="cate_tit">이슈 진행현황</p>
+					<div class="prj_sch_chart">
+						<div class="chartPointer" id="issueChart"></div>
+					</div>
+				</div>
+			</div>
+			<div class="btm_con">
+				<div>
+					<p class="cate_tit">카테고리별 이슈 진행현황</p>
+					<div class="prj_sch_frame">
+						<div class="chartPointer" id="issueCateChart"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	var cont = new Vue({
+		el: '.content'
+		, data: {
+			projectView: {}
+			, projectPartiList: []
+			, projectBmtModelList: []
+			, projectBmtCompareModelList: []
+			, projectTableList: []
+			, projectBmtRequestList: []
+			, tableList: ""
+			, projectStatNm: '<nl:codeListJson codeType="C300" />'
+			, projectGradeNm: '<nl:codeListJson codeType="B500" />'
+			, projectTableNm: '<nl:codeListJson codeType="B600" />'
+			, pid: '<c:out value="${param.pid}"/>'
+			, passYnGubun: '<nl:gubunListJson gubunKey="passYnboolean" />'
+			, bmtTcChartList: []
+			, issueCntList: []
+			, shapesDataSource: {
+				batch : false,
+				data : [],
+				schema : { model : { children : "items" } }
+			}
+			, nowDate : '<c:out value="${nowDate}"/>'
+			, codeListD100: '<nl:codeListJson codeType="D100" />'
+			, reqId: ''
+			, reqSubject: ''
+		}
+		, mounted: function() {
+			this.$nextTick(function() {
+				this.getProjectView();
+				this.getBmtTcChart();
+				this.getIssueChart();
+				this.getIssueCateChart();
+			});
+
+		}
+		, methods: {
+			getProjectView: function() {
+				$.get("/bmt/project/getProjectEditInfoView?pid="+cont.pid, function(data){
+					cont.projectView = data.projectView;
+					if(cont.projectView.improveField != null){
+						cont.projectView.improveField = cont.projectView.improveField.replace(/(?:\n)/g, '<br>');
+						cont.projectView.improveField.split('\n').join('<br>');
+					}
+					cont.projectPartiList = data.projectPartiList;
+					cont.projectTableList = data.projectTableList;
+					cont.projectBmtModelList = data.projectBmtModelList;
+					cont.projectBmtCompareModelList = data.projectBmtCompareModelList;
+					cont.projectBmtRequestList = data.projectBmtRequestList;
+					cont.setJoinComposeDiagram();
+					cont.getTableList();
+					cont.getBmtRequestList();
+				});
+			
+			}
+			, getBmtRequestList: function(){
+				for(var i=0; i< cont.projectBmtRequestList.length; i++){
+					this.reqId = cont.projectBmtRequestList[i].reqId;
+					this.reqSubject = cont.projectBmtRequestList[i].reqSubject; 
+				}
+			}
+			,getTableList: function(){
+				var str = ''
+				for(var i=0; i < cont.projectTableList.length; i++){
+					str += cont.projectTableList[i].partTableNm + ', '
+				}
+				cont.tableList = str.substring(0, str.length-2)
+			}
+			, getFileDown: function(f) {
+				fileDown(f.filePath, f.fileNm, f.orgFileNm);
+			}
+			, getIssueCateChart: function() {
+				var obj = {
+						data: []
+						, categories: []
+						, bigCateId: []
+					}
+				
+				$.post("/bmt/project/getIssueCateDataList", this.$data, function(data){
+					if (!isEmpty(data.issueCateCntList)) {
+						data.issueCateCntList.forEach(function(e){
+							obj.data.push(e.cdCount);
+							obj.categories.push(e.codeNm);
+							obj.bigCateId.push(e.issueLcateCd);
+						});
+					}
+					cont.getIssueCateChartView(obj);
+				});
+			}
+			, getBmtTcChart: function() {
+				$.post("/bmt/project/getBmtTcChartList", this.$data, function(data){
+					if (!isEmpty(data.bmtTcChartList)) {
+						cont.bmtTcChartList = data.bmtTcChartList;
+					}
+					else {
+						cont.bmtTcChartList = data.bmtTcChartList;
+					}
+					cont.getBmtTcChartView();
+				})
+			}
+			, getIssueChart: function() {
+				$.post("/bmt/project/getIssueDataList", this.$data, function(data){
+					if (!isEmpty(data.issueCntList)) {
+						cont.updateIssue = true;
+						cont.issueCntList = data.issueCntList;
+					}
+					else {
+						cont.issueCntList = data.issueCntList;
+					}
+					cont.getIssueChartView();
+				})
+			}			
+			, getBmtTcChartView: function(){
+				var _visible = false;
+				var series, categories= [];
+				var chartId;
+				var tcData = [];
+				var data = [];
+				
+ 				for (var i=0; i < cont.bmtTcChartList.length; i++){
+					var object = new Object();
+					object.xqms = cont.bmtTcChartList[i].autoCnt;
+					object.manual = cont.bmtTcChartList[i].manualCnt;
+					object.ing = cont.bmtTcChartList[i].tcIngCnt;
+					object.total = cont.bmtTcChartList[i].tcTotalCnt;
+					object.xqmsPercent = cont.bmtTcChartList[i].xqmsPercent
+					object.manualPercent = cont.bmtTcChartList[i].manualPercent
+					object.ingPercent = cont.bmtTcChartList[i].ingPercent
+					tcData.push(object);
+				}
+ 				
+				if (tcData[0].total != 0) _visible = true;
+		
+				categories = [cont.nowDate]
+				
+				if (tcData[0].xqms != 0) {
+					data.push({ "source": "XQMS"
+								, "percentage": tcData[0].xqmsPercent + "% \n" + "(" + tcData[0].xqms + "건" + ")" });
+				}
+				
+				if (tcData[0].manual != 0) {
+					data.push({ "source": "수동테스트"
+								, "percentage": tcData[0].manualPercent + "% \n" + "(" + tcData[0].manual + "건" + ")" });
+				}
+					
+				if (tcData[0].ing != 0) {
+					data.push({ "source": "미진행"
+								, "percentage": tcData[0].ingPercent + "% \n" + "(" + tcData[0].ing + "건" + ")" });
+					
+				}
+				
+				$("#tcChart").kendoChart({
+					dataSource: {
+						data: data
+					},
+					legend: {
+						position: "bottom"
+					},
+					seriesDefaults: {
+						labels: {
+							visible: _visible
+							, background: "transparent"
+							, template: "#= category # \n #= value#"
+						}
+					}
+					, chartArea: {
+						height: 470
+					}
+					, series: [{
+						type: "pie"
+						, field: "percentage"
+						, categoryField: "source"
+						, startAngle: 150
+					}],
+					seriesColors: ["#aacd6e","#548687","#58c9b9"],
+					seriesClick: function() {
+						location.href = "/bmt/tc/tcList?pid="+cont.pid;
+					},
+					valueAxis: {
+						line: {
+							visible: false
+						}
+						,min: 0
+						,max : 1
+					},
+					categoryAxis: {
+						categories: categories,
+						majorGridLines: {
+							visible: false
+						}
+					},
+					tooltip: {
+						visible: true,
+						template: "#= category # - #= value #"
+					},
+					overlay: {
+						gradient: "none"
+					}
+				});
+			}
+/* 			, processResponse: function(response) {
+				var item;
+				
+				for (var i = 0; i < response.length; i++) {
+					item = response[i];
+					if (item.xqms == 0) {
+						item.persentXqms = '';
+					}
+					else {
+						item.persentXqms = parseInt((item.xqms / item.total) * 100) + "%" + " " + "(" + item.xqms + "건" + ")" ;
+					}
+					if (item.manual == 0) {
+						item.persentManual = '';
+					}
+					else {
+						item.persentManual = parseInt((item.manual / item.total) * 100) + "%" + " " + "(" + item.manual + "건" + ")";	
+					}
+					if (item.ing == 0) {
+						item.persentIng = '';
+					}
+					else {
+						item.persentIng = parseInt((item.ing / item.total) * 100) + "%" + " " + "(" + item.ing + "건" + ")";	
+					}
+				}
+				return response;
+			} */
+			, issueSeriesFormat: function(value) {
+				if (value == 0){
+					return "";
+				}
+				return value; 				
+			}
+			, getIssueChartView: function() {
+				var series, categories= [];
+				var chartId;
+				var chasu;
+				var totCntList = [];
+				var compCntList = [];
+				var ingCntList = [];
+				var openCntList = [];
+				var fwCntList = [];
+				var heCntList = [];
+				var normalCntList = [];
+
+				for (var i = 0; i < cont.issueCntList.length; i++){
+					// categories 추가
+					chasu = cont.issueCntList[i].chasu + "차";
+					categories.push(chasu);
+					// issue Data 추가
+					totCntList.push(cont.issueCntList[i].totCnt);
+					compCntList.push(cont.issueCntList[i].compCnt);
+					ingCntList.push(cont.issueCntList[i].ingCnt);
+					openCntList.push(cont.issueCntList[i].openCnt);
+					fwCntList.push(cont.issueCntList[i].fwCnt);
+					heCntList.push(cont.issueCntList[i].heCnt);
+					normalCntList.push(cont.issueCntList[i].normalCnt);
+				}
+				chartId = $("#issueChart");
+				
+				series = [
+					{name:"전체", color:"#596e82", data: totCntList}
+					, {name:"오픈", color:"#ff7473", data: openCntList}
+					, {name:"H/E이슈", color:"#f99e53", data: heCntList}
+					, {name:"차기F/W적용", color:"#f4e134", data: fwCntList}
+					, {name:"정상시나리오", color:"#8be53c", data: normalCntList}
+					, {name:"수정중", color:"#41c4d6", data: ingCntList}
+					, {name:"수정완료", color:"#4f86c6", data: compCntList}
+				]
+				
+				chartId.kendoChart({
+					legend: {
+						position: "bottom"
+					}
+					, seriesDefaults: {
+						type: "column"
+
+						, labels: {
+							visible: true
+							, template: "#= cont.issueSeriesFormat(value) #"
+							, background: "transparent"
+
+						}
+					}
+					, valueAxis: {
+						line: {
+							visible: false
+						}
+					}
+					, chartArea: {
+						height: 470
+					}
+					, series: series
+					, seriesClick: function(e) {
+						//statCheck 0전체, 1오픈, 2H/E이슈, 3차기F/W적용, 4정상시나리오, 5수정중, 6수정완료
+						var statCheck = e.point.seriesIx
+						var progressStat = ''
+						if(statCheck == 1){
+							progressStat = 'B201';
+							location.href = "/bmt/issue/issueList?pid="+cont.pid+"&progressStat="+progressStat;
+							return;
+						}else if(statCheck == 2){
+							progressStat = 'B205';
+							location.href = "/bmt/issue/issueList?pid="+cont.pid+"&progressStat="+progressStat;
+							return;
+						}else if(statCheck == 3){
+							progressStat = 'B204';
+							location.href = "/bmt/issue/issueList?pid="+cont.pid+"&progressStat="+progressStat;
+							return;
+						}else if(statCheck == 4){
+							progressStat = 'B206';
+							location.href = "/bmt/issue/issueList?pid="+cont.pid+"&progressStat="+progressStat;
+							return;
+						}else if(statCheck == 5){
+							progressStat = 'B202';
+							location.href = "/bmt/issue/issueList?pid="+cont.pid+"&progressStat="+progressStat;
+							return;
+						}else if(statCheck == 6){
+							progressStat = 'B203';
+							location.href = "/bmt/issue/issueList?pid="+cont.pid+"&progressStat="+progressStat;
+							return;
+						}else{
+							location.href = "/bmt/issue/issueList?pid="+cont.pid+"&progressStat="+progressStat;
+							return;
+						}
+					}
+					, categoryAxis: {
+						categories: categories
+						, majorGridLines: {
+							visible: false
+						}
+					}
+					, tooltip: {
+						visible: true
+						, format: "##,#"
+						, template: "#= series.name #: #= value #"
+					}
+				});			
+			}
+			, setJoinComposeDiagram: function() {
+				var nowJoinCompose = this.projectView.nowJoinCompose;
+				if (isEmpty(nowJoinCompose)) return;
+				var array = JSON.parse(nowJoinCompose);
+				this.shapesDataSource.data = convertJsonTree(array, "id", "parentId");
+				var diagramElement = $("#diagram").kendoDiagram({
+					dataSource : this.shapesDataSource
+					, layout : {
+						type : "tree"
+						, subtype: "down"
+						, horizontalSeparation : 50
+						, verticalSeparation : 30
+					}
+					, shapeDefaults : {
+						visual : this.visualTemplate
+					}
+				});
+				diagram = diagramElement.data("kendoDiagram");
+				diagramElement.css("height", "450");
+				diagramElement.css("width", "922");
+			}
+			, visualTemplate: function(options) {
+				var dataviz = kendo.dataviz;
+				var g = new dataviz.diagram.Group();
+				var dataItem = options.dataItem;
+				g.append(new dataviz.diagram.Rectangle({
+					width : 170
+					, height : 60
+					, stroke : {
+						width : 2
+					}
+					, fill : {
+						color : "#fff"
+					}
+				}));
+				
+				g.append(new dataviz.diagram.TextBlock({
+					text : dataItem.model.modelGroupNm
+					, x : 60
+					, y : 8
+					, fill : "#333"
+				}));
+				
+				g.append(new dataviz.diagram.TextBlock({
+					text : "(" + dataItem.model.modelNm + ")"
+					, x : 60
+					, y : 28
+					, fill : "#333"
+				}));
+				
+				if (!isEmpty(dataItem.model.icon)) {
+					g.append(new dataviz.diagram.Image({
+						source : "/images/bot/ico_model_" + dataItem.model.icon + ".png"
+						, x : 2
+						, y : 4
+						, width : 52
+						, height : 52
+					}));
+				}
+				return g;
+			}
+			, getIssueCateChartView: function(obj) {
+				$("#issueCateChart").kendoChart({
+					legend: {
+						position: "bottom"
+					}
+					, seriesDefaults: {
+						type: "column"
+						, labels: {
+							visible: true
+							, background: "transparent"
+							, margin: {
+								top: 6
+							}
+						}
+					}
+					, series: [{
+						name: "전체이슈"
+						, data: obj.data
+						, color: "#1ec0ff"
+					}]
+					, seriesClick: function(e) {
+						var issueLcateCd = obj.bigCateId[e.point.categoryIx];
+						if(isEmpty(issueLcateCd)){
+							issueLcateCd = "";
+						}
+						location.href = "/bmt/issue/issueList?pid="+cont.pid+"&issueLcateCd="+issueLcateCd;
+					}
+					, valueAxis: {
+						line: {
+							visible: false
+						}
+						, axisCrossingValue: 0
+					}
+					, categoryAxis: {
+						categories: obj.categories
+						, line: {
+							visible: false
+						}
+						, majorGridLines: {
+							visible: false
+						}
+					}
+					, tooltip: {
+						visible: true
+						, template: "#= value #"
+					}
+				});
+			}
+		}
+	});
+</script>

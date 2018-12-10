@@ -1,0 +1,20 @@
+/**
+ * @title	: H/E 테스트 케이스 서비스 
+ * @package	: kr.co.nextlab.hded.service
+ * @file	: HdedTcService.java
+ * @author	: winolonam
+ * @date	: 2018. 4. 26.
+ * @desc	: 
+ */
+package kr.co.nextlab.hded.service;
+
+import kr.co.nextlab.comm.model.FileVo;
+
+public interface HdedTcService {
+	/**
+	 * 테스트 케이스 대량 등록 
+	 * @param tcVo
+	 * @return
+	 */
+	public FileVo insertLargeTcList(FileVo fileVo);
+}

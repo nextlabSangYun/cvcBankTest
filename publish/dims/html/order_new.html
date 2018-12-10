@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>DIMS</title>    
+    <link href="../css/style.css" rel="stylesheet">    
+</head>
+<body class="sub">
+
+	<div class="wrapper">
+		
+		<div class="right_box">
+			<div class="content_top">
+				<h2><img src="../images/bullet_title.png" alt=""><span>신품발주</span></h2>
+				<ul class="path_list">
+					<li><a href="#"><img src="../images/icon_home.png" alt="home"></a></li>
+					<li><a href="#">물류센터</a></li>
+					<li><a href="#">신품납품관리</a></li>
+					<li><a href="#">신품발주</a></li>
+				</ul>
+			</div><!-- end content_top -->
+			<div class="content_middle">
+				<div class="height20"></div>
+				<section>
+					<div class="table_title">기본정보</div>
+					<div class="table_horizon">
+						<table summary="">
+							<caption></caption>
+							<tbody>
+								<tr>
+									<th scope="row">발주처</th>
+									<td>안성물류센터</td>
+									<th scope="row">등록일</th>
+									<td>2018-03-12</td>
+								</tr>
+								<tr>
+									<th scope="row">담당자명</th>
+									<td>홍길동</td>
+									<th scope="row">담당자 연락처</th>
+									<td>010-1234-4567</td>
+								</tr>
+								<tr>
+									<th scope="row">발주처 소재지</th>
+									<td>안양시 만안구 석수동 123-15</td>
+									<th scope="row">납품 요청일</th>
+									<td>
+										<div class="datepicker_wrap"><input type="text" class="datepicker"></div>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</section>
+				<div class="height20"></div>
+				<section>
+					<div class="table_title">제조(납품)사 선택</div>
+					<div class="table_horizon">
+						<table summary="">
+							<caption></caption>
+							<tbody>
+								<tr>
+									<th scope="row">제조사명</th>
+									<td>
+										<div class="select_wrap full">
+											<select id="">
+												<option value="hide">선택</option>
+												<option value="">전체</option>
+												<option value="">분류1</option>
+												<option value="">분류2</option>
+											</select>
+										</div> 
+									</td>
+									<th scope="row">제조사 소재지</th>
+									<td>안양시 만안구 석수동 123-15</td>
+								</tr>
+								<tr>
+									<th scope="row">담당자명</th>
+									<td>홍길동</td>
+									<th scope="row">담당자 연락처</th>
+									<td>010-1234-4567</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</section>
+				<div class="height20"></div>
+				<section>
+					<div class="table_top_wrap">
+						<div class="count">발주 부속물 목록(제조사를 먼저 선택해주세요)</div>		
+						<div class="button_wrap">					
+							<button type="button" class="btn_tbl white thin plus"><span>추가</span></button>
+							<button type="button" class="btn_tbl white thin minus"><span>삭제</span></button>
+						</div>			
+					</div><!-- end .table_option_wrap -->		
+					
+					<div class="table_vertical">
+						<table summary="검색결과">
+							<caption>검색결과</caption>
+							<colgroup>                        
+								<col width="55">
+								<col width="55">
+								<col style="width: calc(100% - 360px)/2;">
+								<col style="width: calc(100% - 360px)/2;">
+								<col style="250">
+							</colgroup>
+							<thead>
+								<tr>				
+									<th scope="col">
+										<input type="checkbox" class="dims_checkbox all" id="checkbox_all" name="">
+										<label for="checkbox_all" class="nolabel"></label>
+									</th>
+									<th scope="col">No.</th>
+									<th scope="col">분류</th>
+									<th scope="col">모델명</th>
+									<th scope="col">발주수량</th>	
+								</tr>
+							</thead> 
+							<tbody> 
+								<tr>
+									<td>
+										<input type="checkbox" class="dims_checkbox" id="checkbox_10" name="">
+										<label for="checkbox_10" class="nolabel"></label>
+									</td>
+									<td>1</td>
+									<td>
+										<div class="select_wrap full">
+											<select id="">
+												<option value="hide">선택</option>
+												<option value="">전체</option>
+												<option value="">분류1</option>
+												<option value="">분류2</option>
+											</select>
+										</div> 
+									</td>
+									<td>
+										<div class="">
+											<select id="">
+												<option value="hide">선택11</option>
+												<option value="">전체</option>
+												<option value="">분류1</option>
+												<option value="">분류2</option>
+											</select>
+										</div> 
+									</td>
+									<td>
+										<input type="text" class="dims_input" id="" name="" placeholder="발주 수량을 입력해주세요">
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<input type="checkbox" class="dims_checkbox" id="checkbox_9" name="">
+										<label for="checkbox_9" class="nolabel"></label>
+									</td>
+									<td>2</td>
+									<td>
+										<div class="select_wrap full">
+											<select id="">
+												<option value="hide">선택</option>
+												<option value="">전체</option>
+												<option value="">분류1</option>
+												<option value="">분류2</option>
+											</select>
+										</div> 
+									</td>
+									<td>
+										<div class="select_wrap full">
+											<select id="">
+												<option value="hide">선택</option>
+												<option value="">전체</option>
+												<option value="">분류1</option>
+												<option value="">분류2</option>
+											</select>
+										</div> 
+									</td>
+									<td>
+										<input type="text" class="dims_input" id="" name="" placeholder="발주 수량을 입력해주세요">
+									</td>
+								</tr>								
+							</tbody> 
+						</table>						
+					</div><!-- end table_wrap -->
+					<div class="table_bottom_wrap">						
+						<div class="button_wrap right">					
+							<button type="button" class="btn_tbl white">취소</button>
+							<button type="button" class="btn_tbl white">저장</button>
+						</div>
+					</div>
+					<!-- end.table_bottom_wrap -->
+				</section>
+				<div class="height20"></div>
+				<section>
+					<div class="notice_wrap center">여러 부속물을 입력하시는 경우 부속물 #1이 대표 품목이 되며, 목록 페이지에서 '대표품목 외 0건'으로 노출됩니다</div>
+				</section>
+			</div><!-- end.content_middle -->			
+		</div><!-- end right_box -->	
+	</div><!-- end .wrapper -->	
+  
+    <script src="../js/lib/jquery-3.2.1.min.js"></script>
+    <script src="../js/lib/jquery-ui.min.js"></script>	
+	<script src="../js/ui.js"></script>
+	<script src="../js/lib/prefixfree.min.js"></script>		
+	<script src="../js/lib/jquery.form.min.js"></script>
+	<script src="../js/lib/calendar.js"></script>    
+</body>
+</html>

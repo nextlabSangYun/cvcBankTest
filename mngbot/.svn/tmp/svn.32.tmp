@@ -1,0 +1,59 @@
+/**
+ * @title	: QA test case service
+ * @package	: kr.co.nextlab.qa.service
+ * @file	: QaTcService.java
+ * @author	: winolonam
+ * @date	: 2018. 07. 19.
+ * @desc	: 
+ */
+package kr.co.nextlab.qa.service;
+
+import java.util.List;
+
+import kr.co.nextlab.qa.model.QaTcCategoryVo;
+import kr.co.nextlab.qa.model.QaTcInfotVo;
+
+public interface QaTcService {
+
+	/**
+	 * 테스트 현황 조회
+	 * @param pid
+	 * @return
+	 */
+	public QaTcInfotVo selectTcStatList(String pid);
+	
+	/**
+	 * 결함 현황 조회
+	 * @param pid
+	 * @return
+	 */
+	public QaTcInfotVo selectFlawStatList(String pid);
+	
+	/**
+	 * 카테고리 리스트 조회
+	 * @param qaTcCategoryVo
+	 * @return
+	 */
+	public List<QaTcCategoryVo> selectTcCategoryList(QaTcCategoryVo qaTcCategoryVo);
+	
+	/**
+	 * 카테고리 등록
+	 * @param qaTcCategoryVo
+	 * @return
+	 */
+	public boolean insertTcCategory(QaTcCategoryVo qaTcCategoryVo);
+	
+	/**
+	 * 카테고리 수정
+	 * @param qaTcCategoryVo
+	 * @return
+	 */
+	public boolean updateModTcCategory(QaTcCategoryVo qaTcCategoryVo);
+	
+	/**
+	 * 카테고리 삭제
+	 * @param qaTcCategoryVo
+	 * @return
+	 */
+	public boolean updateDelTcCategory(QaTcCategoryVo qaTcCategoryVo);
+}

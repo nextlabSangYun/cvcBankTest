@@ -1,0 +1,62 @@
+/**
+ * @title	: 기본 인터셉터처리
+ * @package	: kr.co.nextlab.interceptor
+ * @file	: BaseInterceptor.java
+ * @author	: jnlee
+ * @date	: 2017. 11. 5.
+ * @desc	: 
+ */
+package kr.co.nextlab.interceptor;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.lang.Nullable;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+
+public class BaseInterceptor extends HandlerInterceptorAdapter {
+
+	@Override
+	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+		String requestUri = request.getRequestURI();
+		
+		// 기본 호출 url셋팅
+		String url = (String)request.getAttribute("url");
+		if (StringUtils.isEmpty(url))
+			request.setAttribute("url", requestUri);
+		
+		String [] urlDepth = requestUri.split("/");
+		if (urlDepth.length > 2) {
+			String appKey = urlDepth[1];
+			request.setAttribute("app", appKey);
+			if (appKey.equals("bot")) request.setAttribute("appId", "AP01");
+			else if (appKey.equals("bmt")) request.setAttribute("appId", "AP02");
+			else if (appKey.equals("stats")) request.setAttribute("appId", "AP03");
+			else if (appKey.equals("hded")) request.setAttribute("appId", "AP04");
+			else request.setAttribute("appId", "AP00");
+		}
+		
+		return super.preHandle(request, response, handler);
+	}
+	
+	@Override
+	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
+			@Nullable ModelAndView modelAndView) throws Exception {
+		// spring tld path 제외를 위한 빈 attribute 저장
+		request.setAttribute("springTldPath", "");
+		response.setHeader("pragma","No-cache");
+		response.setHeader("Cache-Control","no-cache");
+		response.addHeader("Cache-Control","No-store");
+		response.setDateHeader("Expires", -1);
+		super.postHandle(request, response, handler, modelAndView);
+	}
+	
+	@Override
+	public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler,
+			@Nullable Exception ex) throws Exception {
+		super.afterCompletion(request, response, handler, ex);
+	}
+	
+}

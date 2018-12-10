@@ -1,0 +1,113 @@
+<%@page contentType="text/html charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://www.nextlab.co.kr/tags/nextlab" prefix="nl"%>
+<div class="content" id="appData">
+	<div class="sub_layout">
+		<div class="sort_area">
+			<div class="sel_item">
+				<span class="sort_tit">사용자 그룹</span>
+				<nl:select v-model="criteria.userGroupId">
+					<nl:option value="">- 전체 -</nl:option>
+					<nl:options items="${userGroupList}" itemValue="userGroupId" itemLabel="userGroupNm"/>
+				</nl:select>
+			</div>
+			<div class="sel_item">
+				<span class="sort_tit">활성화상태</span>
+				<nl:radiobutton v-model="criteria.useYn"/><label for="1">전체</label>
+				<nl:gubunRadiobuttons gubunKey="activeYnboolean" v-model="criteria.useYn"/>
+			</div>
+			<div class="sel_item">
+					<span class="sort_tit">사용자 성명</span>
+					<input type="text" v-model="criteria.userNm"/>
+				</div>
+			<button class="g_btn01" @click="btnSearch">조회</button>
+		</div>
+		<div class="tb_desc">
+			<p>조회결과 : {{ userList.length | number(0) }}건</p>
+			<button class="g_btn01" onclick="showPopupLayer('/bot/user/userMngForm'); return false;">사용자 추가</button>
+		</div>
+		<div class="g_table">
+			<table>
+				<caption>사용자 ID, 성명, 이메일 주소 등으로 구성된 표 입니다.</caption>
+				<colgroup>
+					<col style="width:8%;">
+					<col>
+					<col>
+					<col>
+					<col>
+					<col>
+					<col>
+				</colgroup>
+				<thead>
+					<tr>
+						<th>No</th>
+						<th>사용자 그룹</th>
+						<th>사용자 ID</th>
+						<th>성명</th>
+						<th>이메일 주소</th>
+						<th>핸드폰 번호</th>
+						<th>활성화상태</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr v-for="(list, idx) in pagingList">
+						<td>{{ getFirstPage + idx}}</td>
+						<td>{{ list.userGroupNm }}</td>
+						<td><a href="#" class="link" @click="showPopupLayer('/bot/user/userMngForm?userId='+list.userId ); return false;">{{ list.id }}</a></td>
+						<td>{{ list.userNm }}</td>
+						<td>{{ list.email }}</td>
+						<td>{{ list.phone | phone }}</td>
+						<td :class="{'inactive':list.useYn == 'N'}">{{ list.useYn | gubun(useYnGubun) }}</td>
+					</tr>
+					<tr v-if="userList.length == 0">
+						<td colspan="7">조회된 데이터가 없습니다.</td>
+					</tr>
+				</tbody>
+			</table>
+			<paginator ref="paginator" :go-fn="getPagingList"></paginator>
+		</div>
+	</div>
+</div>
+
+<script>
+	var list = new Vue({
+		el: '#appData'
+		, data: {
+			userList: []
+			, pagingList: []
+			, criteria: {
+				useYn: ''
+				, userGroupId: ''
+				, userNm: ''
+			}
+			, useYnGubun: '<nl:gubunListJson gubunKey="activeYnboolean" />'
+		}
+		, beforeMount: function() {
+			this.$nextTick(function() {
+				this.getUserList();
+			});
+		}
+		, computed: {
+			getFirstPage: function(){
+				return this.$refs.paginator.pageNumAsc;
+			}
+		}
+		, methods: {
+			getUserList: function() {
+				$.post("/bot/user/getUserMngList", list.criteria, function(data){
+					list.userList = data.userList;
+					list.getPagingList();
+					list.goPage(1);
+				});
+			}
+			, getPagingList: function () {
+				this.pagingList = this.$refs.paginator.pagingList(this.userList);
+			}
+			, btnSearch: function() {
+				this.getUserList();
+			}
+			, goPage: function(page) {
+				this.$refs.paginator.goPage(page);
+			}
+		}
+	});
+</script>

@@ -1,0 +1,406 @@
+/**
+ * @title	: 메시지관련 컴포넌트
+ * @package	: kr.co.nextlab.component
+ * @file	: MessageComponent.java
+ * @author	: jnlee
+ * @date	: 2017. 12. 26.
+ * @desc	: 
+ */
+package kr.co.nextlab.component;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.converter.MappingJackson2MessageConverter;
+import org.springframework.messaging.simp.stomp.StompSession;
+import org.springframework.stereotype.Component;
+import org.springframework.util.concurrent.ListenableFuture;
+import org.springframework.web.socket.client.WebSocketClient;
+import org.springframework.web.socket.client.standard.StandardWebSocketClient;
+import org.springframework.web.socket.messaging.WebSocketStompClient;
+
+import kr.co.nextlab.bmt.model.BmtRequestVo;
+import kr.co.nextlab.bmt.model.DecisionMakingVo;
+import kr.co.nextlab.bmt.model.IssueVo;
+import kr.co.nextlab.bmt.model.ProjectVo;
+import kr.co.nextlab.bot.model.MessageVo;
+import kr.co.nextlab.bot.model.UserVo;
+import kr.co.nextlab.bot.service.MessageService;
+import kr.co.nextlab.hded.model.HeProjectVo;
+import kr.co.nextlab.support.WebSocketSessionHandler;
+import kr.co.nextlab.util.PropertyUtil;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Data
+@Component
+public class MessageComponent {
+	
+	@Autowired
+	private MessageService messageService;
+	
+	private static StompSession stompSession = null;
+	
+	/**
+	 * push 서버 접속
+	 * @return 접속세션
+	 * @throws Exception
+	 */
+	private StompSession connenct() throws Exception {
+		WebSocketClient webSocketClient = new StandardWebSocketClient();
+		WebSocketStompClient stompClient = new WebSocketStompClient(webSocketClient);
+		stompClient.setMessageConverter(new MappingJackson2MessageConverter());
+		String url = PropertyUtil.getProperty("websocket.was.url");
+		ListenableFuture<StompSession> future = stompClient.connect(url, new WebSocketSessionHandler());
+		return future.get();
+	}
+	
+	/**
+	 * 메시지 전송
+	 * @param messageVo
+	 * @return 전송성공여부
+	 */
+	private boolean send(MessageVo messageVo) {
+		boolean isSend = false;
+		try {
+			// 접속된 세션이 없는 경우 새로 접속
+			if (stompSession == null || !stompSession.isConnected())
+				stompSession = this.connenct();
+			
+			// 접속성공시 메시지 전송
+			if (stompSession.isConnected()) {
+				if (messageVo != null)
+					stompSession.send("/send/message/user", messageVo);
+				isSend = true;
+			}
+		} catch (Exception e) {
+			log.error("sendMessage error : " + e);
+			e.printStackTrace();
+		}
+		return isSend;
+	}
+	
+	/**
+	 * 메시지 한건 등록
+	 * @param messageVo 메시지 정보
+	 * @return 전송메시지
+	 */
+	public MessageVo sendMessage(MessageVo messageVo) {
+		messageVo = messageService.insertMessage(messageVo);
+		this.send(messageVo);
+		return messageVo;
+	}
+	
+	/**
+	 * 메지시 여러건 등록
+	 * @param messageVo 메시지 정보
+	 * @param toUserIdArray 수신자
+	 * @return 전송메시지
+	 */
+	public List<MessageVo> sendMessage(MessageVo messageVo, String [] toUserIdArray) {
+		List<MessageVo> messageList = new ArrayList<MessageVo>();
+		MessageVo sendMessageVo = null;
+		for (String toUserId : toUserIdArray) {
+			try {
+				sendMessageVo = (MessageVo) BeanUtils.cloneBean(messageVo);
+				sendMessageVo.setToUserId(toUserId);
+				messageList.add(messageService.insertMessage(sendMessageVo));
+				this.send(sendMessageVo);
+			} catch (Exception e) {
+				log.error("messageVo clone error : " + e);
+				e.printStackTrace();
+			}
+		}
+		return messageList;
+	}
+	
+	/**
+	 * 발신자 프로필 이미지
+	 * @param userVo 사용자정보
+	 * @return 프로필 이미지
+	 */
+	public String getSendUserImg(UserVo userVo) {
+		String sendUserImg = "";
+		if (StringUtils.isEmpty(userVo.getOrgFileNm()))
+			sendUserImg = "/images/common/img_profile.png";
+		else
+			sendUserImg = "/file/download?savePath=" + userVo.getFilePath() + "&saveName=" + userVo.getFileNm() + "&realName=" + userVo.getOrgFileNm();
+		return sendUserImg;
+	}
+	
+	/**
+	 * 프로젝트 생성 메시지 포맷
+	 * @param projectVo 프로젝트정보
+	 * @param appId appid
+	 * @param userVo 보내는사용자정보
+	 * @return 프로젝트 생성 메시지
+	 */
+	public MessageVo setMessageCreateProject(ProjectVo projectVo, String appId, UserVo userVo) {
+		MessageVo messageVo = new MessageVo();
+		messageVo.setSendUserNm(userVo.getUserNm());
+		messageVo.setSendUserId(userVo.getUserId());
+		messageVo.setSendUserImg(this.getSendUserImg(userVo));
+		messageVo.setAppId(appId);
+		messageVo.setPid(projectVo.getPid());
+		messageVo.setSubject("프로젝트 참여알림 : " + projectVo.getProjectNm());
+		messageVo.setContent("BMT 프로젝트 '" + projectVo.getProjectNm() + "'에 참여자로 등록되었습니다.");
+		messageVo.setLinkUrl("/bmt/projectMain?pid=" + projectVo.getPid());
+		return messageVo;
+	}
+	
+	/**
+	 * HE프로젝트 생성 메시지 포맷
+	 * @param projectVo 프로젝트정보
+	 * @param appId appid
+	 * @param userVo 보내는사용자정보
+	 * @return 프로젝트 생성 메시지
+	 */
+	public MessageVo setMessageCreateHeProject(HeProjectVo heProjectVo, String appId, UserVo userVo) {
+		MessageVo messageVo = new MessageVo();
+		messageVo.setSendUserNm(userVo.getUserNm());
+		messageVo.setSendUserId(userVo.getUserId());
+		messageVo.setSendUserImg(this.getSendUserImg(userVo));
+		messageVo.setAppId(appId);
+		messageVo.setPid(heProjectVo.getPid());
+		messageVo.setSubject("프로젝트 참여알림 : " + heProjectVo.getProjectNm());
+		messageVo.setContent("Head-end 프로젝트 '" + heProjectVo.getProjectNm() + "'에 참여자로 등록되었습니다.");
+		messageVo.setLinkUrl("/hded/projectMain?pid=" + heProjectVo.getPid());
+		return messageVo;
+	}
+	
+	/**
+	 * 프로젝트 완료 메시지 포맷
+	 * @param projectVo 프로젝트정보
+	 * @param appId appid
+	 * @param userVo 보내는사용자정보
+	 * @return 프로젝트 생성 메시지
+	 */
+	public MessageVo setMessageCompleteProject(ProjectVo projectVo, String appId, UserVo userVo) {
+		MessageVo messageVo = new MessageVo();
+		messageVo.setSendUserNm(userVo.getUserNm());
+		messageVo.setSendUserId(userVo.getUserId());
+		messageVo.setSendUserImg(this.getSendUserImg(userVo));
+		messageVo.setAppId(appId);
+		messageVo.setPid(projectVo.getPid());
+		messageVo.setSubject("프로젝트 완료알림 : " + projectVo.getProjectNm());
+		messageVo.setContent("BMT 프로젝트 '" + projectVo.getProjectNm() + "'가 완료처리 되었습니다.");
+		messageVo.setLinkUrl("/bmt/projectMain?pid=" + projectVo.getPid());
+		return messageVo;
+	}
+	
+	/**
+	 * 이슈 생성 메시지 포맷
+	 * @param issueVo 이슈정보
+	 * @param appId appid
+	 * @param userVo 보내는사용자정보
+	 * @return 이슈 생성 메시지
+	 */
+	public MessageVo setMessageCreateIssue(IssueVo issueVo, String appId, UserVo userVo) {
+		MessageVo messageVo = new MessageVo();
+		messageVo.setSendUserNm(userVo.getUserNm());
+		messageVo.setSendUserId(userVo.getUserId());
+		messageVo.setSendUserImg(this.getSendUserImg(userVo));
+		messageVo.setAppId(appId);
+		messageVo.setPid(issueVo.getPid());
+		messageVo.setSubject("이슈 처리요청 : " + issueVo.getIssueSubject());
+		messageVo.setContent("이슈 '" + issueVo.getIssueSubject() + "'에 대한 처리요청이 생성되었습니다.");
+		messageVo.setLinkUrl("/bmt/issue/issueList?pid=" + issueVo.getPid() + "&issueId=" + issueVo.getIssueId());
+		return messageVo;
+	}
+
+	/**
+	 * 이슈 생성 코멘트 메시지 포맷
+	 * @param issueVo 이슈정보
+	 * @param appId appid
+	 * @param userVo 보내는사용자정보
+	 * @return 이슈 생성 메시지
+	 */
+	public MessageVo setMessageIssueComment(IssueVo issueVo, String appId, UserVo userVo) {
+		MessageVo messageVo = new MessageVo();
+		messageVo.setSendUserNm(userVo.getUserNm());
+		messageVo.setSendUserId(userVo.getUserId());
+		messageVo.setSendUserImg(this.getSendUserImg(userVo));
+		messageVo.setAppId(appId);
+		messageVo.setPid(issueVo.getPid());
+		messageVo.setSubject("이슈 처리요청 : " + issueVo.getIssueSubject());
+		messageVo.setContent("이슈 '" + issueVo.getIssueSubject() + "'의 코멘트가 추가되었습니다.");
+		messageVo.setLinkUrl("/bmt/issue/issueList?pid=" + issueVo.getPid() + "&issueId=" + issueVo.getIssueId());
+		return messageVo;
+	}
+
+	/**
+	 * 이슈 해결완료 메시지 포맷
+	 * @param issueVo 이슈정보
+	 * @param appId appid
+	 * @param userVo 보내는사용자정보
+	 * @return 이슈 생성 메시지
+	 */
+	public MessageVo setMessageCompleteIssue(IssueVo issueVo, String appId, UserVo userVo) {
+		MessageVo messageVo = new MessageVo();
+		messageVo.setSendUserNm(userVo.getUserNm());
+		messageVo.setSendUserId(userVo.getUserId());
+		messageVo.setSendUserImg(this.getSendUserImg(userVo));
+		messageVo.setAppId(appId);
+		messageVo.setPid(issueVo.getPid());
+		messageVo.setSubject("이슈 해결완료 알림 : " + issueVo.getIssueSubject());
+		messageVo.setContent("이슈 '" + issueVo.getIssueSubject() + "'가 해결완료 되었습니다.");
+		messageVo.setLinkUrl("/bmt/issue/issueList?pid=" + issueVo.getPid() + "&issueId=" + issueVo.getIssueId());
+		return messageVo;
+	}
+	/**
+	 * 이슈 재오픈 메시지 포맷
+	 * @param issueVo 이슈정보
+	 * @param appId appid
+	 * @param userVo 보내는사용자정보
+	 * @return 이슈 생성 메시지
+	 */
+	public MessageVo setMessageRecallIssue(IssueVo issueVo, String appId, UserVo userVo) {
+		MessageVo messageVo = new MessageVo();
+		messageVo.setSendUserNm(userVo.getUserNm());
+		messageVo.setSendUserId(userVo.getUserId());
+		messageVo.setSendUserImg(this.getSendUserImg(userVo));
+		messageVo.setAppId(appId);
+		messageVo.setPid(issueVo.getPid());
+		messageVo.setSubject("이슈 재오픈 알림 : " + issueVo.getIssueSubject());
+		messageVo.setContent("이슈 '" + issueVo.getIssueSubject() + "'가 재오픈 되었습니다.");
+		messageVo.setLinkUrl("/bmt/issue/issueList?pid=" + issueVo.getPid() + "&issueId=" + issueVo.getIssueId());
+		return messageVo;
+	}
+	
+	/**
+	 * bmt 요청 메시지 포멧
+	 * @param projectVo 프로젝트정보
+	 * @param appId appid
+	 * @param userVo 보내는사용자정보
+	 * @return 프로젝트 생성 메시지
+	 */
+	public MessageVo setMessageCreateBmtRequest(BmtRequestVo bmtRequestVo, String appId, UserVo userVo) {
+		MessageVo messageVo = new MessageVo();
+		messageVo.setSendUserNm(userVo.getUserNm());
+		messageVo.setSendUserId(userVo.getUserId());
+		messageVo.setSendUserImg(this.getSendUserImg(userVo));
+		messageVo.setAppId(appId);
+		messageVo.setSubject("BMT 요청 알림 : " + bmtRequestVo.getReqSubject());
+		messageVo.setContent("BMT 요청 '" + bmtRequestVo.getReqSubject() + "'에 담당자로 등록되었습니다.");
+		messageVo.setLinkUrl("/bmt/request/requestList?reqId=" + bmtRequestVo.getReqId());
+		return messageVo;
+	}
+	
+	/**
+	 * bmt 요청 승인완료 메시지 포멧
+	 * @param projectVo 프로젝트정보
+	 * @param appId appid
+	 * @param userVo 보내는사용자정보
+	 * @return 프로젝트 생성 메시지
+	 */
+	public MessageVo setMessageCompleteBmtRequest(BmtRequestVo bmtRequestVo, String appId, UserVo userVo) {
+		MessageVo messageVo = new MessageVo();
+		messageVo.setSendUserNm(userVo.getUserNm());
+		messageVo.setSendUserId(userVo.getUserId());
+		messageVo.setSendUserImg(this.getSendUserImg(userVo));
+		messageVo.setAppId(appId);
+		messageVo.setSubject("BMT 요청 승인완료 알림 : " + bmtRequestVo.getReqSubject());
+		messageVo.setContent("BMT 요청 '" + bmtRequestVo.getReqSubject() + "'이 승인완료 되었습니다.");
+		messageVo.setLinkUrl("/bmt/request/requestList?reqId=" + bmtRequestVo.getReqId());
+		return messageVo;
+	}
+	
+	/**
+	 * bmt 요청 반려 메시지 포멧
+	 * @param projectVo 프로젝트정보
+	 * @param appId appid
+	 * @param userVo 보내는사용자정보
+	 * @return 프로젝트 생성 메시지
+	 */
+	public MessageVo setMessageCancelBmtRequest(BmtRequestVo bmtRequestVo, String appId, UserVo userVo) {
+		MessageVo messageVo = new MessageVo();
+		messageVo.setSendUserNm(userVo.getUserNm());
+		messageVo.setSendUserId(userVo.getUserId());
+		messageVo.setSendUserImg(this.getSendUserImg(userVo));
+		messageVo.setAppId(appId);
+		messageVo.setSubject("BMT 요청 반려처리 알림 : " + bmtRequestVo.getReqSubject());
+		messageVo.setContent("BMT 요청 '" + bmtRequestVo.getReqSubject() + "'이 반려처리 되었습니다.");
+		messageVo.setLinkUrl("/bmt/request/requestList?reqId=" + bmtRequestVo.getReqId());
+		return messageVo;
+	}
+	
+	/**
+	 * bmt 요청 코멘트 등록
+	 * @param projectVo 프로젝트정보
+	 * @param appId appid
+	 * @param userVo 보내는사용자정보
+	 * @return 프로젝트 생성 메시지
+	 */
+	public MessageVo setMessageCreateReqComment(BmtRequestVo bmtRequestVo, String appId, UserVo userVo) {
+		MessageVo messageVo = new MessageVo();
+		messageVo.setSendUserNm(userVo.getUserNm());
+		messageVo.setSendUserId(userVo.getUserId());
+		messageVo.setSendUserImg(this.getSendUserImg(userVo));
+		messageVo.setAppId(appId);
+		messageVo.setSubject("BMT 처리요청 : " + bmtRequestVo.getReqSubject());
+		messageVo.setContent("BMT 요청 '" + bmtRequestVo.getReqSubject() + "'의 코멘트가 추가되었습니다.");
+		messageVo.setLinkUrl("/bmt/request/requestList?reqId=" + bmtRequestVo.getReqId());
+		return messageVo;
+	}
+	
+	/**
+	 * 투표 참여요청알림
+	 * @param decisionMakingVo 의사결정정보
+	 * @param appId appid
+	 * @param userVo 보내는사용자정보
+	 * @return 투표 참여요청알림 생성 메시지
+	 */
+	public MessageVo setMessageCreateVote(DecisionMakingVo decisionMakingVo, String appId, UserVo userVo) {
+		MessageVo messageVo = new MessageVo();
+		messageVo.setSendUserNm(userVo.getUserNm());
+		messageVo.setSendUserId(userVo.getUserId());
+		messageVo.setSendUserImg(this.getSendUserImg(userVo));
+		messageVo.setAppId(appId);
+		messageVo.setSubject("투표 참여요청알림 : " + decisionMakingVo.getVoteSubject());
+		messageVo.setContent("BMT 의사결정지원 '" + decisionMakingVo.getVoteSubject() + "'의 투표 대상으로 등록되었습니다.");
+		messageVo.setLinkUrl("/bmt/issue/decisionMaking?pid=" + decisionMakingVo.getPid());
+		return messageVo;
+	}
+	
+	/**
+	 * 투표 완료알림
+	 * @param decisionMakingVo 의사결정정보
+	 * @param appId appid
+	 * @param userVo 보내는사용자정보
+	 * @return 투표 완료알림 생성 메시지
+	 */
+	public MessageVo setMessageCompleteVote(DecisionMakingVo decisionMakingVo, String appId, UserVo userVo) {
+		MessageVo messageVo = new MessageVo();
+		messageVo.setSendUserNm(userVo.getUserNm());
+		messageVo.setSendUserId(userVo.getUserId());
+		messageVo.setSendUserImg(this.getSendUserImg(userVo));
+		messageVo.setAppId(appId);
+		messageVo.setSubject("투표 완료알림 : " + decisionMakingVo.getVoteSubject());
+		messageVo.setContent("BMT 의사결정지원 '" + decisionMakingVo.getVoteSubject() + "'의 완료처리 되었습니다.");
+		messageVo.setLinkUrl("/bmt/issue/decisionMaking?pid=" + decisionMakingVo.getPid());
+		return messageVo;
+	}
+	
+	/**
+	 * 투표 확인알림
+	 * @param decisionMakingVo 의사결정정보
+	 * @param appId appid
+	 * @param userVo 보내는사용자정보
+	 * @return 투표 확인알림 생성 메시지
+	 */
+	public MessageVo setMessageUpdateVote(DecisionMakingVo decisionMakingVo, String appId, UserVo userVo) {
+		MessageVo messageVo = new MessageVo();
+		messageVo.setSendUserNm(userVo.getUserNm());
+		messageVo.setSendUserId(userVo.getUserId());
+		messageVo.setSendUserImg(this.getSendUserImg(userVo));
+		messageVo.setAppId(appId);
+		messageVo.setSubject("투표 확인요청알림 : " + decisionMakingVo.getVoteSubject());
+		messageVo.setContent("BMT 의사결정지원 '" + decisionMakingVo.getVoteSubject() + "'이 변경되었습니다. 확인해주세요.");
+		messageVo.setLinkUrl("/bmt/issue/decisionMaking?pid=" + decisionMakingVo.getPid());
+		return messageVo;
+	}
+}

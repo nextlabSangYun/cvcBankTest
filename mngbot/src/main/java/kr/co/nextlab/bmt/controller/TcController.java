@@ -1,0 +1,417 @@
+/**
+ * @title	: 테스트 케이스 컨트롤러 
+ * @package	: kr.co.nextlab.bmt.controller
+ * @file	: TcController.java
+ * @author	: minmax(이세용)
+ * @date	: 2018. 1. 8.
+ * @desc	: 
+ */
+package kr.co.nextlab.bmt.controller;
+
+import java.util.Date;
+
+import java.util.List;
+import java.util.UUID;
+
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.View;
+import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
+
+import kr.co.nextlab.annotation.security.Auth;
+import kr.co.nextlab.bmt.model.TcCategoryVo;
+import kr.co.nextlab.bmt.model.TcCriteria;
+import kr.co.nextlab.bmt.model.TcVo;
+import kr.co.nextlab.bmt.model.XqmsCriteria;
+import kr.co.nextlab.bmt.model.XqmsVo;
+import kr.co.nextlab.bmt.service.ProjectService;
+import kr.co.nextlab.bmt.service.TcService;
+import kr.co.nextlab.bmt.service.XqmsService;
+import kr.co.nextlab.comm.controller.BaseController;
+import kr.co.nextlab.excel.ExcelDownloadView;
+import kr.co.nextlab.excel.ExcelHeader;
+import kr.co.nextlab.excel.ExcelResource;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Controller
+public class TcController extends BaseController {
+
+	@Autowired
+	private TcService tcService;
+
+	@Autowired
+	private ProjectService projectService;
+	
+	@Autowired
+	private XqmsService xqmsService;;
+	/**
+	 * 테스트 케이스 리스트 페이지 
+	 * @param model
+	 */
+	@RequestMapping("/bmt/tc/tcList")
+	public void tcList(Model model, String pid, String pageRows)
+	{
+		model.addAttribute("pageRows", StringUtils.isEmpty(pageRows) ? "50" : pageRows);
+		model.addAttribute("projectView", projectService.selectProjectView(pid));
+	}
+	
+	
+	/**
+	 * 테스트케이스 리스트 조회
+	 * @param model
+	 * @param criteria
+	 * @return 테스트케이스 리스트
+	 */
+	@RequestMapping(value="/bmt/tc/getTcList")
+	public View getTcList(Model model, TcCriteria criteria)
+	{
+		model.addAttribute("tcList",tcService.selectTcList(criteria));
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * TC 내역 삭제
+	 * @param model
+	 * @param TcSeqArray
+	 * @return
+	 */
+	@RequestMapping("/bmt/tc/delTcPrc")
+	public View delTcPrc(Model model, String[] param)
+	{
+		boolean del = false;
+		del = tcService.deleteTcPrc(param);
+		model.addAttribute("del", del);
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 테스트 카테고리 리스트 조회
+	 * @param model
+	 * @param tcCategoryVo 카테고리정보
+	 * @return 테스트 카테고리 리스트
+	 */
+	@RequestMapping("/bmt/tc/getTcCategoryList")
+	public View getTcCategoryList(Model model, TcCategoryVo tcCategoryVo)
+	{
+		model.addAttribute("tcCategoryList", tcService.selectTcCategoryList(tcCategoryVo));
+		return new MappingJackson2JsonView();
+	}
+	
+	
+	
+	/**
+	 * 테스트 케이스 상세 정보 페이지 
+	 * @param model
+	 */
+	@Auth(url={"/bmt/tc/tcList"}) 
+	@RequestMapping("/bmt/tc/tcDetailForm")
+	public void tcDetailForm(Model model, String pid, String seq)
+	{
+		model.addAttribute("projectView", projectService.selectProjectView(pid));
+	}
+	/**
+	 * 테스트 케이스 검색 폼
+	 * @param model
+	 */
+	@Auth(url={"/bmt/tc/tcList"}) 
+	@RequestMapping("/bmt/tc/tcSearchForm")
+	public void tcSearchForm(Model model){
+		
+	}
+	/**
+	 * 테스트 케이스 수동 리포트 등록폼
+	 * @param model
+	 */
+	@Auth(url={"/bmt/tc/tcList"}) 
+	@RequestMapping("/bmt/tc/tcSubmitForm")
+	public void tcSubmitForm(Model model, TcCriteria tcCriteria)
+	{
+		model.addAttribute("user", super.getUser());
+		XqmsCriteria xqmsCriteria = new XqmsCriteria();
+		xqmsCriteria.setPid(tcCriteria.getPid());
+		xqmsCriteria.setPerson(super.getUser().getUserNm());
+		XqmsVo xqmsVo =  xqmsService.selectLastReport(xqmsCriteria);
+		if(xqmsVo != null)
+		{
+			model.addAttribute("modelSeq",xqmsVo.getModelSeq());
+			model.addAttribute("remocon",xqmsVo.getRemocon());
+			model.addAttribute("mac", xqmsVo.getMac());
+		}
+	}
+	/**
+	 * 테스트 케이스 추가 폼
+	 * @param model
+	 */
+	@Auth(url={"/bmt/tc/tcList"}) 
+	@RequestMapping("/bmt/tc/tcAddForm")
+	public void tcAddForm(Model model)
+	{
+		
+	}
+	
+	/**
+	 * 테스트 케이스 리포트 폼(사용안함)
+	 * @param model
+	 */
+	@Auth(url={"/bmt/tc/tcList"}) 
+	@RequestMapping("/bmt/tc/tcReportForm")
+	public void tcReportForm(Model model)
+	{
+		
+	}
+	
+	/**
+	 * 테스트 케이스 리스트 등록(복수 테스트 케이스 등록)
+	 * @param model
+	 * @param tcVo
+	 * @return
+	 */
+	@Auth(url={"/bmt/tc/tcList"}) 
+	@RequestMapping(value="/bmt/tc/regTcList")
+	public View regTcList(Model model,@RequestBody  List<TcVo> tcVo)
+	{
+		boolean save = false;
+		try
+		{
+			save = tcService.insertTcList(tcVo);
+			if (!save) model.addAttribute("message", "저장 실패");
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage());
+			if (e.getCause() != null) model.addAttribute("message", "저장 실패");
+			else model.addAttribute("message", e.getMessage());
+		}
+		model.addAttribute("save", save);
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 테스트 케이스 수정
+	 * @param model
+	 * @param tcVo
+	 * @return
+	 */
+	@Auth(url={"/bmt/tc/tcList"}) 
+	@RequestMapping(value="/bmt/tc/modTc")
+	public View modTc(Model model,@RequestBody  TcVo tcVo)
+	{
+		boolean result = false;
+		try
+		{
+			result = tcService.updateTc(tcVo);
+			if (!result) model.addAttribute("message", "수정 실패");
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage());
+			if (e.getCause() != null) model.addAttribute("message", "수정 실패");
+			else model.addAttribute("message", e.getMessage());
+		}
+		model.addAttribute("result", result);
+		return new MappingJackson2JsonView();
+	}
+
+	/**
+	 * 테스트 케이스 조회(단일 테스트 케이스)
+	 * @param model
+	 * @param tcCriteria
+	 * @return
+	 */
+	@RequestMapping("/bmt/tc/getTc")
+	public View getTc(Model model, TcCriteria tcCriteria)
+	{
+		TcVo vo = tcService.selectTc(tcCriteria);
+		model.addAttribute("tc",vo);
+		return new MappingJackson2JsonView();
+	}
+
+	/**
+	 * 리포트 수동 등록
+	 * @param model
+	 * @param xqmsVo
+	 * @return
+	 */
+	@Auth(url={"/bmt/tc/tcList"}) 
+	@RequestMapping("/bmt/tc/regReport")
+	public View regReport(Model model,@RequestBody XqmsVo xqmsVo)
+	{
+		xqmsVo.setReportId(UUID.randomUUID().toString());
+		xqmsVo.setXqmsDtm(new Date());
+		xqmsVo.setTcType("B402");
+		boolean save = false;
+		try
+		{
+			save = tcService.insertRegReport(xqmsVo);
+			if (!save) model.addAttribute("message", "저장 실패");
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage());
+			if (e.getCause() != null) model.addAttribute("message", "저장 실패");
+			else model.addAttribute("message", e.getMessage());
+		}
+		model.addAttribute("save", save);
+		
+		return new MappingJackson2JsonView();
+	}	
+
+	/**
+	 * 테스트 카테고리 폼
+	 * @param model
+	 */
+	@Auth(url={"/bmt/tc/tcCategoryForm"})
+	@RequestMapping("/bmt/tc/tcCategoryForm")
+	public void tcCategoryForm(Model model)
+	{
+		
+	}
+	
+	/**
+	 * 테스트 카테고리 등록
+	 * @param model
+	 * @param tcCategoryVo
+	 * @return
+	 */
+	@Auth(url={"/bmt/tc/tcCategoryForm"}) 
+	@RequestMapping("/bmt/tc/regTcCategory")
+	public View regTcCategory(Model model,@RequestBody TcCategoryVo tcCategoryVo)
+	{
+
+		boolean result = false;
+		try
+		{
+			//새 GUID 할당
+			tcCategoryVo.setTcCateId(UUID.randomUUID().toString());
+			
+			result = tcService.insertTcCategory(tcCategoryVo);
+			if (!result) model.addAttribute("message", "카테고리 등록 실패");
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage());
+			if (e.getCause() != null) model.addAttribute("message", "카테고리 등록 실패");
+			else model.addAttribute("message", e.getMessage());
+		}
+		model.addAttribute("result", result);
+		model.addAttribute("tcCategoryVo", tcCategoryVo);
+		return new MappingJackson2JsonView();
+	}
+	/**
+	 * 테스트 카테고리 수정
+	 * @param model
+	 * @param categoryVo
+	 * @return
+	 */
+	@Auth(url={"/bmt/tc/tcCategoryForm"}) 
+	@RequestMapping("/bmt/tc/modTcCategory")
+	public View modTcCategory(Model model,@RequestBody  TcCategoryVo tcCategoryVo)
+	{
+		boolean result = false;
+		try
+		{
+			result = tcService.updateModTcCategory(tcCategoryVo);
+			if (!result) model.addAttribute("message", "카테고리 수정 실패");
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage());
+			if (e.getCause() != null) model.addAttribute("message", "카테고리 수정 실패");
+			else model.addAttribute("message", e.getMessage());
+		}
+		model.addAttribute("result", result);
+		model.addAttribute("tcCategoryVo", tcCategoryVo);
+		return new MappingJackson2JsonView();
+	}
+	/**
+	 * 테스트 카테고리 삭제
+	 * @param model
+	 * @param categoryVo
+	 * @return
+	 */
+	@Auth(url={"/bmt/tc/tcCategoryForm"}) 
+	@RequestMapping("/bmt/tc/delTcCategory")
+	public View delTcCategory(Model model,@RequestBody  TcCategoryVo tcCategoryVo)
+	{
+		boolean result = false;
+		try
+		{
+			result = tcService.updateDelTcCategory(tcCategoryVo);
+			if (!result) model.addAttribute("message", "카테고리 삭제 실패");
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage());
+			if (e.getCause() != null) model.addAttribute("message", "카테고리 삭제 실패");
+			else model.addAttribute("message", e.getMessage());
+		}
+		model.addAttribute("result", result);
+		model.addAttribute("tcCategoryVo", tcCategoryVo);
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * 테스트 케이스 수동 리포트 일괄 등록폼
+	 * @param model
+	 */
+	@Auth(url={"/bmt/tc/tcList"}) 
+	@RequestMapping("/bmt/tc/tcSubmitBatchForm")
+	public void tcSubmitBatchForm(Model model, XqmsCriteria xqmsCriteria){ }
+	
+	/**
+	 * 리포트 수동 일괄등록
+	 * @param model
+	 * @param xqmsVo
+	 * @return
+	 */
+	@Auth(url={"/bmt/tc/tcList"}) 
+	@RequestMapping("/bmt/tc/regReportBatchPrc")
+	public View regReportBatchPrc(Model model,@RequestBody XqmsVo xqmsVo){
+				
+		boolean save = false;
+		xqmsVo.setPerson(super.getUser().getUserNm());
+		
+		try{
+			save = tcService.insertRegReportBatch(xqmsVo);
+			if (!save) model.addAttribute("message", "저장 실패");
+		}catch(Exception e){
+			log.error(e.getMessage());
+			if (e.getCause() != null) model.addAttribute("message", "저장 실패");
+			else model.addAttribute("message", e.getMessage());
+		}
+		model.addAttribute("save", save);
+		
+		return new MappingJackson2JsonView();
+	}
+	
+	/**
+	 * Tc 리스트 엑셀 다운로드
+	 * @param model
+	 * @param criteria
+	 * @return
+	 */
+	@RequestMapping("/bmt/tc/getTcExcel")
+	public ExcelDownloadView getTcExcel(Model model, TcCriteria criteria, HttpServletResponse response){
+		List<TcVo> list = tcService.selectTcList(criteria);
+		
+		ExcelHeader[] headers = new ExcelHeader[]{
+				new ExcelHeader("tcDivision", "구분", "", "B900", HorizontalAlignment.CENTER)
+				, new ExcelHeader("bigCateNm", "대분류", HorizontalAlignment.CENTER)
+				, new ExcelHeader("middleCateNm", "중분류", HorizontalAlignment.CENTER)
+				, new ExcelHeader("smallCateNm", "소분류", HorizontalAlignment.CENTER)
+				, new ExcelHeader("importance", "중요도", "", "B100", HorizontalAlignment.CENTER)
+				, new ExcelHeader("tc", "Test Case", HorizontalAlignment.LEFT )
+				, new ExcelHeader("lastBmtResult", "최근 테스트 결과", "", "B300", HorizontalAlignment.CENTER)
+		};
+		
+		return new ExcelDownloadView(new ExcelResource(list, headers),"Tc내역.xlsx");
+	}
+}

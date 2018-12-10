@@ -1,0 +1,241 @@
+/**
+ * @title	: pk채번 service 구현
+ * @package	: kr.co.nextlab.comm.service.impl
+ * @file	: SequenceServiceImpl.java
+ * @author	: sist818
+ * @date	: 2017. 12. 4.
+ * @desc	: 
+ */
+package kr.co.nextlab.comm.service.impl;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import kr.co.nextlab.comm.mapper.SequenceMapper;
+import kr.co.nextlab.comm.model.SequenceVo;
+import kr.co.nextlab.comm.service.SequenceService;
+
+@Service
+public class SequenceServiceImpl implements SequenceService {
+	
+	@Autowired
+	private SequenceMapper sequenceMapper;
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public String next(String sequenceId, String sequenceKey) {
+		SequenceVo resultSequence = getSequence(sequenceId, sequenceKey);
+		return resultSequence.next();
+	}
+	
+	public SequenceVo getSequence(String sequenceId, String sequenceKey) {
+		SequenceVo sequenceVo = new SequenceVo();
+		sequenceVo.setSequenceId(sequenceId);
+		sequenceVo.setSequenceKey(sequenceKey);
+
+		SequenceVo resultSequence = sequenceMapper.getSequenceByIdKey(sequenceVo);
+		if (resultSequence == null) {  
+			resultSequence = sequenceMapper.getSequenceById(sequenceVo.getSequenceId());
+			if (resultSequence == null) {
+				throw new RuntimeException("존재하지않는 시퀀스 아이디 " + sequenceId);
+			} else {
+				resultSequence.setNext(1);
+				resultSequence.setSequenceKey(sequenceVo.getSequenceKey());
+
+				this.sequenceMapper.insertSequenceDetail(resultSequence);
+			}
+		} else {
+			resultSequence.increase();
+			this.sequenceMapper.increaseSequence(sequenceVo);
+		}
+
+        return resultSequence;
+    }
+    
+	/**
+	* 프로젝트 아이디 채번
+	* @return
+	*/
+	@Override
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public String getProjectId() {
+		String key = "PJ";
+        Date now = new Date();
+        String today = new SimpleDateFormat("yyyyMMdd").format(now);		
+        String projectId = this.next("projectId", today);
+        return key + today + projectId;
+	}
+	
+	/**
+	 * 측정모델 아이디 채번
+	 */
+	@Override
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public String getModelId() {
+		String key = "M";
+		String sequence = this.next("modelId", key);
+		return key + sequence;
+	}
+	
+	/**
+	 * 위젯아이디 채번
+	 */
+	@Override
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public String getWidgetId() {
+		String key = "WJ";
+		String sequence = this.next("widgetId", key);
+		return key + sequence;
+	}
+	
+	/**
+	 * 사용자그룹아이디 채번
+	 */
+	@Override
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public String getUserGroupId() {
+		String key = "G";
+		String sequence = this.next("userGroupId", key);
+		return key + sequence;
+	}
+	
+    /**
+     * 사용자 아이디
+     */
+    @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public String getUserId() {
+    	String key = "U";
+    	String userId = this.next("userId", key);
+        return key + userId;
+    }
+    
+    /**
+     * 측정모델분류 채번
+     */
+    @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public String getModelGroupId() {
+    	String key = "MG";
+    	String modelGroupId = this.next("modelGroupId", key);
+    	return key + modelGroupId;
+    }
+    
+    /**
+     * 이슈관리 채번
+     */
+    @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public String getIssueId() {
+        Date now = new Date();
+        String today = new SimpleDateFormat("yyyyMMdd").format(now);		
+        String issueId = this.next("issueId", today);
+        return today + '-' + issueId;
+    }
+    
+    /**
+     * 메시지 관리 (푸쉬)
+     */
+    @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public String getMessageId() {
+		String key = "P";
+        Date now = new Date();
+        String today = new SimpleDateFormat("yyyyMMdd").format(now);		
+        String messageId = this.next("messageId", today);
+        return key + today + messageId;
+    }
+    
+    /**
+     * 바탕화면 아이디채번
+     */
+    @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public String getWallpaperId() {
+    	String key = "W";
+        String messageId = this.next("WallpaperId", key);
+        return key +  messageId;
+    }
+
+    /**
+	 * bmt요청아이디 채번
+	 */
+	@Override
+	public String getRequestId() {
+		Date now = new Date();
+        String today = new SimpleDateFormat("yyyyMM").format(now);		
+        String messageId = this.next("reqId", today);
+		return today + messageId;
+	}
+
+	/**
+	 * headend project id 채번
+	 * HD YYYYMMDD NO
+	 */
+	@Override
+	public String getHdProjectId() {
+		String key = "HD";
+        Date now = new Date();
+        String today = new SimpleDateFormat("yyyyMMdd").format(now);
+        String projectId = this.next("hePid", today);
+        return key + today + projectId;
+	}
+
+	/**
+	 * headend system id 채번
+	 * S YYYYMM NO
+	 */
+	@Override
+	public String getHdSystemId() {
+		String key = "S";
+        Date now = new Date();
+        String today = new SimpleDateFormat("yyyyMM").format(now);
+        String projectId = this.next("heSystemId", today);
+        return key + today + projectId;
+	}
+
+	/**
+	 * headend category id 채번
+	 * C YYYYMMDD SEQSEQ
+	 */
+	@Override
+	public String getHdCategoryId() {
+		String key = "C";
+        Date now = new Date();
+        String today = new SimpleDateFormat("yyyyMMdd").format(now);
+        String projectId = this.next("heTcCateId", today);
+        return key + today + projectId;
+	}
+
+	/**
+	 * headend test case id 채번
+	 * T YYYYMMDD SEQSEQ
+	 */
+	@Override
+	public String getHdTcId() {
+		String key = "T";
+        Date now = new Date();
+        String today = new SimpleDateFormat("yyyyMMdd").format(now);
+        String projectId = this.next("heTcId", today);
+        return key + today + projectId;
+	}
+
+	/**
+	 * headend issue id 채번
+	 * I YYYYMMDD SEQ
+	 */
+	@Override
+	public String getHdIssueId() {
+		String key = "I";
+        Date now = new Date();
+        String today = new SimpleDateFormat("yyyyMMdd").format(now);
+        String projectId = this.next("heIssueId", today);
+        return key + today + projectId;
+	}
+    
+}

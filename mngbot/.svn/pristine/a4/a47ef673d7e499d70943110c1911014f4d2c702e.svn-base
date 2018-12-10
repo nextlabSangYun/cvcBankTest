@@ -1,0 +1,37 @@
+<%@ page contentType="text/html" pageEncoding="UTF-8" %>
+<%@ taglib uri="http://www.nextlab.co.kr/tags/nextlab" prefix="nl"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<link href="/css/kendo.common-material.min.css" rel="stylesheet">
+<link href="/css/kendo.material.min.css" rel="stylesheet">
+<script type="text/javascript" src="/js/kendo.all.min.js"></script>
+<div class="content">
+	<div class="sub_layout has_snb">
+		<div class="cont_wrap">
+			<div>
+				<iframe :src="iFrameSrc" width="100%" height="1000"></iframe>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+	var cont = new Vue({
+		el: '.content'
+		, data: {
+			pid: '<c:out value="${param.pid}"/>'
+			, iFrameSrc:""
+			, reportUrl: '<nl:property key="qa.report.url"/>'
+			, reportPath: '<nl:property key="qa.report.path"/>'
+		}
+		, mounted: function() {
+			this.setup()
+		}
+		, methods: {
+			setup: function(){
+				this.iFrameSrc = this.reportUrl + this.reportPath + "totalTestResult?pid=" + this.pid;
+			}
+		}
+		, computed: {
+			
+		}
+	});
+</script>

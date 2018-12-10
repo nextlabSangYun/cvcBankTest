@@ -1,0 +1,64 @@
+/**
+ * @title	: H/E 테스트케이스 템플릿 관련 vo
+ * @package	: kr.co.nextlab.hded.model
+ * @file	: HeTcTmplVo.java
+ * @author	: winolonam
+ * @date	: 2018. 06. 05.
+ * @desc	: 
+ */
+package kr.co.nextlab.hded.model;
+
+import java.util.Date;
+
+import lombok.Data;
+
+@Data
+public class HeTcTmplVo {
+	
+	/**
+	 * 기본정보
+	 */
+	private String tcId;
+	private String systemId;
+	private String tcCateId;
+	private String lcateId;
+	private String mcateId;
+	private String tcNm;
+	private String tcPreEnvir;
+	private String tcInputVal;
+	private String tcOutputVal;
+	private String normalCriterion;
+	private String beforeResultCd;
+	private String bigo;
+	private String useYn;
+	private String tcStat;
+	private String tcGroupId;
+	private String tcChangeCd;
+	private String tcChangeVal;
+	private String tcChangeReason;
+	private String regId;
+	private Date regDtm;
+	private String modId;
+	private Date modDtm;
+	
+	/**
+	 * TC변경이력 조회
+	 */
+	private String projectNm;
+	
+	/**
+	 * 버킷 Tc 상세조회 등록자 이름
+	 */
+	private String regNm;
+	/**
+	 * 버킷리스트  조회 , 버킷리스트에서 TC등록시에도 사용
+	 * 카테고리명, 시스템 이름
+	 */
+	private String lcateNm;
+	private String mcateNm;
+	private String scateNm;
+	private String systemNm;
+	
+
+	
+}
